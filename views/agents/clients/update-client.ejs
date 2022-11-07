@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/base.css">
+    <link rel="stylesheet" href="/styles/navigation.css">
+
+    <script src="/scripts/mobile.js" defer></script>
+    <script src="/scripts/search-bar.js" defer></script>
+    <script src="/scripts/client-managment.js" defer></script>
+
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/auth.css">
+    <link rel="stylesheet" href="/styles/policies.css">
+
+</head>
+<body>
+    <main>
+    <header id="main-header">
+        <div id="logo"> <a href="/"> ВАШ ПРИЈАТЕЛ АД</a></div>
+        <nav>
+            <ul class="nav-items"> 
+                <% if(locals.isAuth) {%>
+                    <li><a href="/all-invoices"> Фактури </a></li>
+                    <li><a href="/all-payments"> Уплати </a></li>
+                    <li><a href="/all-policies"> Полиси </a></li>
+                    <li><a href="/all-clients"> Kлиенти </a></li>
+                    <li><a href="/debt-clients">За наплата</a></li>
+                <% }%>
+                <% if(locals.isAdmin) {%>
+                    <li class="adminA"><a href="/admin/daily-report">Дневен извештај</a></li>
+                    <li class="adminA"><a href="/admin/admin-report">Админ панел</a></li>
+                    <% }%>
+                <% if(locals.isAuth) {%>
+                <li>
+                    <form id="nav-form" action="/logout" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                        <button class="btn">Одјава</button>
+                    </form>
+                </li>
+               <% }%>      
+               <% if(!locals.isAuth) {%>
+                <li><a href="/signup">Креирај агент</a></li>
+                <li><a href="/login">Логирај се</a></li>
+            <% }%>
+            </ul>
+        </nav>
+        <button id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+    
+<section class="updateClientMain"> 
+        <div id="updateClientInfo">
+            <h3>Клиент: <%=client.name%> </h3>
+            <p>Адреса на живеење: <%=client.address%> </p>
+            <p>ЕМБГ / ЕМБС: <%=client.pin%> </p>
+            <p>Телефон: <%=client.phone%> </p>
+<hr>
+            <p>Агент: <%=client.agentName%> </p>
+            <p>Вкупна премија: <%=totalPremium%>,00 денари </p>
+            <p>Платена премија: <%=totalPaid%>,00 денари </p>
+            <p>Должна премија: <%=debt%>,00 денари </p>
+            <%if (client.startedLawsuit) {%>
+            <h4>Клиентот е тужен. Вкупен долг за наплата е: <%=totalDebt%>,00 денари </h4>
+            <%}%>
+        <!-- </section>
+        <section class="updateClientMain">  -->
+
+        </div>
+        <form action="/new-policy" method="POST">
+                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                <p>Нова полиса</p>
+                <label for="pin"></label>
+                <input type="hidden" name="pin" value="<%=client.pin%>"> 
+                <label for="name"></label>
+                <input type="hidden" name="name" value="<%=client.name%>"> 
+                <hr>
+                <label for="insurancePolicy"></label>
+                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Полиса"> 
+                <label for="amount"></label>
+                <input type="number" name="amount" id="amount" placeholder="Премија по полиса"> 
+                <!-- <label for="payment"></label>
+                <input type="number" name="payment" id="payment" placeholder="Платена премија">  -->
+                <label for="insurancePolicyType"></label>
+                <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса"> 
+                    <option value="">Избери класа</option>
+                    <option id="ao" value="Автоодговорност">Автоодговорност</option>
+                    <option id="zk" value="Зелен картон">Зелен картон</option>
+                    <option value="Патничко осигурување">Патничко осигурување</option>
+                    <option value="Каско осигурување">Каско осигурување</option>
+                    <option value="Домаќинско осигурување">Домаќинско осигурување</option>
+                    <option value="Пожар осигурување">Пожар осигурување</option>
+                    <option value="Oсигурување на дејност">Oсигурување на дејност</option>
+                </select>    
+                <label for="registrationNumber"></label>
+                <input type="text" name="registrationNumber" id="registrationNumber" placeholder="Број на регистрација"> 
+
+                
+                <label for="insurancePolicyDate"></label>
+                <input type="date" name="insurancePolicyDate" id="insurancePolicyDate" placeholder="Датум на полиса"> 
+                <label for="installmentsNumber"></label>
+                <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати"> 
+                <!-- <label for="installmentsNumber"></label>
+                <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" min="1" max="6">  -->
+                <hr>
+                <select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
+                    <option value="Надворешен агент">Надворешен Агент</option>
+                    <option value="Борче Јосифоски">Борче Јосифоски</option>
+                    <option value="Нури Мустафа">Нури Мустафа</option>
+                    <option value="Лумјан Крензи">Лумјан Крензи</option>
+                    <option value="Анета Росоман">Анета Росоман</option>
+                    <option value="Ненад Скопје">Ненад Скопје</option>
+                </select> 
+               
+                <button class="btn" <% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса </button>
+        </form>
+</section>
+<hr>
+        <h2>Полиси за осигурување на <%=client.name%></h2>
+<section class="allPolicies">
+            <% for (const policy of clientPolicies ) { %>
+    <section class="single-policy" >
+    <div>
+        <h3 id="policy-title">Број на полиса: <%=policy.policyNumber.policyNumber%></h3>
+        <hr>
+        <p>Вид на полиса: <%=policy.policyNumber.policyType%></p>
+        <p>Премија: <%=policy.policyNumber.policyAmount%>,00 денари</p>
+        <p>Датум на издавање: <%=moment(policy.policyNumber.policyDate).format('DD/MM/YYYY')%></p> 
+        <p>Број на рати: <%=policy.policyNumber.installmentsNumber%></p>
+        <p>Вкупно платено: <%=policy.policyNumber.totalPaid%>,00 денари </p>
+        <p class="debtParagraph"   data-debt="<%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>">Преостанато за плаќање: <%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>,00 денари </p>
+<hr>
+<h4>Уплати по полиса <%= policy.policyNumber.policyNumber %> </h4>
+<section id="single-payments">
+    <div id="payments-tables">
+        <p>Износ</p>
+        <p>Примени од</p>
+        <p>Датум</p>
+    </div>
+<% for (const payment of policy.policyNumber.thePayment ) { %>
+    <div id="payments-table">
+        <p><%=payment.amount%>,00 денари</p>
+        <p><%=payment.agent%></p>
+        <p><%=moment(payment.date).format('DD/MM/YYYY')%></p>
+    </div>
+    <%}%>
+
+</section>
+<form action="/new-payment" method="POST" id="payment-form">
+    <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+    <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>"> 
+    <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>"> 
+    <input type="hidden" name="pin" value="<%=client.pin%>"> 
+    <input type="hidden" name="clientName" value="<%-client.name%>"> 
+    <input type="hidden" name="agentName" value="<%=agentName%>"> 
+    <input type="number" name="payment" id="payment" placeholder="Износ (без децимали)"> 
+    <button class="btn" id="paymentBtn"> Внеси уплата </button>
+</form>
+    </div>
+    <div class="policy-documents">
+        <% if (policy.policyNumber.installmentsNumber > 1) { %> 
+            <form action="/annex/<%=client._id%>" method="POST">
+                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                <input type="hidden" name="clientId" value="<%=client._id%>">
+                <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
+                <input type="hidden" name="thePolicy" value="<%=policy.policyNumber.clientPin%>">
+                <button class="btn" > Анекс </a>
+            </form>
+        <% } %> 
+        <form action="/invoice/<%=client._id%>" method="POST">
+            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+            <input type="hidden" name="clientId" value="<%=client._id%>">
+            <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
+            <button class="btn" > Фактура </a>
+        </form>
+    </section>
+</div>
+               <% } %>    
+</section>
+
+<br>
+ <hr>
+<h2>Сите уплати</h2>
+<div class="paymentsByClient">
+    <div class="singlePayment">
+        <p>Износ на уплата:</p>
+        <p>Датум на уплата: </p>
+        <p>Наплатено од Агент: </p>
+    </div>
+    <% for (const payment of clientPayments) { %>
+        <div class="singlePayment">
+            <p><%=payment.clientName.paymentAmount%>,00 денари</p>
+            <p><%=payment.date%> година</p>
+            <p><%=payment.clientName.agentName%></p>
+        </div>
+    <%}%>
+</div>
+<br>
+<hr>
+
+<% if (!client.startedLawsuit) {%> 
+<section>
+    <form action="/debt-client/:id" method="POST" >
+        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+        <input type="hidden" name="clientId" value="<%=client._id%>">
+        <input type="hidden" name="clientDebt" value="<%=debt%>">
+        <button class="btn">За тужење</button>
+    </form>
+</section>
+
+<%} else {%>
+    <section class="totalDebtSection">
+<p>Клиентот е тужен на износ од <%=debt%>,00 денари (основен долг). Дополнително на основниот долг треба да бидат наплатени:</p>
+<p> - Судска такса во износ од <%=courtFee%>,00 денари </p>
+<p> - Адвокатска награда во износ од <%=attorneyFee%>,00 денари </p>
+<p> - Судска такса за одлука во износ од <%=courtFeeDecision%>,00 денари </p>
+<hr>
+<h3> Вкупно за наплата: <%=totalDebt%>,00 денари </h3>
+</section>
+
+<%}%>
+
+<% if(locals.isAdmin) {%>
+    <section>
+       <div>
+        <h3>Промени внесени податоци кај клиент</h3>
+        <form action="/update-client/<%=clientId%>"  method="POST" id="updateClientData">
+            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+            <label for="name"></label>
+            <input type="text" name="name" id="name"  value="<%=client.name%>">
+            <label for="address"></label>
+            <input type="text" name="address" id="address" value="<%=client.address%>">
+            <label for="pin"></label>
+            <input type="text" name="pin" id="pin" value="<%=client.pin%>" minlength="6" maxlength="13" value="<%=client.pin%> "> 
+        <hr>
+            <button class="btn"> Промени клиент </button>
+            <main>
+        </form>
+    </div>
+  
+    <section class="delete-client-section">
+        <form action="/agents/clients/delete/<%=client._id%>" method="POST">
+            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+            <button value="<%= client._id%>"data-clientid="<%= client._id%>" data-csrf="<%=locals.csrfToken%>" class="btn-alt">Избриши клиент</button>
+        </form>
+        <p>This is the client id: <%= client._id%></p>
+    </section>
+    </section>
+    <% }%> 
+</main>
+<hr>
+
+<div class="footer-div"> 
+    <p>ВАШ ПРИЈАТЕЛ АД Прилеп</p>
+</div>
+</body>
+</html>

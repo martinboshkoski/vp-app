@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/base.css">
+    <link rel="stylesheet" href="/styles/legal.docs.css">
+</head>
+
+<h1>Договор</h1>
+<h3>за исплата на премија на осигурување на рати</h3>
+
+<p class="standard"> 1. Друштво за застапување во осигурувањето ВАШ ПРИЈАТЕЛ АД Прилеп, со адреса на ул. Кузман Јосифоски бр. 8, Прилеп, 
+    со ЕДБ 4021015527724 и ЕМБС 7048947, претставувано од Управителот Васе Стефаноска од Прилеп, како Застапник во осигурувањето (во понатамошниот текст: Застапникот во осигурувањето); и</p>
+    <p class="standard"> 2. <%=client.name%>  со живеалиште на ул. <%=client.address%>, со ЕМБГ <%=client.pin%>, како Договорувач на осигурувањето (во понатамошниот текст: Договорувачот на осигурувањето)</p>
+    <br>
+    <p class="article"> Член 1 </p>
+    <p class="standard"> Помеѓу Договарачот на осигурувањето и Застапникот во осигурување е склучен договор за осигурвање - осигурителна полиса со број: <%=policy.policyNumber%>, склучена на <%=policy.policyDate%> година, со премија во висина од <%=policy.policyAmount%>,00 денари. 
+    Врз основа на овој договор, договорните страни се согласни износот на име премија да биде исплаќан на еднакви месечни рати.
+    </p>
+    
+    <p class="article"> Член 2 </p>
+    <p class="standard"> Договорните страни се договорија долгот да се исплати на <%=policy.installmentsNumber%>
+    еднакви месечни рати, односно:. 
+     </p>
+     <% for (const installment of installments ) { %>
+        <li>
+            <%=installment%>;
+        </li>
+        <%}%>
+    
+    <p class="article"> Член 3 </p>
+    <p class="standard"> Договарачот ги исплаќа средствата во готово во едно од подражните места на ВАШ ПРИЈАТЕЛ АД Прилеп, или директно на 
+        сметката при Стопанска Банка АД Скопје со број 200002894248065. </p>
+
+    <p class="article"> Член 4 </p>
+    <p class="standard"> Доколку една од горенаведените рати не е исплатена навреме, договорните страни се согласни дека целокупниот износ стасува со датум на доспеаност на денот на склучување на полисата за осигурување со број: <%=policy.policyNumber%>,. </p>
+
+    <p class="article"> Член 5 </p>
+    <p class="standard"> Во случај на спор, надлежен ќе биде Основниот Граѓански суд во Скопје. 
+    <section>
+        <h3>Договорни страни:</h3>
+        <br>
+        <br>
+        <table>
+            <tr>
+                <td>________________________</td>
+                <td>________________________</td>
+              </tr>
+            <tr>
+              <td>ВАШ ПРИЈАТЕЛ АД Прилеп</td>
+              <td><%=client.name%></td>
+            </tr>
+          </table>
+    </section>

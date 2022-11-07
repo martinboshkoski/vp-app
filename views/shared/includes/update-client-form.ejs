@@ -1,0 +1,37 @@
+<form action="/update-client/<%=client._id%>"  method="POST" id="updateClientData">
+    <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+    <label for="name"></label>
+    <input type="text" name="name" id="name"  value="<%=client.name%>">
+    <label for="address"></label>
+    <input type="text" name="address" id="address" value="<%=client.address%>">
+    <label for="pin"></label>
+    <input type="text" name="pin" id="pin" value="<%=client.pin%>" minlength="6" maxlength="13" required> 
+<hr>
+    <label for="insurancePolicy"></label>
+    <input type="text" name="insurancePolicy" id="insurancePolicy" value="<%=client.insurancePolicy%>" > 
+    
+    <label for="amount"></label>
+    <input type="number" name="amount" id="amount" value="<%=client.amount%>"> 
+
+    <label for="payment"></label>
+    <input type="number" name="payment" id="payment" value="<%=client.payment%>"> 
+    
+    <label for="insurancePolicyType"></label>
+    <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса"> 
+        <option value="Автоодговорност">Автоодговорност</option>
+        <option value="Зелен картон">Зелен картон</option>
+        <option value="Патничко осигурување">Патничко осигурување</option>
+        <option value="Каско осигурување">Каско осигурување</option>
+        <option value="Домаќинско осигурување">Домаќинско осигурување</option>
+
+    </select>    
+
+    <label for="insurancePolicyDate"></label>
+    <input type="date" name="insurancePolicyDate" id="insurancePolicyDate" value="<%=client.insurancePolicyDate%>"> 
+
+    <label for="installmentsNumber"></label>
+    <input type="number" name="installmentsNumber" id="installmentsNumber" value="<%=client.installmentsNumber%>" min="1" max="6"> 
+
+    <button class="btn"> Промени клиент </button>
+    <main>
+</form>

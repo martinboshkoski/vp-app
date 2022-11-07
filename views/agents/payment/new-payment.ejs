@@ -1,0 +1,25 @@
+
+<%- include('../../shared/includes/head', {pageTitle: 'All Clients'})%>
+<link rel="stylesheet" href="/styles/forms.css">
+<link rel="stylesheet" href="/styles/auth.css">
+</head>
+<body>
+<%- include('../../shared/includes/header')%>
+<main>
+<h1>Внеси уплата</h1>
+<form action="/new-payment" method="POST">
+    <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+    <h4>Податоци</h4>
+
+    <label for="pin"></label>
+    <input type="text" name="pin" id="pin" placeholder="ЕМБГ / ЕМБС на клиент" minlength="6" maxlength="13" required> 
+
+    <label for="payment"></label>
+    <input type="number" name="payment" id="payment" placeholder="Уплатен износ"> 
+
+    <button class="btn"> Внеси уплата </button>
+</form>
+</main>
+<%- include('../../shared/includes/footer')%>
+
+

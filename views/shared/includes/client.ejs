@@ -1,0 +1,31 @@
+<article >
+  <li class="client" id="allpolicies-top" >
+    <p>Име / назив на клиент: </p>
+    <p>ЕМБГ/ЕМБС на клиент:</p>
+    <!-- <p>Вкупна премија </p> -->
+    <!-- <p>Платена премија </p> -->
+    <!-- <p>Датум </p> -->
+<p>  Агент</p>
+<p>Статус</p>
+<p>Детали</p>
+</li>
+<br>
+    <% for (const client of clients ) { %>
+        <li>
+          <div class="client">
+            <p><%=client.name%></p>
+            <p><%=client.pin%></p>
+            <!-- <p >< %=client.insurancePolicy[0][0][2]%>,00 денари</p>         -->
+            <!-- <p > < %=client.payment%>,00 денари  </p>        -->
+            <p > <%=client.agentName%></p>
+            <% if(client.startedLawsuit) {%>
+            <p>Клиентот е тужен</p>
+              <%}else {%>
+<p></p>
+                <%}%>
+           <a class="btn " href="/agents/clients/<%=client.id%>">Види</a>    
+          </div>
+        </li>
+       <% } %>    
+       
+</article>

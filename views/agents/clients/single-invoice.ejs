@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/base.css">
+    <link rel="stylesheet" href="/styles/invoice.css">
+</head>
+<section id="invocie-section">
+    <div>
+        <h2 id="title">ВАШ ПРИЈАТЕЛ АД Прилеп</h1>
+        <h3>Друштво за застапување во осигурувањето</h3>
+        <h4>ул. Кузман Јосифоски бр. 8, Прилеп</h4>
+        <h4>ЕДБ 4021015527724 и ЕМБС 7048947</h4>
+    </div>
+<hr>
+<h1>Фактура број: 00<%=invoiceNumber%>/2022 </h1>
+<hr>
+<p>Договорувач: <%=invoiceData.clientName%> </p>
+<p>Адреса: <%=invoiceData.clientAddress%> </p>
+<p>Полиса број: <%=invoiceData.policyNumber%></p>
+<p>Вид на осигурување: <%=invoiceData.policyType%></p>
+<p>Износ: <%=invoiceData.policyAmount%>,00 денари</p>
+
+<hr>
+  <br>
+
+<p>Рокот за плаќање на фактурата (доспевање) е 8 (осум) дена од денот на приемот на фактурата или полисата за осигурување.</p>
+
+<p>Плаќањето да се изврши на сметка број: 200002894248065, при Стопанска Банка АД Скопје.</p>
+
+<p>Да се плати на наведената жиро сметка најдоцна до роковите за плаќање што се назначени во самата фактура. Доколку износот на фактурата не е платен во договорениот рок, осигурувачот има право да пресметува законска казнена камата за скеој ден задоцнување со одредбите од ЗОО.</p>
+<p>Согласно законот за ДДВ член 23 точка 6, дејноста Осигурување е ослободена од плаќање данок, без право за одбиток на претходен данок.</p>
+<p>Напомена: при уплата задолжително да се наведе точниот број на фактурата.</p>
+<p>Доколку настане осигуран случај - штета, премијата за осигурување стасува за наплата веднаш.</p>
+
+<table>
+    <tr>
+        <td>________________________</td>
+        <td>________________________</td>
+      </tr>
+    <tr>
+      <td>ВАШ ПРИЈАТЕЛ АД Прилеп</td>
+      <td>Примил: <%=invoiceData.clientName%></td>
+    </tr>
+  </table>
+</section>
+
+<!-- <section id="footer-section">
+<hr>
+<h3>ВАШ ПРИЈАТЕЛ АД Прилеп</h3>
+<h4>ул. Кузман Јосифоски бр. 8, Прилеп</h4>
+<h4>ЕДБ 4021015527724 и ЕМБС 7048947</h4>
+<h4>Тел: 048 429 515 | info@vashprijatel.mk</h4>
+
+</section> -->

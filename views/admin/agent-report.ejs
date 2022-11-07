@@ -1,0 +1,51 @@
+<%- include('../shared/includes/head', {pageTitle: 'Agents info'})%>
+<link rel="stylesheet" href="/styles/forms.css">
+<link rel="stylesheet" href="/styles/auth.css">
+<link rel="stylesheet" href="/styles/policies.css">
+
+</head>
+<body>
+<%- include('../shared/includes/header')%>
+<main>
+
+<h1>Полиси за агент <%= agentSeller %></h1>
+    <div class="agent-alt">
+      <p>Клиент</p>
+      <p>Број на полиса</p>
+      <p>Датум на полиса</p>
+      <p>Премија на полиса</p>
+      <p>Уплата на премија (рата)</p>
+      <p>Провизија (за рата): </p>
+    </div>
+
+    da se proba da se napravi da gi generira posebno polisite (duri i dvojno) ako imalo ispolnuvanje na uslovot da datumot e vo 
+    periodot koj e naznacen vo req.body od strana na userot
+<% for (const policyOfAgent of requiredPoliciesByPayment) { %>
+        <div class="agent">
+          <p> <%= policyOfAgent.clientName%> </p>
+          <p> <%= policyOfAgent.policyNumber%> </p>
+          <p><%= moment(policyOfAgent.policyDate).format('DD/MM/YYYY') %> </p>
+          <p> <%= policyOfAgent.policyAmount%>,00 денари </p>
+          <% for (installment of policyOfAgent.thePayment){%>
+              <% if(moment(installment.date).isBetween(startDate, endDate) ) { %>
+                <p><%=installment.amount%>,00 денари </p>                
+                <% } %> 
+       <% } %> 
+       <% for (installment of policyOfAgent.thePayment){%>
+        <% if(moment(installment.date).isBetween(startDate, endDate)) { %>
+          <p><%=installment.agentCommision%>,00 денари </p>                
+          <% } %> 
+ <% } %> 
+        </div>
+    <% } %> 
+
+  <div id="agent-report">
+    <h3>Податоци за агент: <%= agentSeller %>, за период од <%=moment(startDate).format('DD/MM/YYYY')%> година до <%=moment(endDate).format('DD/MM/YYYY') %> година </h3>
+    <p>Полисирана премија: <%=theTotalPremium%>,00 денари</p>
+    <p>Вкупна наплатена премија: <%=thetotalPaidPremium%>,00 денари. </p>
+      <p>Процент на наплата на агентот <%= agentSeller %>: <%=Math.round(thetotalPaidPremium/theTotalPremium*100) %> % </p>
+    <p>Вкупен износ на провизија за период од <%=moment(startDate).format('DD/MM/YYYY')%> година до <%=moment(endDate).format('DD/MM/YYYY') %> година: <%=totalAgentCommission%> ,00 денари </p>
+  </div>
+
+  </main>
+<%- include('../shared/includes/footer')%>

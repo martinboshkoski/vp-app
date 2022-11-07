@@ -1,0 +1,56 @@
+<%- include('../../shared/includes/head', {pageTitle: 'All Clients'})%>
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/auth.css">
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+    <h1>Внеси нов клиент</h1>
+    <form action="/new-client" method="POST">
+        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+        <!-- <h4>Податоци за клиент</h4> -->
+        <label for="name"></label>
+        <input type="text" name="name" id="name" placeholder="Име и презиме">
+
+        <label for="address"></label>
+        <input type="text" name="address" id="address" placeholder="Адреса на живеење">
+
+        <label for="pin"></label>
+        <input type="text" name="pin" id="pin" placeholder="ЕМБГ / ЕМБС" minlength="6" maxlength="13" required> 
+
+        <label for="phone"></label>
+        <input type="tel" name="phone" placeholder="Телефонски број"> 
+
+        <hr>
+        <!-- <p>Прва полиса</p>
+        <label for="insurancePolicy"></label>
+        <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Полиса"> 
+        
+        <label for="amount"></label>
+        <input type="number" name="amount" id="amount" placeholder="Премија по полиса">  -->
+
+        <!-- <label for="payment"></label>
+        <input type="number" name="payment" id="payment" placeholder="Платена премија">  -->
+        
+        <!-- <label for="insurancePolicyType"></label>
+        <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса"> 
+            <option value="Автоодговорност">Автоодговорност</option>
+            <option value="Зелен картон">Зелен картон</option>
+            <option value="Патничко осигурување">Патничко осигурување</option>
+            <option value="Каско осигурување">Каско осигурување</option>
+            <option value="Домаќинско осигурување">Домаќинско осигурување</option>
+            <option value="Пожар осигурување">Пожар осигурување</option>
+        </select>    
+
+        <label for="insurancePolicyDate"></label>
+        <input type="date" name="insurancePolicyDate" id="insurancePolicyDate" placeholder="Датум на полиса">  -->
+
+        <!-- <label for="installmentsNumber"></label>
+        <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" min="1" max="6">  -->
+
+        <button class="btn"> Креирај клиент </button>
+    </form>
+</main>
+<%- include('../../shared/includes/footer')%>
+
+

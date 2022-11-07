@@ -1,0 +1,22 @@
+<%- include('../../shared/includes/head', {pageTitle: 'Debt Clients'})%>
+    <link rel="stylesheet" href="/styles/debt.css">
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+    <h1>Kлиенти на извршител</h1>
+    <% for (const client of clients ) { %>
+        <% if (client.enforcement) {%> 
+            <section>
+            <div class="singleClient">
+                <p><%=client.name%>, за долг од: <%=client.debt%>,00 денари</p>
+  
+    </div>
+    <% } %>
+        <% } %>
+    </ul>
+    </section>
+</main>
+<%- include('../../shared/includes/footer')%>
+
+

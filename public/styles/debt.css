@@ -1,0 +1,73 @@
+.debtUl {
+    display: grid;
+    grid-template-columns: 2fr 2fr;
+}
+
+.toStartProcedure{
+    text-align: left;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.startLawsuitForm{
+text-align: center;
+}
+
+/* .startLawsuitForm li{
+  list-style: none;
+  color: red;
+} */
+
+.startLawsuitBtn{
+  background-color: white;
+  color: black;
+  border: 2px solid var(--color-green-300);
+  padding: 0.30rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.debtClientLists {
+  display: grid;
+  grid-template-columns: 2fr;
+}
+
+.debtClientLists ul {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto;
+  grid-gap: 0;
+}
+
+.debtClientLists li {
+padding: 1rem;
+margin: 0.5rem;
+max-height: 8rem;
+border: 2px solid  var(--color-green-300);
+border-radius: 0.8rem;
+box-shadow: #061f07;
+}
+
+.debtList {
+  height: 15rem;
+}
+
+.singleClient {
+  display: grid;
+  grid-template-columns: 6fr 1fr 1fr;
+text-align: left;
+border: 1px var(--color-green-500) solid;
+margin: 0.5rem;
+padding: 0.5rem;
+border-radius: 0.8rem;
+box-shadow: #061f07;
+}
+
+.singleClient button{
+margin-top: 0.5rem;
+margin-bottom: 0.5rem;
+width: 80%;
+}

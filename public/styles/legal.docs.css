@@ -1,0 +1,22 @@
+h1, h3, table, section {
+    text-align: center;
+    margin: auto;
+}
+
+td {
+    padding: 0 2rem;
+}
+
+.standard {
+    text-align: justify;
+}
+
+.article {
+    text-align: center;
+    font-weight: bolder;
+}
+
+.li {
+    margin-left: 1rem;
+    padding-left: 1rem;
+}

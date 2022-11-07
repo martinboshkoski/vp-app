@@ -1,0 +1,42 @@
+<%- include('../../shared/includes/head', {pageTitle: 'All Invoices'})%>
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/policies.css">
+    <script src="/scripts/client-managment.js" defer></script>
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+
+    <br>
+    <hr>
+    <br>
+   
+
+    <div class="searchBar">
+        <input type="text" placeholder="Пребарувај (број на фактура, должник)" id="searchBar" onkeyup="searchClients()"> 
+    </div>
+    <div class="client" id="allpolicies-top">
+      <p>Број на фактура: </p>
+      <p>Износ: </p>
+      <p>Датум: </p>
+      <p>Должник: </p>
+<p></p>
+    </div>
+    <hr>
+    <% for (const invoice of invoices ) { %>
+        <li>
+          <div class="client">
+            <p>00<%=invoice.invoicesNumber%>/2022</p>
+            <p><%=invoice.policyAmount%>,00 денари</p>
+            <p><%=invoice.policyDate%> година</p>
+            <p><%=invoice.clinetName%></p>
+            <a class="btn " href="/invoice/<%=invoice._id%>">Види</a>    
+          </div>
+        </li>
+       <% } %>    
+</main>
+
+
+<%- include('../../shared/includes/footer')%>
+
+

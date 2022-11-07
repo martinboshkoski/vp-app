@@ -1,0 +1,29 @@
+
+h1 {
+    text-align: center;
+}
+
+p {
+    text-align: justify;
+}
+div {
+    text-align: right;
+}
+
+#invocie-section {
+    padding: 1rem;
+    margin: 1rem;
+    border: 1px solid black;
+}
+
+table {
+    padding-top: 3rem;
+    text-align: right;
+    margin: auto;
+}
+
+table tr, td {
+    padding-left: 3rem;
+    padding-right: 3rem;
+
+}

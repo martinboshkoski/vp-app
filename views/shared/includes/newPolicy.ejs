@@ -1,0 +1,28 @@
+<form action="/new-policy" method="POST">
+    <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+    <h4>Податоци за полиса</h4>
+    <label for="pin"></label>
+    <input type="text" name="pin" id="pin" placeholder="ЕМБГ / ЕМБС на клиент" minlength="6" maxlength="13" required> 
+    <hr>
+    <label for="insurancePolicy"></label>
+    <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Полиса"> 
+    <label for="amount"></label>
+    <input type="number" name="amount" id="amount" placeholder="Премија по полиса"> 
+    <!-- <label for="payment"></label>
+    <input type="number" name="payment" id="payment" placeholder="Платена премија">  -->
+    <label for="insurancePolicyType"></label>
+    <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса"> 
+        <option value="Автоодговорност">Автоодговорност</option>
+        <option value="Зелен картон">Зелен картон</option>
+        <option value="Патничко осигурување">Патничко осигурување</option>
+        <option value="Каско осигурување">Каско осигурување</option>
+        <option value="Домаќинско осигурување">Домаќинско осигурување</option>
+        <option value="Пожар осигурување">Пожар осигурување</option>
+        <option value="Oсигурување на дејност">Oсигурување на дејност</option>
+    </select>    
+    <label for="insurancePolicyDate"></label>
+    <input type="date" name="insurancePolicyDate" id="insurancePolicyDate" placeholder="Датум на полиса"> 
+    <!-- <label for="installmentsNumber"></label>
+    <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" min="1" max="6">  -->
+    <button class="btn"> Внеси полиса </button>
+</form>

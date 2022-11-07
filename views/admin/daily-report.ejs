@@ -1,0 +1,34 @@
+<%- include('../shared/includes/head', {pageTitle: 'Agents info'})%>
+<link rel="stylesheet" href="/styles/policies.css">
+
+</head>
+<body>
+<%- include('../shared/includes/header')%>
+<main>
+<h1>Податоци и други показатели за агенти</h1>
+
+<form action="/outside-agent" method="POST" class="search-agent">
+    <section class="search-agent">
+
+<input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+<select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
+    <option value="Надворешен агент">Надворешен Агент</option>
+    <option value="Борче Јосифоски">Борче Јосифоски</option>
+    <option value="Нури Мустафа">Нури Мустафа</option>
+    <option value="Лумјан Крензи">Лумјан Крензи</option>
+    <option value="Анета Росоман">Анета Росоман</option>
+    <option value="Ненад Скопје">Ненад Скопје</option>
+</select> 
+<div>
+
+<label for="start-date">Почетен датум:</label>
+<input type="date" name="startDate" id="startDate">
+<label for="start-date">Краен датум:</label>
+<input type="date" name="endDate" id="endDate">
+</div>
+
+<button class="btn">Барај</button>
+</section>
+
+</main>
+<%- include('../shared/includes/footer')%>

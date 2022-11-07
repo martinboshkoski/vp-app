@@ -1,0 +1,52 @@
+<%- include('../../shared/includes/head', {pageTitle: 'All Clients'})%>
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/auth.css">
+    <script src="/scripts/client-managment.js" defer></script>
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+    <h1>Агент: <%=agentName%> </h1>
+
+    <% if(!locals.isAdmin) {%>
+<section class="center-section">
+    <div class="div-helper" >
+        <p><a href="/new-client" class="btn">Внеси нов клиент</a></p>
+    </div>
+</section>
+  
+    <!-- <p><a href="/new-client" class="btn">Внеси уплата</a></p> -->
+    <%}%>
+    <br>
+    <hr>
+    <br>
+    <% if(locals.isAdmin) {%>
+        <section class="totalReportSection">
+            <p>Вкупен број на клиенти: </p>
+            <p>Вкупен износ на полисирана премија:</p>
+            <p>Вкупен износ на наплатена премија: </p>
+            <p>Процент на наплата на премија: </p>
+          </section>
+          <section  class="totalReportSection">
+            <p><%=clients.length%></p>
+            <p><%=totalAmountsPremium%>,00 денари</p>
+            <p><%=totalPaidAmounts%>,00 денари </p>
+            <p> <%=percentagePayment%> %</p>
+          </section>
+        <br>
+        <hr>
+        <br>
+    <% }%>
+
+    <div class="searchBar">
+        <input type="text" placeholder="Пребарувај (име и презиме, ЕМБГ/ЕМБС, број полиса)" id="searchBar" onkeyup="searchClients()"> 
+    </div>
+      <ul id="myUL">
+        <%-include('../../shared/includes/client') %>
+      </ul>
+</main>
+
+
+<%- include('../../shared/includes/footer')%>
+
+

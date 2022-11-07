@@ -1,0 +1,54 @@
+<%- include('../../shared/includes/head', {pageTitle: 'All Clients'})%>
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/policies.css">
+    <script src="/scripts/client-managment.js" defer></script>
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+
+    <br>
+    <hr>
+    <br>
+    <% if(locals.isAdmin) {%>
+        <section class="totalReportSection">
+            <p>Вкупен број на полиси: <%=policiesNumber%></p>
+            <p>Вкупен износ на полисирана премија: <%=totalAmountsPremium%>,00 денари</p>
+            <p>Вкупен износ на наплатена премија: <%=totalPaidAmounts%>,00 денари </p>
+            <p>Процент на наплата на премија: <%=percentagePayment%> %</p>
+          </section>
+          <section class="totalReportSection">
+          </section>
+        <br>
+        <hr>
+        <br>
+    <% }%>
+
+    <div class="searchBar">
+        <input type="text" placeholder="Пребарувај (број на полиса, ЕМБГ/ЕМБС)" id="searchBar" onkeyup="searchClients()"> 
+    </div>
+<!-- § -->
+    <div class="client" id="allpolicies-top">
+      <p>Број на полиса: </p>
+      <p>Класа: </p>
+      <p>Премија на полиса: </p>
+      <p>Платена премија: </p>
+      <p>Датум на полиса: </p>
+    </div>
+    <hr>
+    <% for (const policy of policies ) { %>
+        <li>
+          <div class="client">
+            <p><%=policy.policyNumber.policyNumber%></p>
+            <p><%=policy.policyNumber.policyType%></p>
+            <p><%=policy.policyNumber.policyAmount%>,00 денари</p>
+            <p><%=policy.policyNumber.totalPaid%>,00 денари</p>
+            <p><%=policy.policyNumber.policyDate%></p>
+        </li>
+       <% } %>    
+</main>
+
+
+<%- include('../../shared/includes/footer')%>
+
+

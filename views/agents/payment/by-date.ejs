@@ -1,0 +1,52 @@
+<!-- <%- include('../../shared/includes/head', {pageTitle: 'All Clients'})%>
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/policies.css">
+    <script src="/scripts/client-managment.js" defer></script>
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="policiesList">
+      <h3>Барај по датум</h3>
+      <form action="/get-by-date" method="POST">
+        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+        <input type="hidden">
+        <input type="date" name="date">
+        <button class="btn">Барај</button>
+      </form>
+    </div>
+<hr>
+    <div class="searchBar">
+      <input type="text" placeholder="Пребарувај (Име на клиент, ЕМБГ/ЕМБС, износ)" id="searchBar" onkeyup="searchClients()"> 
+  </div>
+    <div class="client" id="client-top">
+      <p>Име на клиент:</p>
+      <p>ЕМБС/ЕМБГ: </p>
+      <p>Износ: </p>
+      <p>Датум: </p>
+      <p>Наплатено од: </p>
+
+    </div>
+    <hr>    
+    <% for (const payment of payments ) { %>
+        <li>
+          <div class="client">
+            <p><%=payment.clientName%></p>
+            <p><%=payment.clientPin%></p>
+            <p><%=payment.paymentAmount%>,00 денари</p>
+            <p><%=payment.date%> година</p>
+            <p><%=payment.agentName%></p>
+            <hr>
+          </div>
+        </li>
+       <% } %>    
+<hr>
+</main>
+<%- include('../../shared/includes/footer')%>
+
+ -->
