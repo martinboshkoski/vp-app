@@ -233,3 +233,12 @@ text-align: center;
     background-color: gray;
 border: #555555 1px solid;
 }
+
+.deletePolicy {
+    margin: auto;
+    text-align: center;
+}
+.deletePolicy button {
+    text-align: center;
+    margin: auto;
+}

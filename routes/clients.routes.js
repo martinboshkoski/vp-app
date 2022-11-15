@@ -72,6 +72,9 @@ router.post('/new-client', clientController.getNewClient)
 
 router.post('/agents/clients/delete/:id', clientController.deleteClient)
 
+router.post('/agents/clients/deletePayment', clientController.deleteSinglePayment)
+
+
 //////////////////debt section
 
 // router.post('/debtClient/clients/:id', debtController.getNewDebtClient)

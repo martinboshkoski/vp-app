@@ -181,15 +181,39 @@ async function updateClient(req, res, next) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 async function deleteClient(req, res, next) {
-  let client;
-  client = await Client.findById(req.params.id);
-  const clientId = client._id;
+  let theClientId;
   try {
-    await db.getDb().collection("clients").deleteOne({ _id: clientId });
+    theClientId = new mongodb.ObjectId(req.body.theClientId);
+  } catch (error) {
+    error.code = 404;
+    throw error;
+  }
+  try {
+    await db.getDb().collection("clients").deleteOne({ _id: theClientId});
   } catch (error) {
     return next(error);
   }
   await db.getDb().collection("deleted-clients").insertMany(client);
+  res.redirect("/all-clients");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+async function deleteSinglePayment(req, res, next) {
+
+  console.log(req.body)
+  // let thePaymentId;
+  // try {
+  //   thePaymentId = new mongodb.ObjectId(req.body.payment);
+  // } catch (error) {
+  //   error.code = 404;
+  //   throw error;
+  // }
+  // try {
+  //   await db.getDb().collection("clients").deleteOne({ _id: theClientId});
+  // } catch (error) {
+  //   return next(error);
+  // }
+  // await db.getDb().collection("deleted-clients").insertMany(client);
   res.redirect("/all-clients");
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +290,6 @@ async function getEnforcementClients(req, res, next) {
   res.render("agents/enforcementAgent/enforcement-agent", {clients:clients});
 }
 
-
 module.exports = {
   getClient: getClient,
   getNewClient: getNewClient,
@@ -278,5 +301,6 @@ module.exports = {
   getAnnex: getAnnex, 
   withdrawLawsuit: withdrawLawsuit, 
   enforcementAgent: enforcementAgent, 
-  getEnforcementClients:getEnforcementClients
+  getEnforcementClients:getEnforcementClients,
+  deleteSinglePayment: deleteSinglePayment
 };

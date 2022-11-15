@@ -1,9 +1,13 @@
 {
-  "name": "webshop---code-along---100days-of-code",
+  "name": "VP App (clients)",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines" : {
+    "node": "v17.3.0"
+  },
   "scripts": {
+    "start:dev": "nodemon app.js",
     "start": "nodemon app.js"
   },
   "keywords": [],

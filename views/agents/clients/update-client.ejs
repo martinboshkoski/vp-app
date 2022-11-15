@@ -69,9 +69,28 @@
             <p>Вкупна премија: <%=totalPremium%>,00 денари </p>
             <p>Платена премија: <%=totalPaid%>,00 денари </p>
             <p>Должна премија: <%=debt%>,00 денари </p>
-            <%if (client.startedLawsuit) {%>
-            <h4>Клиентот е тужен. Вкупен долг за наплата е: <%=totalDebt%>,00 денари </h4>
-            <%}%>
+            <hr>
+            <% if (!client.startedLawsuit) {%> 
+                <section>
+                    <form action="/debt-client/:id" method="POST" >
+                        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                        <input type="hidden" name="clientId" value="<%=client._id%>">
+                        <input type="hidden" name="clientDebt" value="<%=debt%>">
+                        <button class="btn">За тужење</button>
+                    </form>
+                </section>
+                
+                <%} else {%>
+                    <section class="totalDebtSection">
+                <p>Клиентот е тужен на износ од <%=debt%>,00 денари (основен долг). Дополнително на основниот долг треба да бидат наплатени:</p>
+                <p> - Судска такса во износ од <%=courtFee%>,00 денари </p>
+                <p> - Адвокатска награда во износ од <%=attorneyFee%>,00 денари </p>
+                <p> - Судска такса за одлука во износ од <%=courtFeeDecision%>,00 денари </p>
+                <hr>
+                <h3> Вкупно за наплата: <%=totalDebt%>,00 денари </h3>
+                </section>
+                
+                <%}%>
         <!-- </section>
         <section class="updateClientMain">  -->
 
@@ -182,12 +201,21 @@
             <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
             <button class="btn" > Фактура </a>
         </form>
+    </div>
+        <div >
+            <form class="deletePolicy" action="/agents/clients/deletePayment" method="POST">
+                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                <input type="hidden" name="paymentInfo" value="<%=payment.amount%> ">
+                <button type="submit"> Избриши полиса </button>
+            </form>
+        </div>
+    
     </section>
 </div>
                <% } %>    
 </section>
 
-<br>
+<!-- <br>
  <hr>
 <h2>Сите уплати</h2>
 <div class="paymentsByClient">
@@ -201,58 +229,47 @@
             <p><%=payment.clientName.paymentAmount%>,00 денари</p>
             <p><%=payment.date%> година</p>
             <p><%=payment.clientName.agentName%></p>
+            <% if(locals.isAdmin) {%>
+
+                <% } %> 
         </div>
     <%}%>
 </div>
 <br>
-<hr>
+<hr> -->
 
-<% if (!client.startedLawsuit) {%> 
-<section>
-    <form action="/debt-client/:id" method="POST" >
-        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-        <input type="hidden" name="clientId" value="<%=client._id%>">
-        <input type="hidden" name="clientDebt" value="<%=debt%>">
-        <button class="btn">За тужење</button>
-    </form>
-</section>
 
-<%} else {%>
-    <section class="totalDebtSection">
-<p>Клиентот е тужен на износ од <%=debt%>,00 денари (основен долг). Дополнително на основниот долг треба да бидат наплатени:</p>
-<p> - Судска такса во износ од <%=courtFee%>,00 денари </p>
-<p> - Адвокатска награда во износ од <%=attorneyFee%>,00 денари </p>
-<p> - Судска такса за одлука во износ од <%=courtFeeDecision%>,00 денари </p>
-<hr>
-<h3> Вкупно за наплата: <%=totalDebt%>,00 денари </h3>
-</section>
-
-<%}%>
 
 <% if(locals.isAdmin) {%>
     <section>
        <div>
+        <br>
+        <hr>
         <h3>Промени внесени податоци кај клиент</h3>
         <form action="/update-client/<%=clientId%>"  method="POST" id="updateClientData">
             <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-            <label for="name"></label>
+            <label for="name">Име и презиме</label>
             <input type="text" name="name" id="name"  value="<%=client.name%>">
-            <label for="address"></label>
+            <label for="address">Адреса</label>
             <input type="text" name="address" id="address" value="<%=client.address%>">
-            <label for="pin"></label>
+            <label for="pin">ЕМБГ</label>
             <input type="text" name="pin" id="pin" value="<%=client.pin%>" minlength="6" maxlength="13" value="<%=client.pin%> "> 
+            <label for="agent">Агент</label>
+            <input type="text" name="agent" id="agent" value="<%=client.agentName%>">
         <hr>
             <button class="btn"> Промени клиент </button>
             <main>
         </form>
+        <form action="/agents/clients/delete/<%=client._id%>" method="POST">
+            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+            <input type="hidden" name="theClientId" value="<%=client._id%>">
+
+            <button value="<%= client._id%>"data-clientid="<%= client._id%>" data-csrf="<%=locals.csrfToken%>" class="btn-alt">Избриши клиент</button>
+        </form>
     </div>
   
     <section class="delete-client-section">
-        <form action="/agents/clients/delete/<%=client._id%>" method="POST">
-            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-            <button value="<%= client._id%>"data-clientid="<%= client._id%>" data-csrf="<%=locals.csrfToken%>" class="btn-alt">Избриши клиент</button>
-        </form>
-        <p>This is the client id: <%= client._id%></p>
+  
     </section>
     </section>
     <% }%> 
