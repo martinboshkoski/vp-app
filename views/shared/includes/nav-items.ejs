@@ -25,7 +25,9 @@
     </li>
    <% }%>      
    <% if(!locals.isAuth) {%>
+       <% if(locals.isAdmin) {%>
     <li><a href="/signup">Креирај агент</a></li>
+            <% }%>
     <li><a href="/login">Логирај се</a></li>
 <% }%>
 </ul>
