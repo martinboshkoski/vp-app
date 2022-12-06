@@ -49,7 +49,7 @@ app.use(morgan('combined'))
 
 db.connectToDatabase().then(function(){
     // app.listen(3000);
-    console.log('connecte')
+    console.log('connected')
     app.listen(process.env.PORT || 3000);
 }).catch(function(error){
     console.log('Failed to connect to the database');
