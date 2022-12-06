@@ -34,9 +34,9 @@
                     <li><a href="/debt-clients">За наплата</a></li>
                 <% }%>
                 <% if(locals.isAdmin) {%>
-                    <li class="adminA"><a href="/admin/daily-report">Дневен извештај</a></li>
                     <li class="adminA"><a href="/admin/admin-report">Админ панел</a></li>
-                    <% }%>
+                    <li><a href="/signup">Креирај агент</a></li>
+                <% } %>
                 <% if(locals.isAuth) {%>
                 <li>
                     <form id="nav-form" action="/logout" method="POST">
