@@ -202,14 +202,6 @@
             <button class="btn" > Фактура </a>
         </form>
     </div>
-        <div >
-            <form class="deletePolicy" action="/agents/clients/deletePayment" method="POST">
-                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-                <input type="hidden" name="paymentInfo" value="<%=payment.amount%> ">
-                <button type="submit"> Избриши полиса </button>
-            </form>
-        </div>
-    
     </section>
 </div>
                <% } %>    
