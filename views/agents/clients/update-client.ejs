@@ -147,6 +147,8 @@
                 <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" min="1" max="6">  -->
                 <hr>
                 <select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
+                    <option value="Канцеларија Кузман Јосифоски">Канцеларија Кузман Јосифоски</option>
+                    <option value="Канцеларија Димо Наредникот">Канцеларија Димо Наредникот</option>
                     <option value="Надворешен агент">Надворешен Агент</option>
                     <option value="Борче Јосифоски">Борче Јосифоски</option>
                     <option value="Нури Мустафа">Нури Мустафа</option>
@@ -154,7 +156,6 @@
                     <option value="Анета Росоман">Анета Росоман</option>
                     <option value="Ненад Скопје">Ненад Скопје</option>
                 </select> 
-               
                 <button class="btn" <% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса </button>
         </form>
 </section>
@@ -171,6 +172,7 @@
         <p>Датум на издавање: <%=moment(policy.policyNumber.policyDate).format('DD/MM/YYYY')%></p> 
         <p>Број на рати: <%=policy.policyNumber.installmentsNumber%></p>
         <p>Вкупно платено: <%=policy.policyNumber.totalPaid%>,00 денари </p>
+        <p>Агент/Продавач: <%=policy.policyNumber.agentSeller%></p>
         <p class="debtParagraph"   data-debt="<%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>">Преостанато за плаќање: <%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>,00 денари </p>
 <hr>
 <h4>Уплати по полиса <%= policy.policyNumber.policyNumber %> </h4>
