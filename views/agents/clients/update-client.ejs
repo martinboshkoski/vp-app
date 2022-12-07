@@ -60,7 +60,7 @@
     
 <section class="updateClientMain"> 
         <div id="updateClientInfo">
-            <h3>Клиент: <%=client.name%> </h3>
+            <h3>Клиент/Договорувач: <%=client.name%> </h3>
             <p>Адреса на живеење: <%=client.address%> </p>
             <p>ЕМБГ / ЕМБС: <%=client.pin%> </p>
             <p>Телефон: <%=client.phone%> </p>
@@ -97,14 +97,14 @@
         </div>
         <form action="/new-policy" method="POST">
                 <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-                <p>Нова полиса</p>
+                <p>Нова полиса на Клиент/Договорувач</p>
                 <label for="pin"></label>
                 <input type="hidden" name="pin" value="<%=client.pin%>"> 
                 <label for="name"></label>
                 <input type="hidden" name="name" value="<%=client.name%>"> 
                 <hr>
                 <label for="insurancePolicy"></label>
-                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Полиса"> 
+                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Број на полиса"> 
                 <label for="amount"></label>
                 <input type="number" name="amount" id="amount" placeholder="Премија по полиса"> 
                 <!-- <label for="payment"></label>
@@ -112,7 +112,6 @@
                 <label for="insurancePolicyType"></label>
                 <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса"> 
                     <option value="">Избери класа</option>
-
                     <option id="" value="Осигурување од одговорност од употреба на моторни возила (AO)">  Осигурување од одговорност од употреба на моторни возила (AO)</option>
                     <option id="" value="Осигурување од одговорност од употреба на моторни возила (ЗК)">  Осигурување од одговорност од употреба на моторни возила (ЗК)</option>
                     <option id="" value="Осигурувањето на имот од пожар и природни непогоди">Осигурувањето на имот од пожар и природни непогоди</option>
@@ -137,16 +136,13 @@
                     <option id="" value="Осигурувањето на живот во врска со удели во инвестициони фондови">Осигурувањето на живот во врска со удели во инвестициони фондови </option>
                     <option id="" value="Осигурувањето на тонтина (здружение на рентиери)">Осигурувањето на тонтина (здружение на рентиери)</option>
                     <option id="" value="Осигурувањето на средства за исплата">Осигурувањето на средства за исплата</option>
-
                 </select>    
                 <label for="registrationNumber"></label>
                 <input type="text" name="registrationNumber" id="registrationNumber" placeholder="Број на регистрација"> 
-
-                
                 <label for="insurancePolicyDate"></label>
                 <input type="date" name="insurancePolicyDate" id="insurancePolicyDate" placeholder="Датум на полиса"> 
                 <label for="installmentsNumber"></label>
-                <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати"> 
+                <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" max="12"> 
                 <!-- <label for="installmentsNumber"></label>
                 <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" min="1" max="6">  -->
                 <hr>
