@@ -242,3 +242,20 @@ border: #555555 1px solid;
     text-align: center;
     margin: auto;
 }
+
+.completeListOfPolicies {
+    display: grid;
+    grid-template-columns: 1.8fr 5fr 1.8fr 1.9fr 1.9fr 1.8fr 3fr; 
+    max-height: 5rem;
+    text-align: left;
+    gap: 0.4rem;
+    margin: 0.4rem auto;
+    padding: 0.1rem 0.25rem;
+    border: 1px solid var(--color-green-500);
+    border-radius: 0.5rem;
+    box-shadow: 1.25px 2.5px #888888;
+}
+
+.completeListOfPolicies p{
+    margin: 0.5rem
+}
