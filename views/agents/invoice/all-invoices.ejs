@@ -6,18 +6,16 @@
 <body>
  <%- include('../../shared/includes/header')%>
 <main>
-
     <br>
     <hr>
     <br>
-   
-
     <div class="searchBar">
         <input type="text" placeholder="Пребарувај (број на фактура, должник)" id="searchBar" onkeyup="searchClients()"> 
     </div>
     <div class="client" id="allpolicies-top">
       <p>Број на фактура: </p>
       <p>Износ: </p>
+      <p>Полиса: </p>
       <p>Датум: </p>
       <p>Должник: </p>
 <p></p>
@@ -28,15 +26,15 @@
           <div class="client">
             <p>00<%=invoice.invoicesNumber%>/2022</p>
             <p><%=invoice.policyAmount%>,00 денари</p>
+            <p><%=invoice.policyNumber%></p>
             <p><%=invoice.policyDate%> година</p>
             <p><%=invoice.clinetName%></p>
+            <p></p>
             <a class="btn " href="/invoice/<%=invoice._id%>">Види</a>    
           </div>
         </li>
        <% } %>    
 </main>
-
-
 <%- include('../../shared/includes/footer')%>
 
 

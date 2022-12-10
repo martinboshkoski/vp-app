@@ -185,14 +185,16 @@ article {
     text-align: left;
 }
 .client, .client-alt{
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; 
-    border: 1px solid black;
-    padding-bottom: 0.5px;
-    padding-top: 0.5px;
-    border-radius: 0.6rem;
-    margin: 0.3rem;
+    display: grid;
+    grid-template-columns: 1.8fr 5fr 1.8fr 1.9fr 1.9fr 1.8fr 3fr; 
+    max-height: 5rem;
+    text-align: left;
+    gap: 0.4rem;
+    margin: 0.4rem auto;
+    padding: 0.1rem 0.25rem;
+    border: 1px solid var(--color-green-500);
+    border-radius: 0.5rem;
     box-shadow: 1.25px 2.5px #888888;
-    text-align: center;
 }
 
 #client-top, #allpolicies-top  {
@@ -214,8 +216,8 @@ article {
 
 .client p {
     border-right: 1px black solid;
-    padding-left: 0.5rem;
-}
+padding: 0.2rem;
+margin: 0rem;}
 .noStyleForm {
     padding: 0.25rem;
     cursor: pointer;

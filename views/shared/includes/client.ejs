@@ -5,8 +5,10 @@
     <!-- <p>Вкупна премија </p> -->
     <!-- <p>Платена премија </p> -->
     <!-- <p>Датум </p> -->
-<p>  Агент</p>
+<p>Агент</p>
+<p>Контакт</p>
 <p>Статус</p>
+<p></p>
 <p>Детали</p>
 </li>
 <br>
@@ -18,14 +20,15 @@
             <!-- <p >< %=client.insurancePolicy[0][0][2]%>,00 денари</p>         -->
             <!-- <p > < %=client.payment%>,00 денари  </p>        -->
             <p > <%=client.agentName%></p>
+            <p > <%=client.phone%></p>
             <% if(client.startedLawsuit) {%>
             <p>Клиентот е тужен</p>
               <%}else {%>
 <p></p>
                 <%}%>
+                <p></p>
            <a class="btn " href="/agents/clients/<%=client.id%>">Види</a>    
           </div>
         </li>
        <% } %>    
-       
 </article>
