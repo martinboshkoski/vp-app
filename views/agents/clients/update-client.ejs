@@ -10,15 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/base.css">
     <link rel="stylesheet" href="/styles/navigation.css">
-
     <script src="/scripts/mobile.js" defer></script>
     <script src="/scripts/search-bar.js" defer></script>
     <script src="/scripts/client-managment.js" defer></script>
-
     <link rel="stylesheet" href="/styles/forms.css">
     <link rel="stylesheet" href="/styles/auth.css">
     <link rel="stylesheet" href="/styles/policies.css">
-
 </head>
 <body>
     <main>
@@ -30,13 +27,17 @@
                     <li><a href="/all-invoices"> Фактури </a></li>
                     <li><a href="/all-payments"> Уплати </a></li>
                     <li><a href="/all-policies"> Полиси </a></li>
+                    <li> |</li>
                     <li><a href="/all-clients"> Kлиенти </a></li>
-                    <li><a href="/debt-clients">За наплата</a></li>
+                    <li><a href="/debt-clients">Тужени</a></li>
+                    <li><a href="/enforcement-agent">Извршител</a></li>
                 <% }%>
                 <% if(locals.isAdmin) {%>
-                    <li class="adminA"><a href="/admin/admin-report">Админ панел</a></li>
+                    <li class="adminA"><a href="/admin/daily-report">Агенти</a></li>
+                    <!-- <li class="adminA"><a href="/admin/daily-report">Дневен извештај</a></li>
+                    <li class="adminA"><a href="/admin/admin-report">Админ панел</a></li> -->
                     <li><a href="/signup">Креирај агент</a></li>
-                <% } %>
+                    <% }%>
                 <% if(locals.isAuth) {%>
                 <li>
                     <form id="nav-form" action="/logout" method="POST">
@@ -46,10 +47,9 @@
                 </li>
                <% }%>      
                <% if(!locals.isAuth) {%>
-                <li><a href="/signup">Креирај агент</a></li>
                 <li><a href="/login">Логирај се</a></li>
             <% }%>
-            </ul>
+               </ul>
         </nav>
         <button id="mobile-menu-btn">
             <span></span>
@@ -78,8 +78,7 @@
                         <input type="hidden" name="clientDebt" value="<%=debt%>">
                         <button class="btn">За тужење</button>
                     </form>
-                </section>
-                
+                </section>             
                 <%} else {%>
                     <section class="totalDebtSection">
                 <p>Клиентот е тужен на износ од <%=debt%>,00 денари (основен долг). Дополнително на основниот долг треба да бидат наплатени:</p>
@@ -89,12 +88,9 @@
                 <hr>
                 <h3> Вкупно за наплата: <%=totalDebt%>,00 денари </h3>
                 </section>
-                
                 <%}%>
-        <!-- </section>
-        <section class="updateClientMain">  -->
-
         </div>
+        <% if (!client.startedLawsuit) {%> 
         <form action="/new-policy" method="POST">
                 <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
                 <p>Нова полиса на Клиент/Договорувач</p>
@@ -104,13 +100,11 @@
                 <input type="hidden" name="name" value="<%=client.name%>"> 
                 <hr>
                 <label for="insurancePolicy"></label>
-                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Број на полиса"> 
+                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Број на полиса" pattern="[a-zA-Z0-9]+"> 
                 <label for="amount"></label>
-                <input type="number" name="amount" id="amount" placeholder="Премија по полиса"> 
-                <!-- <label for="payment"></label>
-                <input type="number" name="payment" id="payment" placeholder="Платена премија">  -->
+                <input type="number" name="amount" id="amount" placeholder="Премија по полиса" required> 
                 <label for="insurancePolicyType"></label>
-                <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса"> 
+                <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса" required> 
                     <option value="">Избери класа</option>
                     <option id="" value="Осигурување од одговорност од употреба на моторни возила (AO)">  Осигурување од одговорност од употреба на моторни возила (AO)</option>
                     <option id="" value="Осигурување од одговорност од употреба на моторни возила (ЗК)">  Осигурување од одговорност од употреба на моторни возила (ЗК)</option>
@@ -138,29 +132,49 @@
                     <option id="" value="Осигурувањето на средства за исплата">Осигурувањето на средства за исплата</option>
                 </select>    
                 <label for="registrationNumber"></label>
-                <input type="text" name="registrationNumber" id="registrationNumber" placeholder="Број на регистрација"> 
+                <input type="text" name="registrationNumber" id="registrationNumber" placeholder="Број на регистрација" pattern="[a-zA-Z0-9]+"> 
                 <label for="insurancePolicyDate"></label>
                 <input type="date" name="insurancePolicyDate" id="insurancePolicyDate" placeholder="Датум на полиса"> 
                 <label for="installmentsNumber"></label>
                 <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" max="12"> 
-                <!-- <label for="installmentsNumber"></label>
-                <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" min="1" max="6">  -->
                 <hr>
                 <select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
+                    <option value="">Избери агент</option>
+                    <option value="БРАЦО ДООЕЛ">БРАЦО ДООЕЛ</option>
+                    <option value="Борче ЕУРОАГЕНТ">Борче ЕУРОАГЕНТ</option>
+                    <option value="БОШКОСКИ">БОШКОСКИ</option>
+                    <option value="----"> -----------------Агенти под Канцеларија Кузман Јосифоски Питу---------------</option>
                     <option value="Канцеларија Кузман Јосифоски">Канцеларија Кузман Јосифоски</option>
+                    <option value="Дејан Петровски">Дејан Петровски</option>
+                    <option value="Лумјан Крензи"> Лумјан Крензи </option>
+                    <option value="Билјана Мирческа"> Билјана Мирческа </option>
+                    <option value="Александар Цуцулоска"> Александар Цуцулоска</option>
+                    <option value="Владимир Ѓорѓимајкоски">Владимир Ѓорѓимајкоски</option>
+                    <option value="Анита Бошева">Анита Бошева</option>
+                    <option value="Далиборка Башеска Јорданоска">Далиборка Башеска Јорданоска</option>
+                    <option value="Ненад Митиќ">Ненад Митиќ</option>
+                    <option value="----"> -----------------Агенти под Канцеларија Димо Наредникот---------------</option>
                     <option value="Канцеларија Димо Наредникот">Канцеларија Димо Наредникот</option>
-                    <option value="Надворешен агент">Надворешен Агент</option>
-                    <option value="Борче Јосифоски">Борче Јосифоски</option>
                     <option value="Нури Мустафа">Нури Мустафа</option>
-                    <option value="Лумјан Крензи">Лумјан Крензи</option>
-                    <option value="Анета Росоман">Анета Росоман</option>
-                    <option value="Ненад Скопје">Ненад Скопје</option>
+                    <option value="Дино Ташкоски">Дино Ташкоски</option>
+                    <option value="Алмир Хаиро">Алмир Хаиро</option>
+                    <option value="Џеват Дајтоски">Џеват Дајтоски</option>
+                    <option value="Владимир Мандароски">Владимир Мандароски</option>
+                    <option value="Фатмир Адемоски">Фатмир Адемоски</option>
+                    <option value="Филип Трајкоски">Филип Трајкоски</option>
+                    <option value="Коле Јовески">Коле Јовески</option>
+                    <option value="Мартин Димоски">Мартин Димоски</option>
+                    <option value="Борче Јосифоски">Борче Јосифоски</option>
+                    <option value="АЛМА БЕЈЗ">АЛМА БЕЈЗ</option>
                 </select> 
                 <button class="btn" <% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса </button>
         </form>
-</section>
+
+        <%}%>
+    </section>
 <hr>
         <h2>Полиси за осигурување на <%=client.name%></h2>
+
 <section class="allPolicies">
             <% for (const policy of clientPolicies ) { %>
     <section class="single-policy" >
@@ -246,9 +260,6 @@
 </div>
 <br>
 <hr> -->
-
-
-
 <% if(locals.isAdmin) {%>
     <section>
        <div>
