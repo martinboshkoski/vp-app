@@ -5,46 +5,64 @@
 </head>
 <body>
  <%- include('../../shared/includes/header')%>
-<main>
-
-    <br>
-    <hr>
-    <br>
-
-    <div class="policiesList">
-      <h3>Барај по датум</h3>
+<main id="payments-main">
+<!-- 
+    <form action="/dailyPaymentsReport" method="POST">
+      <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+      <input type="date" name="date">
+      <!-- <input type="hidden" name="dailyPayments" value="<%=payments%>"> -->
+      <!-- <button class="btn">Дневен извештај</button> -->
+    <!-- </form>  -->
+    <div class=" ">
       <form action="/get-by-date" method="POST">
         <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+<!-- <select name="agentName" >
+  <option value="Канцеларија 1">Канцеларија 1</option>
+  <option value="Канцеларија 2">Канцеларија 2</option>
+</select> -->
         <input type="date" name="date" >
         <button id="searchPaymentsBtn" class="btn">Барај</button>
       </form>
     </div>
 <hr>
+<!-- 
     <div class="searchBar" >
       <input type="text" placeholder="Пребарувај (Име на клиент, ЕМБГ/ЕМБС, износ)" id="searchBar" onkeyup="searchClients()"> 
-  </div>
-    <div class="client" id="client-top">
-      <p>Име на клиент:</p>
-      <p>Број на полиса</p>
-      <p>Износ: </p>
-      <p>Датум: </p>
-      <p>Наплатено од: </p>
+  </div> -->
+  <h3>Дневник на благајна од <%=pickedDate%> година</h3>
+  <h4>Подружница: <%=agentName%> </h4>
+
+    <div class="paymentsSection-alt">
+      <p>Клиент:</p>
+      <p>Влез</p>
+      <p>Број на полиса: </p>
+      <p>Забелешка</p>
     </div>
     <hr>    
     <% for (const payment of payments ) { %>
         <li>
-          <div id="paymentsSection" class="client">
+          <div class="paymentsSection">
             <p><%=payment.clientName.clientName || payment.clientName %></p>
-            <p><%=payment.clientName.policyNumber || payment.policyNumber %></p>
             <p><%= payment.paymentAmount || payment.clientName.paymentAmount%>,00 денари</p>
-            <p><%=payment.date%> година</p>
-            <p><%=payment.agentName || payment.clientName.agentName%></p>
-            <hr>
+            <p><%=payment.clientName.policyNumber || payment.policyNumber %></p>
+            <p>
           </div>
         </li>
        <% } %>    
+       <div class="paymentsSection-alt">
+        <p>ВКУПНО:</p>
+        <p><%=sum%>,00 денари</p>
+        <p> </p>
+        <p></p>
+      </div>
 <hr>
+<div class="paymentsSection">
+  <p>Број на прилози:</p>
+  <p></p>
+  <p>Одговорно лице на подружница (потпис)</p>
+  <p></p>
+</div>
+
+
 </main>
 <%- include('../../shared/includes/footer')%>
-
-
