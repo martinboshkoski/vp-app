@@ -186,7 +186,7 @@ article {
 }
 .client, .client-alt{
     display: grid;
-    grid-template-columns: 1.8fr 4fr 1.6fr 1.5fr 1.9fr 1.8fr 3fr; 
+    grid-template-columns: 2.5fr 4fr 1.6fr 1.5fr 1.9fr 1.8fr 3fr; 
     max-height: 5rem;
     text-align: left;
     gap: 0.4rem;
