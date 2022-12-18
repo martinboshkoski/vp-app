@@ -58,6 +58,12 @@ router.get('/agents/clients/:id', clientController.getUpdateClient)
 
 router.post('/update-client/:id', clientController.updateClient)
 
+
+//////Daily report (generate)
+
+// router.post('/dailyPaymentsReport', paymentsController.generatePaymentsReport)
+
+
 //////withdraw lawsuit/enforcement agent
 
 router.post('/withdraw-lawsuit/:id', clientController.withdrawLawsuit)
@@ -90,7 +96,4 @@ router.post('/get-by-date', paymentsController.getByDate)
 
 router.post('/outside-agent', agentController.getAgent)
 
-
 module.exports = router;
-
-
