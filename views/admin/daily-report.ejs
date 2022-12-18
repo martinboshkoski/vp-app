@@ -6,27 +6,44 @@
 <%- include('../shared/includes/header')%>
 <main>
 <h1>Податоци и други показатели за агенти</h1>
-
 <form action="/outside-agent" method="POST" class="search-agent">
     <section class="search-agent">
-
 <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
 <select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
-    <option value="Надворешен агент">Надворешен Агент</option>
-    <option value="Борче Јосифоски">Борче Јосифоски</option>
+    <option value="">Избери агент</option>
+    <option value="БРАЦО ДООЕЛ">БРАЦО ДООЕЛ</option>
+    <option value="Борче ЕУРОАГЕНТ">Борче ЕУРОАГЕНТ</option>
+    <option value="БОШКОСКИ">БОШКОСКИ</option>
+    <option value="----"> -----------------Агенти под Канцеларија Кузман Јосифоски Питу---------------</option>
+    <option value="Канцеларија Кузман Јосифоски">Канцеларија Кузман Јосифоски</option>
+    <option value="Дејан Петровски">Дејан Петровски</option>
+    <option value="Лумјан Крензи"> Лумјан Крензи </option>
+    <option value="Билјана Мирческа"> Билјана Мирческа </option>
+    <option value="Александар Цуцулоска"> Александар Цуцулоска</option>
+    <option value="Владимир Ѓорѓимајкоски">Владимир Ѓорѓимајкоски</option>
+    <option value="Анита Бошева">Анита Бошева</option>
+    <option value="Далиборка Башеска Јорданоска">Далиборка Башеска Јорданоска</option>
+    <option value="Ненад Митиќ">Ненад Митиќ</option>
+    <option value="----"> -----------------Агенти под Канцеларија Димо Наредникот---------------</option>
+    <option value="Канцеларија Димо Наредникот">Канцеларија Димо Наредникот</option>
     <option value="Нури Мустафа">Нури Мустафа</option>
-    <option value="Лумјан Крензи">Лумјан Крензи</option>
-    <option value="Анета Росоман">Анета Росоман</option>
-    <option value="Ненад Скопје">Ненад Скопје</option>
+    <option value="Дино Ташкоски">Дино Ташкоски</option>
+    <option value="Алмир Хаиро">Алмир Хаиро</option>
+    <option value="Џеват Дајтоски">Џеват Дајтоски</option>
+    <option value="Владимир Мандароски">Владимир Мандароски</option>
+    <option value="Фатмир Адемоски">Фатмир Адемоски</option>
+    <option value="Филип Трајкоски">Филип Трајкоски</option>
+    <option value="Коле Јовески">Коле Јовески</option>
+    <option value="Мартин Димоски">Мартин Димоски</option>
+    <option value="Борче Јосифоски">Борче Јосифоски</option>
+    <option value="АЛМА БЕЈЗ">АЛМА БЕЈЗ</option>
 </select> 
 <div>
-
 <label for="start-date">Почетен датум:</label>
 <input type="date" name="startDate" id="startDate">
 <label for="start-date">Краен датум:</label>
 <input type="date" name="endDate" id="endDate">
 </div>
-
 <button class="btn">Барај</button>
 </section>
 
