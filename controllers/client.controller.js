@@ -239,10 +239,11 @@ async function startLawsut(req, res, next) {
 
   let startedLawsuit = true;
   let debt = req.body.clientDebt;
+  let lawsuitDate = moment().format('DD-MM-YYYY');
 
   try {
     client = await Client.findById(clientId);
-    clientModel = await new Client(client).save(agentName, startedLawsuit, debt);
+    clientModel = await new Client(client).save(agentName, startedLawsuit, debt, lawsuitDate);
   } catch (error) {
     next(error);
     return;
