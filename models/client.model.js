@@ -1,70 +1,105 @@
-const mongodb = require('mongodb')
-const moment = require('moment')
+const mongodb = require("mongodb");
 
-const db = require('../data/database')
+const moment = require("moment");
 
-class Payment {
-    constructor(clientName, clientPin, paymentAmount, policyNumber, agentName) {
-        this.clientName = clientName,
-        this.clientPin = clientPin;
-        this.paymentAmount = +paymentAmount;
-        this.policyNumber = policyNumber;
-        this.agentName = agentName; 
-        this.date = moment().format('DD/MM/YYYY');
+const db = require("../data/database");
+
+class Client {
+  constructor(clientData) {
+    this.name = clientData.name;
+    this.address = clientData.address;
+    this.pin = clientData.pin;
+    this.phone = clientData.phone;
+    // this.insurancePolicy = clientData.insurancePolicy,
+    // this.insurancePolicyType = clientData.insurancePolicyType,
+    // this.amount = +clientData.amount,
+    // this.insurancePolicyDate = clientData.insurancePolicyDate,
+    // this.installmentsNumber = +clientData.installmentsNumber;
+    this.payment = +clientData.payment;
+    if (clientData._id) {
+      this.id = clientData._id.toString();
     }
-////////////////////////////////////////////////////////////////////////
-  static async findAll() {
-    const payments = await db.getDb().collection('payments').find().toArray()
-    return payments.map(function(paymentDocument){
-        return new Payment(paymentDocument);
-    })
-}
-////////////////////////////////////////////////////////////////////////
-static async findByDateAndAgent(date, agentName) {
-const theDate = moment(date).format('DD/MM/YYYY').toString()
-  const paymentsOnDate = await db
-      .getDb()
-      .collection("payments")
-      .find({date: theDate, agentName: agentName }).toArray();
-    if (!paymentsOnDate) {
-      const error = new Error(" Не може да се најде уплати на тој датум");
+    this.startedLawsuit = clientData.startedLawsuit;
+    this.agentName = clientData.agentName;
+    this.debt = clientData.debt
+    this.lawsuitDate = clientData.lawsuitDate;
+  }
+
+  ///////////////////////////////////////////////////////////////
+  static async findById(clientId) {
+    let theClientId;
+    try {
+      theClientId = new mongodb.ObjectId(clientId);
+    } catch (error) {
       error.code = 404;
       throw error;
     }
-    return paymentsOnDate;
-  }
-////////////////////////////////////////////////////////////////////////
-  static async findByPin(pin) {
-
-    const thePin = pin;
-
-    const theWantedClient = await db
-          .getDb()
-          .collection("clients")
-          .findOne({pin: thePin });
-        if (!theWantedClient) {
-          const error = new Error(" Не може да се најде");
-          error.code = 404;
-          throw error;
-        }
-        return theWantedClient;
-      }
-////////////////////////////////////////////////////////////////////////
-    async save(clientName, clientPin, paymentAmount, policyNumber, agentName) {
-        const paymentData = {
-            clientName:clientName,
-            clientPin: clientPin,
-            policyNumber: policyNumber,
-            paymentAmount: +paymentAmount,
-            agentName: agentName, 
-            date: moment().format('DD/MM/YYYY'), 
-        }
-            await db.getDb().collection('payments').insertOne(paymentData)
+    const client = await db
+      .getDb()
+      .collection("clients")
+      .findOne({ _id: theClientId });
+    if (!client) {
+      const error = new Error(" Не може да се најде клиентот");
+      error.code = 404;
+      throw error;
     }
-    
-    // remove() {
-    //     const policyId = new mongodb.ObjectId(this.id);
-    //     return db.getDb().collection('policies').deleteOne({ _id: policyId });
-    //   }
+    return client;
+  }
+////////
+
+static async findByPin(clientPin) {
+
+  const client = await db
+    .getDb()
+    .collection("clients")
+    .findOne({ pin: clientPin });
+  if (!client) {
+    const error = new Error(" Не може да се најде клиентот");
+    error.code = 404;
+    throw error;
+  }
+  return client;
 }
-module.exports = Payment;
+  ///////////////////////////////////////////////////////////////
+  static async findAll() {
+    const clients = await db.getDb().collection("clients").find().toArray();
+    return clients.map(function (clientDocument) {
+      return new Client(clientDocument);
+    });
+  }
+
+  ///////////////////////////////////////////////////////////////
+  async save(agentName, startedLawsuit, debt, lawsuitDate) {
+    const clinetData = {
+      name: this.name,
+      address: this.address,
+      pin: this.pin,
+      phone: this.phone,
+      startedLawsuit: startedLawsuit,
+      agentName: agentName, 
+      debt: +debt,
+      lawsuitDate: lawsuitDate
+    };
+
+    if (this.id) {
+      const clientId = new mongodb.ObjectId(this.id);
+      await db
+        .getDb()
+        .collection("clients")
+        .updateOne({ _id: clientId }, { $set: clinetData });
+    } else {
+      await db.getDb().collection("clients").insertOne(clinetData);
+    }
+  }
+
+// async withdrawLawsuit (clientId) {
+//   await db.getDb().collection("clients").updateOne({ _id: clientId }, { $set: {"startedLawsuit":false} });
+// }
+
+///////////////////////////////////////////////////////////////
+  remove() {
+    const clientId = new mongodb.ObjectId(this.id);
+    return db.getDb().collection("clients").deleteOne({ _id: clientId });
+  }
+}
+module.exports = Client;
