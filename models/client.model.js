@@ -22,6 +22,7 @@ class Client {
     this.startedLawsuit = clientData.startedLawsuit;
     this.agentName = clientData.agentName;
     this.debt = clientData.debt
+    this.lawsuitDate = clientData.lawsuitDate;
   }
 
   ///////////////////////////////////////////////////////////////
@@ -68,7 +69,7 @@ static async findByPin(clientPin) {
   }
 
   ///////////////////////////////////////////////////////////////
-  async save(agentName, startedLawsuit, debt) {
+  async save(agentName, startedLawsuit, debt, lawsuitDate) {
     const clinetData = {
       name: this.name,
       address: this.address,
@@ -76,7 +77,8 @@ static async findByPin(clientPin) {
       phone: this.phone,
       startedLawsuit: startedLawsuit,
       agentName: agentName, 
-      debt: +debt
+      debt: +debt,
+      lawsuitDate: lawsuitDate
     };
 
     if (this.id) {
