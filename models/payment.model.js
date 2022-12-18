@@ -20,12 +20,12 @@ class Payment {
     })
 }
 ////////////////////////////////////////////////////////////////////////
-static async findByDate(date) {
+static async findByDateAndAgent(date, agentName) {
 const theDate = moment(date).format('DD/MM/YYYY').toString()
   const paymentsOnDate = await db
       .getDb()
       .collection("payments")
-      .find({date: theDate }).toArray();
+      .find({date: theDate, agentName: agentName }).toArray();
     if (!paymentsOnDate) {
       const error = new Error(" Не може да се најде уплати на тој датум");
       error.code = 404;
