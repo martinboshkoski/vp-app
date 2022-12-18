@@ -7,16 +7,11 @@
  <%- include('../../shared/includes/header')%>
 <main>
     <h1>Агент: <%=agentName%> </h1>
-
-    
 <section class="center-section">
     <div class="div-helper" >
         <p><a href="/new-client" class="btn">Внеси нов клиент</a></p>
     </div>
 </section>
-  
-    <!-- <p><a href="/new-client" class="btn">Внеси уплата</a></p> -->
-  
     <br>
     <hr>
     <br>
@@ -37,7 +32,6 @@
         <hr>
         <br>
     <% }%>
-
     <div class="searchBar">
         <input type="text" placeholder="Пребарувај (име и презиме, ЕМБГ/ЕМБС, број полиса)" id="searchBar" onkeyup="searchClients()"> 
     </div>
@@ -45,8 +39,4 @@
         <%-include('../../shared/includes/client') %>
       </ul>
 </main>
-
-
 <%- include('../../shared/includes/footer')%>
-
-
