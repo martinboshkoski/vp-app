@@ -56,13 +56,28 @@ async function insertPayment(req, res, next) {
   try {
     const policy = await Policy.findById(req.body.policyId);
     const policyNumber = req.body.policyNumber;
+
+//Different percentage for different agents:
+// console.log(req.body.agentSeller)
+// let percentage;
+// if (req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
+// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
+// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
+// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
+// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
+// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
+// ) else {
+//   percentage = 0.15;
+// }
+
     let agentCommision;
     if (policy.policyAmount > +req.body.payment) {
       agentCommision = +req.body.payment * 0.15;
     }
     if (policy.policyAmount === +req.body.payment) {
-      agentCommision = +req.body.payment * 0.2;
+      agentCommision = +req.body.payment * 0.20;
     }
+
 
     const thePayment = {
       amount: +req.body.payment,

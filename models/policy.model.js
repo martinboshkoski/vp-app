@@ -15,8 +15,14 @@ class Policy {
         this.clinetPin = clinetPin, 
         this.clientName = clientName,
         this.thePayment = this.thePayment, 
-        this.agentSeller = agentSeller
-    }
+        this.agentSeller = agentSeller,
+        this.thePayment = {
+                amount: +0,
+                agentCommision: Math.round(0),
+                agent: 'Агент',
+                date: 'Определи датум'
+              };
+        }
 
 static async findById(policyNumber) {
     const policy =  await db.getDb()

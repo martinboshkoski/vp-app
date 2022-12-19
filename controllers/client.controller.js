@@ -77,6 +77,14 @@ async function getNewClient(req, res, next) {
   let startedLawsuit = false;
 
   try {
+    const existingUser = await db.getDb().collection("clients").findOne({ pin: req.body.pin });
+    if (existingUser) {
+      // A user with the same name already exists
+      // Return an error response
+      console.log('im here')
+      res.status(400).send({ error: `Веќе постои ваков матичен број ${req.body.pin}. Вратете се назад (Back - стрекла) и побарајте го по матичен број клиентот, па таму внесете нова полиса` });
+      return
+    }
     await client.save(agentName, startedLawsuit);
   } catch (error) {
     next(error);

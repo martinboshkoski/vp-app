@@ -209,6 +209,8 @@
     <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
     <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>"> 
     <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>"> 
+    <input type="hidden" name="agentSeller" value="<%=policy.policyNumber.agentSeller%>"> 
+
     <input type="hidden" name="pin" value="<%=client.pin%>"> 
     <input type="hidden" name="clientName" value="<%-client.name%>"> 
     <input type="hidden" name="agentName" value="<%=agentName%>"> 
