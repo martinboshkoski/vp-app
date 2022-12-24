@@ -301,6 +301,7 @@ margin: 0rem;}
     display: grid;
     grid-template-columns: 2.3fr 2fr 1fr 1fr;
     border: 1px solid black;
+    font-size: 12px
 }
 
 .paymentsSection-alt{
