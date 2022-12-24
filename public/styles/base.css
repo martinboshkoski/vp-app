@@ -140,6 +140,7 @@ img {
     padding: 2rem 0;
     text-align: left;
     gap: 0.4rem;
+    font-size: 12px
 }
 
 .agent {
@@ -195,6 +196,7 @@ article {
     border: 1px solid var(--color-green-500);
     border-radius: 0.5rem;
     box-shadow: 1.25px 2.5px #888888;
+    font-size: 12px
 }
 
 #client-top, #allpolicies-top  {
@@ -224,6 +226,7 @@ margin: 0rem;}
     font: inherit;
     color: var(--color-gray-100);
     border-radius: var(--border-radius-medium);
+    font-size: 12px
 }
 /* 
 #totalReportSection {
