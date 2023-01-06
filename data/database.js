@@ -4,10 +4,10 @@ const MongoClient = monbodb.MongoClient;
 
 let database;
 
-// const MONGODB_URI = "mongodb+srv://martinboshkoski:Mart1n990B@cluster0.o8vyshm.mongodb.net/vp-clients";
+const MONGODB_URI = "mongodb+srv://martinboshkoski:Mart1n990B@cluster0.o8vyshm.mongodb.net/vp-clients";
 
 
-const MONGODB_URI = "mongodb+srv://martinboshkoski:Mart1n990B@cluster0.o8vyshm.mongodb.net/?retryWrites=true&w=majority"
+// const MONGODB_URI = "mongodb+srv://martinboshkoski:Mart1n990B@cluster0.o8vyshm.mongodb.net/?retryWrites=true&w=majority"
 
 // // `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}cluster0.o8vyshm.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}`
 // 'mongodb+srv://martinboshkoski:Mart1n990@cluster0.o8vyshm.mongodb.net/?retryWrites=true&w=majority/vp-clients'
