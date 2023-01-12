@@ -171,11 +171,11 @@ border-radius: 4rem;
     grid-template-columns: 2 fr 1fr;
 }
 
-#payment-form {
+/* #payment-form {
     padding-top: 1rem;
     display: grid;
     grid-template-columns:2fr 1fr;
-}
+} */
 
 #paymentBtn {
 background-color: var(--color-green-500);

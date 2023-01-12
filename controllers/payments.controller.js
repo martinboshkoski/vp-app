@@ -78,12 +78,12 @@ async function insertPayment(req, res, next) {
       agentCommision = +req.body.payment * 0.20;
     }
 
-
     const thePayment = {
       amount: +req.body.payment,
       agentCommision: Math.round(agentCommision),
       agent: req.body.agentName,
       date: moment().format("YYYY-MM-DD"),
+      paidCash: req.body.paidCash
     };
 
     await db
@@ -105,7 +105,8 @@ async function insertPayment(req, res, next) {
       clientPin,
       policy.policyNumber,
       thePayment.amount,
-      thePayment.agent
+      thePayment.agent, 
+      thePayment.paidCash
     );
     try {
       await payment.save(
@@ -113,7 +114,8 @@ async function insertPayment(req, res, next) {
         clientPin,
         thePayment.amount,
         policy.policyNumber,
-        thePayment.agent
+        thePayment.agent,
+        thePayment.paidCash
       );
     } catch (error) {
       next(error);

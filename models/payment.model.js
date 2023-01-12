@@ -4,7 +4,7 @@ const moment = require('moment')
 const db = require('../data/database')
 
 class Payment {
-    constructor(clientName, clientPin, paymentAmount, policyNumber, agentName) {
+    constructor(clientName, clientPin, paymentAmount, policyNumber, agentName, paidCash) {
         this.clientName = clientName,
         this.clientPin = clientPin;
         this.paymentAmount = +paymentAmount;
@@ -25,12 +25,13 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
   const paymentsOnDate = await db
       .getDb()
       .collection("payments")
-      .find({date: theDate, agentName: agentName }).toArray();
+      .find({date: theDate, agentName: agentName,paidCash: "paidCash"  }).toArray();
     if (!paymentsOnDate) {
       const error = new Error(" Не може да се најде уплати на тој датум");
       error.code = 404;
       throw error;
     }
+    console.log(paymentsOnDate)
     return paymentsOnDate;
   }
 ////////////////////////////////////////////////////////////////////////
@@ -50,7 +51,7 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
         return theWantedClient;
       }
 ////////////////////////////////////////////////////////////////////////
-    async save(clientName, clientPin, paymentAmount, policyNumber, agentName) {
+    async save(clientName, clientPin, paymentAmount, policyNumber, agentName, paidCash) {
         const paymentData = {
             clientName:clientName,
             clientPin: clientPin,
@@ -58,6 +59,7 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
             paymentAmount: +paymentAmount,
             agentName: agentName, 
             date: moment().format('DD/MM/YYYY'), 
+            paidCash: paidCash
         }
             await db.getDb().collection('payments').insertOne(paymentData)
     }
