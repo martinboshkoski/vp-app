@@ -212,13 +212,19 @@
     <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>"> 
     <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>"> 
     <input type="hidden" name="agentSeller" value="<%=policy.policyNumber.agentSeller%>"> 
-
     <input type="hidden" name="pin" value="<%=client.pin%>"> 
     <input type="hidden" name="clientName" value="<%-client.name%>"> 
     <input type="hidden" name="agentName" value="<%=agentName%>"> 
-    <input type="number" name="payment" id="payment" placeholder="Износ (без децимали)"> 
-    <button class="btn" id="paymentBtn"> Внеси уплата </button>
+    <div class="policyPayment">
+        <input type="number" name="payment" id="payment" placeholder="Износ (без децимали)"> 
+        <label>
+            <input type="checkbox" name="paidCash" value="paidCash">
+            Кеш
+        </label>
+        <button class="btn" id="paymentBtn"> Внеси уплата </button>
+    </div>
 </form>
+
     </div>
     <div class="policy-documents">
         <% if (policy.policyNumber.installmentsNumber > 1) { %> 
