@@ -17,14 +17,14 @@
   </div>
   <br>    
   <h3>Сите полиси полисирани во периодот <%=moment(startDate).format('DD/MM/YYYY')%> година до <%=moment(endDate).format('DD/MM/YYYY')%> година </h3>
-  <div class="clientRow">
+  <div class="agent-alt">
     <p>Клиент</p>
     <p>Број на полиса</p>
     <p>Датум на полиса</p>
     <p>Премија на полиса</p>
   </div> 
     <% for (const policyOfAgent of allPoliciesInPeriod) { %>
-      <div class="client-row">
+      <div class="agent">
         <p> <%= policyOfAgent.clientName || policyOfAgent.policyNumber.clientName%> </p>
         <p> <%= policyOfAgent.policyNumber.policyNumber || policyOfAgent.policyNumber%> </p>
         <p><%= moment(policyOfAgent.policyNumber.policyDate).format('DD/MM/YYYY') || (policyOfAgent.policyDate).format('DD/MM/YYYY') %> </p>
