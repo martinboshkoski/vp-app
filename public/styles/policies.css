@@ -260,3 +260,17 @@ border: #555555 1px solid;
     margin: 0.5rem
 }
 
+.client-row {
+    display: grid;
+    grid-template-columns: 3fr 2fr 2fr 2fr;
+    align-items: left;
+    padding: 0px;
+    border-bottom: 1px solid #ccc;
+    border-radius: 2px;
+  }
+
+  .client-row p{
+    border: 1px gray solid;
+    margin: 0;
+  }
+  
