@@ -260,7 +260,7 @@ border: #555555 1px solid;
     margin: 0.5rem
 }
 
-.client-row {
+.clientRow {
     display: grid;
     grid-template-columns: 3fr 2fr 2fr 2fr;
     align-items: left;
@@ -269,7 +269,7 @@ border: #555555 1px solid;
     border-radius: 2px;
   }
 
-  .client-row p{
+  .clientRow p{
     border: 1px gray solid;
     margin: 0;
   }
