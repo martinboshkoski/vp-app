@@ -1,5 +1,6 @@
 const Policy = require("../models/policy.model");
 const Payment = require("../models/payment.model");
+const moment = require("moment");
 
 async function getPolicies(req, res, next) {
   try {
@@ -95,7 +96,23 @@ async function insertNewPolicy(req, res, next) {
   res.redirect(theClientPage);
 }
 
+async function getByDate(req, res, next) {
+const startDate = req.body.startDate
+const endDate = req.body.endDate
+
+const requiredPoliciesByDate = await Policy.findByDate(startDate, endDate)
+
+//to be finalized
+res.render("agents/policies/policies-by-date", {
+  requiredPoliciesByDate: requiredPoliciesByDate,
+  startDate: startDate, 
+  endDate: endDate, 
+  moment: moment
+});
+} 
+
 module.exports = {
   getPolicies: getPolicies,
   insertNewPolicy: insertNewPolicy,
+  getByDate:getByDate
 };

@@ -92,8 +92,13 @@ router.post('/debt-client/:id', clientController.startLawsut)
 /////////
 router.post('/get-by-date', paymentsController.getByDate)
 
+
+router.post('/policy-by-date', policiesController.getByDate)
+
+
 //// agents
 
 router.post('/outside-agent', agentController.getAgent)
+
 
 module.exports = router;

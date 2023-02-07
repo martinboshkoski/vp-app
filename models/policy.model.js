@@ -78,6 +78,16 @@ static async findByClientPin(clientPin) {
     return policy;
 }
 
+
+static async findByDate(startDate, endDate) {
+    const requiredPoliciesByDate = await db.getDb()
+      .collection('policies')
+      .find({ policyDate: { $gte: startDate, $lte: endDate } });
+  
+    // console.log(await requiredPoliciesByDate.toArray());
+    return await requiredPoliciesByDate.toArray();
+  }
+
   static async findAll() {
     const policies = await db.getDb().collection('policies').find().toArray()
     return policies.map(function(policyDocument){

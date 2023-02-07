@@ -1,0 +1,51 @@
+<%- include('../../shared/includes/head', {pageTitle: 'All Clients'})%>
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/policies.css">
+    <script src="/scripts/client-managment.js" defer></script>
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+    <br>
+    <h3>Полиси по избран датум: <%=moment(startDate).format('DD/MM/YYYY')%>  година до <%=moment(endDate).format('DD/MM/YYYY')%>  година</h3>
+    <hr>
+    <!-- <div class="client" id="allpolicies-top">
+      <p>Број на полиса: </p>
+      <p>Класа: </p>
+      <p>Регистрација: </p>
+      <p>Премија на полиса: </p>
+      <p>Платена премија: </p>
+      <p>Датум на полиса: </p>
+      <p>Клиент: </p>
+    </div> -->
+    <hr>
+    <table>
+      <thead>
+        <tr>
+          <th>Број на полиса:</th>
+          <th>Класа</th>
+          <th>Регистрација</th>
+          <th>Премија на полиса:</th>
+          <!-- <th>Број на рати</th> -->
+          <th>Датум на полиса</th>
+          <!-- <th>Client PIN</th> -->
+          <th>Договорувач</th>
+          <!-- <th>Agent Seller</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <% requiredPoliciesByDate.forEach(policy => { %>
+          <tr>
+            <td><%= policy.policyNumber %></td>
+            <td><%= policy.policyType %></td>
+            <td><%= policy.registrationNumber %></td>
+            <td><%= policy.policyAmount %>,00 денари</td>
+            <td><%= policy.policyDate %></td>
+            <td><%= policy.clientName %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+        
+</main>
+<%- include('../../shared/includes/footer')%>
