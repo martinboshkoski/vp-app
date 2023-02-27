@@ -44,6 +44,21 @@ static async findByAgent(agentSeller) {
     return agentPolicies
 }
 
+
+
+// static async findOneByPolicyNumber(policyNumber) {
+// const thePolicyNumber = policyNumber.thePolicyNumber
+//     try {
+//         const policyByNumber = await db.getDb().collection('policies').find({policyNumber:thePolicyNumber}).toArray()
+//         let thePolicyExists = true
+//         return thePolicyExists
+//     }
+//     catch (error) {
+//         error.code = 404;
+//         throw error;
+//     }
+// }
+
 static async findById(policyId) {
     let thePolicyId
     try {
@@ -132,9 +147,13 @@ static async countAll() {
 await db.getDb().collection('policies').insertOne(policyData)
     }
 
-    remove() {
-        const policyId = new mongodb.ObjectId(this.id);
-        return db.getDb().collection('policies').deleteOne({ _id: policyId });
+    static async removePolicy(policyId) {
+        const objectId = new mongodb.ObjectId(policyId);
+        return db.getDb().collection('policies').deleteOne({ _id: objectId });
+      }
+
+      static async deletePoliciesByClient(theClientName) {
+        return db.getDb().collection('policies').deleteMany({ clientName:theClientName });
       }
 }
 module.exports = Policy;

@@ -1,6 +1,7 @@
 const Policy = require("../models/policy.model");
 const Payment = require("../models/payment.model");
 const moment = require("moment");
+const db = require('../data/database')
 
 async function getPolicies(req, res, next) {
   try {
@@ -57,7 +58,16 @@ async function insertNewPolicy(req, res, next) {
   const policyDate = req.body.insurancePolicyDate;
   const agentSeller = req.body.agentSeller;
   const thePayment = [];
+  
+//Validation: Checking of the policy number already exists 
+  const thePolicyNumber = policyNumber.toString()
+  const policyByNumber = await db.getDb().collection('policies').findOne({policyNumber:thePolicyNumber})
+  if (policyByNumber) {
+    res.status(400).send(`<h1> Веќе постои полиса со број ${policyNumber}. Само врати се назад на back (односно "←" на пребарувачот) и смени го бројот на полиса</h1>`);
+    return;
+    }
 
+  //
   const policy = new Policy(
     policyNumber,
     policyType,
@@ -89,9 +99,7 @@ async function insertNewPolicy(req, res, next) {
 
   //finding the url for the concrete client that has made the payment (to transfer to his/her page)
   const clientThroughPayment = await Payment.findByPin(clientPin.toString());
-
   const objectId = clientThroughPayment._id;
-
   const theClientPage = "/agents/clients/" + objectId;
   res.redirect(theClientPage);
 }
@@ -102,17 +110,35 @@ const endDate = req.body.endDate
 
 const requiredPoliciesByDate = await Policy.findByDate(startDate, endDate)
 
-//to be finalized
+let totalPolicyAmount = 0
+requiredPoliciesByDate.forEach(policy => {
+  totalPolicyAmount += policy.policyAmount
+})
+
 res.render("agents/policies/policies-by-date", {
   requiredPoliciesByDate: requiredPoliciesByDate,
   startDate: startDate, 
   endDate: endDate, 
-  moment: moment
+  moment: moment, 
+  totalPolicyAmount:totalPolicyAmount
 });
 } 
+
+async function deleteSinglePolicy(req, res, next) {
+  const policyNumber = req.body.policyNumber;
+  const deletePolicyId = req.body.policyId;
+  try {
+    await Policy.removePolicy(deletePolicyId);
+    await Payment.deletePaymentsByPolicyNumber(policyNumber);
+    res.redirect(`/agents/clients/${req.body.clientId}`);
+  } catch (error) {
+    next(error);
+  }
+}
 
 module.exports = {
   getPolicies: getPolicies,
   insertNewPolicy: insertNewPolicy,
-  getByDate:getByDate
+  getByDate:getByDate, 
+  deleteSinglePolicy:deleteSinglePolicy
 };

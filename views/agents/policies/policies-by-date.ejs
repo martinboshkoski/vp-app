@@ -9,43 +9,44 @@
     <br>
     <h3>Полиси по избран датум: <%=moment(startDate).format('DD/MM/YYYY')%>  година до <%=moment(endDate).format('DD/MM/YYYY')%>  година</h3>
     <hr>
-    <!-- <div class="client" id="allpolicies-top">
-      <p>Број на полиса: </p>
-      <p>Класа: </p>
-      <p>Регистрација: </p>
-      <p>Премија на полиса: </p>
-      <p>Платена премија: </p>
-      <p>Датум на полиса: </p>
-      <p>Клиент: </p>
-    </div> -->
-    <hr>
     <table>
       <thead>
         <tr>
+          <th>#</th>
           <th>Број на полиса:</th>
           <th>Класа</th>
-          <th>Регистрација</th>
           <th>Премија на полиса:</th>
-          <!-- <th>Број на рати</th> -->
           <th>Датум на полиса</th>
-          <!-- <th>Client PIN</th> -->
           <th>Договорувач</th>
-          <!-- <th>Agent Seller</th> -->
+          <th>Регистрација</th>
         </tr>
       </thead>
       <tbody>
+        <% let count = 1 %>
         <% requiredPoliciesByDate.forEach(policy => { %>
           <tr>
+            <td><%= count %></td>
             <td><%= policy.policyNumber %></td>
-            <td><%= policy.policyType %></td>
-            <td><%= policy.registrationNumber %></td>
+            <td style="font-size: smaller;"><%= policy.policyType %></td>
             <td><%= policy.policyAmount %>,00 денари</td>
-            <td><%= policy.policyDate %></td>
+            <td><%=moment(policy.policyDate).format('DD/MM/YYYY')%></td>
             <td><%= policy.clientName %></td>
+            <td><%= policy.registrationNumber %></td>
           </tr>
+          <% count++ %>
         <% }); %>
       </tbody>
-    </table>
-        
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th style="font-size:larger">ВКУПНО</th>
+          <th><%=totalPolicyAmount%>,00 денари</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+    </table>    
 </main>
 <%- include('../../shared/includes/footer')%>

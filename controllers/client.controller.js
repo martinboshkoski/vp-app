@@ -81,7 +81,6 @@ async function getNewClient(req, res, next) {
     if (existingUser) {
       // A user with the same name already exists
       // Return an error response
-      console.log('im here')
       res.status(400).send({ error: `Веќе постои ваков матичен број ${req.body.pin}. Вратете се назад (Back - стрекла) и побарајте го по матичен број клиентот, па таму внесете нова полиса` });
       return
     }
@@ -134,10 +133,10 @@ async function getUpdateClient(req, res, next) {
   }, 0);
 
   let debt = totalPremium - totalPaid
-let courtFee;
-let courtFeeDecision;
-let attorneyFee;
-let totalDebt
+  let courtFee;
+  let courtFeeDecision;
+  let attorneyFee;
+  let totalDebt
 if (startLawsut) {
   
   if (debt<10000) {
@@ -179,6 +178,12 @@ async function updateClient(req, res, next) {
     _id: req.params.id,
   });
 
+  //to find all policies that have that client name 
+  //to find all payments that have that client name
+
+  //update all policies that have that client name
+  //update all payments that have that client name
+
   try {
     await client.save();
   } catch (error) {
@@ -192,36 +197,28 @@ async function deleteClient(req, res, next) {
   let theClientId;
   try {
     theClientId = new mongodb.ObjectId(req.body.theClientId);
+    await db.getDb().collection("clients").deleteOne({ _id: theClientId });
   } catch (error) {
     error.code = 404;
-    throw error;
+    return next(error);
   }
+
+  const policyNumber = req.body.policyNumber;
   try {
-    await db.getDb().collection("clients").deleteOne({ _id: theClientId});
+    await Payment.deletePaymentsByPolicyNumber(policyNumber);
+    await Policy.deletePoliciesByClient(req.body.theClientName);
   } catch (error) {
     return next(error);
   }
-  await db.getDb().collection("deleted-clients").insertMany(client);
+
   res.redirect("/all-clients");
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 async function deleteSinglePayment(req, res, next) {
 
   console.log(req.body)
-  // let thePaymentId;
-  // try {
-  //   thePaymentId = new mongodb.ObjectId(req.body.payment);
-  // } catch (error) {
-  //   error.code = 404;
-  //   throw error;
-  // }
-  // try {
-  //   await db.getDb().collection("clients").deleteOne({ _id: theClientId});
-  // } catch (error) {
-  //   return next(error);
-  // }
-  // await db.getDb().collection("deleted-clients").insertMany(client);
   res.redirect("/all-clients");
 }
 ////////////////////////////////////////////////////////////////////////////////

@@ -36,9 +36,7 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
   }
 ////////////////////////////////////////////////////////////////////////
   static async findByPin(pin) {
-
     const thePin = pin;
-
     const theWantedClient = await db
           .getDb()
           .collection("clients")
@@ -50,6 +48,17 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
         }
         return theWantedClient;
       }
+  ////////////////////////////////////////////////////////////////////////
+  static async deletePaymentsByPolicyNumber(policyNumber) {
+    try {
+      console.log(policyNumber)
+      const deleteResult = await db.getDb().collection('payments').deleteMany({ policyNumber:policyNumber });
+      console.log(deleteResult)
+      return deleteResult;
+    } catch (err) {
+      console.error(err);
+    }
+  }
 ////////////////////////////////////////////////////////////////////////
     async save(clientName, clientPin, paymentAmount, policyNumber, agentName, paidCash) {
         const paymentData = {
@@ -64,6 +73,11 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
             await db.getDb().collection('payments').insertOne(paymentData)
     }
     
+
+
+
+
+
     // remove() {
     //     const policyId = new mongodb.ObjectId(this.id);
     //     return db.getDb().collection('policies').deleteOne({ _id: policyId });

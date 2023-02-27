@@ -34,8 +34,6 @@
                 <% }%>
                 <% if(locals.isAdmin) {%>
                     <li class="adminA"><a href="/admin/daily-report">Агенти</a></li>
-                    <!-- <li class="adminA"><a href="/admin/daily-report">Дневен извештај</a></li>
-                    <li class="adminA"><a href="/admin/admin-report">Админ панел</a></li> -->
                     <li><a href="/signup">Креирај агент</a></li>
                     <% }%>
                 <% if(locals.isAuth) {%>
@@ -100,7 +98,7 @@
                 <input type="hidden" name="name" value="<%=client.name%>"> 
                 <hr>
                 <label for="insurancePolicy"></label>
-                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Број на полиса" pattern="[a-zA-Z0-9]+"> 
+                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Број на полиса" pattern="[a-zA-Z0-9]+" maxlength="21"> 
                 <label for="amount"></label>
                 <input type="number" name="amount" id="amount" placeholder="Премија по полиса" required 
                 min="1" max="500000">
@@ -251,39 +249,28 @@
             <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
             <button class="btn" > Фактура </a>
         </form>
+
+
     </div>
+    <% if(locals.isAdmin) {%>
+    <form action="/agents/clients/deletePolicy" method="POST">
+        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+        <input type="hidden" name="clientId" value="<%=client._id%>">
+        <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
+        <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
+        <button class="btn" > Избриши полиса </a>
+    </form>
+    <% } %>
     </section>
 </div>
                <% } %>    
 </section>
 
-<!-- <br>
- <hr>
-<h2>Сите уплати</h2>
-<div class="paymentsByClient">
-    <div class="singlePayment">
-        <p>Износ на уплата:</p>
-        <p>Датум на уплата: </p>
-        <p>Наплатено од Агент: </p>
-    </div>
-    <% for (const payment of clientPayments) { %>
-        <div class="singlePayment">
-            <p><%=payment.clientName.paymentAmount%>,00 денари</p>
-            <p><%=payment.date%> година</p>
-            <p><%=payment.clientName.agentName%></p>
-            <% if(locals.isAdmin) {%>
-
-                <% } %> 
-        </div>
-    <%}%>
-</div>
-<br>
-<hr> -->
 <% if(locals.isAdmin) {%>
     <section>
        <div>
         <br>
-        <hr>
+        <!-- <hr>
         <h3>Промени внесени податоци кај клиент</h3>
         <form action="/update-client/<%=clientId%>"  method="POST" id="updateClientData">
             <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
@@ -298,17 +285,17 @@
         <hr>
             <button class="btn"> Промени клиент </button>
             <main>
-        </form>
+        </form> -->
         <form action="/agents/clients/delete/<%=client._id%>" method="POST">
             <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
             <input type="hidden" name="theClientId" value="<%=client._id%>">
-
+            <input type="hidden" name="theClientName" value="<%=client.name%>">
+            <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
+            <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
             <button value="<%= client._id%>"data-clientid="<%= client._id%>" data-csrf="<%=locals.csrfToken%>" class="btn-alt">Избриши клиент</button>
         </form>
     </div>
-  
     <section class="delete-client-section">
-  
     </section>
     </section>
     <% }%> 
