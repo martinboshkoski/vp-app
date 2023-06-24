@@ -52,7 +52,15 @@ router.get('/new-payment', function(req, res){
     res.render('agents/payment/new-payment')
 })
 
+///payments
+
 router.post('/new-payment', paymentsController.insertPayment)
+
+router.post('/edit-payment', paymentsController.editPayment)
+
+///
+
+
 
 router.get('/agents/clients/:id', clientController.getUpdateClient)
 

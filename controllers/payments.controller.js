@@ -170,32 +170,49 @@ async function generatePerDate(req, res, next) {
   }
 }
 
+async function editPayment(req, res, next) {
+  const policyId = req.body.policyId;
+  const policyNumber = req.body.policyNumber;
+  const paymentDateOld = req.body.paymentDateOld;
+  const paymentAmountOld = req.body.paymentAmountOld;
+  const paidCash = req.body.paidCash;
+
+  const paymentAmount = req.body.paymentAmount;
+  const paymentDate = req.body.paymentDate;
+
+  try {
+    const payment = await Payment.findPaymentByPolicyNumberAndDate(policyNumber, paymentDateOld);
+    const policy = await Policy.findById(policyId)
+
+    await Payment.updatePayment(payment._id, paymentAmount, paymentDate, paidCash);
+    await Policy.updatePolicyPayment(policyId, paymentDateOld, paymentAmountOld, paymentAmount, paymentDate, paidCash);
+
+    if (!payment) {
+      throw new Error('Payment not found');
+    }
+
+
+    //go to the same client page
+    const clientPin = req.body.pin;
+    const clientThroughPayment = await Payment.findByPin(clientPin.toString());
+    const objectId = clientThroughPayment._id;
+    const theClientPage = "/agents/clients/" + objectId;
+    res.redirect(theClientPage);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while editing the payment' });
+  }
+}
+
+
+
+
 module.exports = {
   getPayments: getPayments,
   insertPayment: insertPayment,
   generatePerDate: generatePerDate,
   getByDate: getByDate,
-  // generatePaymentsReport: generatePaymentsReport
-  // getByPin: getByPin
+  editPayment:editPayment
 };
 
-// async function generatePaymentsReport(req, res, next) {
-//     const theDate = req.body.date;
-//     try {
-//       let payments = await Payment.findAll();
-//       let todayPayments = [];
-
-//       // for (todayPayment of payments) {
-//       //   if (
-//       //     moment(req.body.date).format("DD/MM/YYYY") == moment(todayPayment.date).format("DD/MM/YYYY")
-//       //   ) {
-//       //     todayPayments.push(todayPayment);
-//       //   }
-//       // }
-
-//     res.render("agents/payment/by-date", { theDate: theDate });
-//   } catch (error) {
-//     next(error);
-//     return;
-//   }
-// }

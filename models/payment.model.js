@@ -20,6 +20,15 @@ class Payment {
     })
 }
 ////////////////////////////////////////////////////////////////////////
+static async findPaymentByPolicyNumberAndDate(policyNumber, paymentDateOld) {
+  const payment = await db
+    .getDb()
+    .collection("payments")
+    .findOne({ policyNumber: policyNumber, date: paymentDateOld });
+  return payment;
+}
+
+////////////////////////////////////////////////////////////////////////
 static async findByDateAndAgent(date, agentName) {
 const theDate = moment(date).format('DD/MM/YYYY').toString()
   const paymentsOnDate = await db
@@ -31,6 +40,7 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
       error.code = 404;
       throw error;
     }
+    console.log('im here')
     console.log(paymentsOnDate)
     return paymentsOnDate;
   }
@@ -51,15 +61,13 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
   ////////////////////////////////////////////////////////////////////////
   static async deletePaymentsByPolicyNumber(policyNumber) {
     try {
-      console.log(policyNumber)
       const deleteResult = await db.getDb().collection('payments').deleteMany({ policyNumber:policyNumber });
-      console.log(deleteResult)
       return deleteResult;
     } catch (err) {
       console.error(err);
     }
   }
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
     async save(clientName, clientPin, paymentAmount, policyNumber, agentName, paidCash) {
         const paymentData = {
             clientName:clientName,
@@ -72,16 +80,29 @@ const theDate = moment(date).format('DD/MM/YYYY').toString()
         }
             await db.getDb().collection('payments').insertOne(paymentData)
     }
-    
+//////////////////////////////////////////////////////////////////////
+static async updatePayment(paymentId, paymentAmount, paymentDate, paidCash) {
 
+console.log(paymentId)
+  ///da go nosi i paidinCash tuka od user, vo hidden forma
+  const updatedPaymentData = {
+    paymentAmount: +paymentAmount,
+    date: paymentDate, 
+    paidCash: paidCash
+  };
 
-
-
-
-    // remove() {
-    //     const policyId = new mongodb.ObjectId(this.id);
-    //     return db.getDb().collection('policies').deleteOne({ _id: policyId });
-    //   }
+  const result = await db
+    .getDb()
+    .collection('payments')
+    .updateOne(
+      { _id: paymentId},
+      { $set: updatedPaymentData }
+    );
+  if (result.modifiedCount === 0) {
+    throw new Error('Payment not found or not updated');
+  }
 }
-module.exports = Payment;
-   
+}
+    
+    module.exports = Payment;
+    

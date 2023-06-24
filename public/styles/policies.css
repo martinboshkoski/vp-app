@@ -301,3 +301,18 @@ border: #555555 1px solid;
     background-color: lightgray;
   }
   
+
+  .change-payment {
+    display: grid;
+    grid-template-columns: 3fr 3fr 2fr;
+  }
+
+  .change-payment input {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 70%;
+  }
+
+  .change-payment button {
+    height: 85%;
+  }
