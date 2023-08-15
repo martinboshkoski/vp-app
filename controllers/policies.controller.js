@@ -40,6 +40,9 @@ async function getPolicies(req, res, next) {
       100
     ).toFixed(2);
 
+    totalAmountsPremium = totalAmountsPremium.toLocaleString('de-DE');
+    totalPaidAmounts = totalPaidAmounts.toLocaleString('de-DE');
+
     res.render("agents/policies/policies", {
       policies: policies,
       policiesNumber: policiesNumber,
