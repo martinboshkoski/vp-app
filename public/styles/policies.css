@@ -316,3 +316,7 @@ border: #555555 1px solid;
   .change-payment button {
     height: 85%;
   }
+
+  .unpaid {
+    background-color: #fddcdc;
+  }

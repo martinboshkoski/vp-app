@@ -21,7 +21,13 @@ async function getPolicies(req, res, next) {
     //Calculates the total amount of the premium
     let totalPremium = [];
     for (policy of policies) {
+
       totalPremium.push(policy.policyNumber.policyAmount);
+
+      const policyDate = moment(policy.policyNumber.policyDate);
+      const threeMonthsAgo = moment().subtract(3, 'months');
+
+      policy.isUnpaid = policy.policyNumber.totalPaid < policy.policyNumber.policyAmount && policyDate.isBefore(threeMonthsAgo);
     }
     let totalAmountsPremium = totalPremium.reduce(function (x, y) {
       return x + y;
@@ -40,6 +46,7 @@ async function getPolicies(req, res, next) {
       totalAmountsPremium: totalAmountsPremium,
       totalPaidAmounts: totalPaidAmounts,
       percentagePayment: percentagePayment,
+      moment:moment
     });
   } catch (error) {
     next(error);

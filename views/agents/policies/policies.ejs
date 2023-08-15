@@ -22,9 +22,7 @@
         <hr>
         <br>
     <% }%>
-
      <form action="/policy-by-date" method="POST" class="search-agent">
-
       <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
       <div class="search-bar-div">
         <label for="start-date">Почетен датум:</label>
@@ -37,7 +35,6 @@
     <div class="searchBar">
         <input type="text" placeholder="Пребарувај (број на полиса, ЕМБГ/ЕМБС)" id="searchBar" onkeyup="searchClients()"> 
     </div>
-
     <div class="client" id="allpolicies-top">
       <p>Број на полиса: </p>
       <p>Класа: </p>
@@ -49,19 +46,21 @@
     </div>
     <hr>
     <section id="allPolicies">
-      <% for (const policy of policies ) { %>
-        <li >
+   <ul id="policy-list">  
+      <% for (const policy of policies) { %>
+        <li class="<%= policy.isUnpaid ? 'unpaid' : '' %>">
           <div class="client">
-            <p><%=policy.policyNumber.policyNumber%></p>
-            <p><%=policy.policyNumber.policyType%></p>
-            <p><%=policy.policyNumber.registrationNumber%></p>
-            <p><%=policy.policyNumber.policyAmount%>,00 денари</p>
-            <p><%=policy.policyNumber.totalPaid%>,00 денари</p>
-            <p><%=policy.policyNumber.policyDate%></p>
-            <p><%=policy.policyNumber.clientName%></p>
+            <p><%= policy.policyNumber.policyNumber %></p>
+            <p><%= policy.policyNumber.policyType %></p>
+            <p><%= policy.policyNumber.registrationNumber %></p>
+            <p><%= policy.policyNumber.policyAmount %>,00 денари</p>
+            <p><%= policy.policyNumber.totalPaid %>,00 денари</p>
+            <p><%= moment(policy.policyNumber.policyDate).format('DD.MM.YYYY') %></p>
+            <p><%= policy.policyNumber.clientName %></p>
+          </div>
         </li>
-       <% } %>   
-    </section>
-    
+      <% } %>  
+   </ul>
+  </section>
 </main>
 <%- include('../../shared/includes/footer')%>
