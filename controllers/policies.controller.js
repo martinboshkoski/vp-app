@@ -119,9 +119,14 @@ const requiredPoliciesByDate = await Policy.findByDate(startDate, endDate)
 
 let totalPolicyAmount = 0
 requiredPoliciesByDate.forEach(policy => {
+  const policyDate = moment(policy.policyDate);
+  const threeMonthsAgo = moment().subtract(3, 'months');
+  policy.isUnpaid = policy.totalPaid < policy.policyAmount && policyDate.isBefore(threeMonthsAgo);
+  //
   totalPolicyAmount += policy.policyAmount
 })
 
+console.log(requiredPoliciesByDate)
 res.render("agents/policies/policies-by-date", {
   requiredPoliciesByDate: requiredPoliciesByDate,
   startDate: startDate, 
