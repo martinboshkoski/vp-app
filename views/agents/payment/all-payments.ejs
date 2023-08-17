@@ -46,6 +46,12 @@
             <p><%= payment.paymentAmount || payment.clientName.paymentAmount%>,00 денари</p>
             <p><%=payment.clientName.policyNumber || payment.policyNumber %></p>
             <p>
+              <% if (payment.clientName.paidCash) { %>
+                Во готово - благајна
+              <% } else { %>
+                На сметка (извод)
+              <% } %>
+            </p>  
           </div>
         </li>
        <% } %>    
