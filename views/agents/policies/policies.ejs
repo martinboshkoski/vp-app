@@ -56,7 +56,11 @@
             <p><%= policy.policyNumber.policyAmount %>,00 денари</p>
             <p><%= policy.policyNumber.totalPaid %>,00 денари</p>
             <p><%= moment(policy.policyNumber.policyDate).format('DD.MM.YYYY') %></p>
-            <p><%= policy.policyNumber.clientName %></p>
+            <form action="/find-by-policy" method="POST">
+              <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+              <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
+              <button id="clientByPolicyBtn"><%= policy.policyNumber.clientName %></button>
+            </form>
           </div>
         </li>
       <% } %>  

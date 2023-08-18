@@ -219,6 +219,21 @@ static async updatePolicyPayment(policyId, paymentDateOld, paymentAmountOld, pay
   }
 
 
+static async findByPolicy(policyNumber) {
+
+  const thePolicy = await db
+    .getDb()
+    .collection("policies")
+    .findOne({ policyNumber: policyNumber });
+  if (!thePolicy) {
+    const error = new Error(" Не може да се најде клиентот");
+    error.code = 404;
+    throw error;
+  }
+  return thePolicy;
+}
+
+
 }
 module.exports = Policy;
    

@@ -61,10 +61,13 @@ router.post('/edit-payment', paymentsController.editPayment)
 ///
 
 
-
 router.get('/agents/clients/:id', clientController.getUpdateClient)
 
+router.get('/agents/clients/')
+
 router.post('/update-client/:id', clientController.updateClient)
+
+router.post('/find-by-policy', clientController.findByPolicy)
 
 //////Daily report (generate)
 
@@ -88,7 +91,6 @@ router.post('/agents/clients/delete/:id', clientController.deleteClient)
 router.post('/agents/clients/deletePayment', clientController.deleteSinglePayment)
 
 router.post('/agents/clients/deletePolicy', policiesController.deleteSinglePolicy)
-
 
 //////////////////debt section
 

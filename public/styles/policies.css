@@ -320,3 +320,24 @@ border: #555555 1px solid;
   .unpaid {
     background-color: #fddcdc;
   }
+
+
+button#clientByPolicyBtn {
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-green-500);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-medium);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  
+    /* Hover effect */
+    &:hover {
+      background-color: var(--color-green-300);
+    }
+  
+    /* Active (clicked) effect */
+    &:active {
+      transform: translateY(1px);
+    }
+  }

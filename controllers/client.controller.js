@@ -296,6 +296,16 @@ async function getEnforcementClients(req, res, next) {
   res.render("agents/enforcementAgent/enforcement-agent", {clients:clients});
 }
 
+async function findByPolicy(req, res, next) {
+
+  const policyNumber = req.body.policyNumber
+  thePolicy = await Policy.findByPolicy(policyNumber);
+
+  client = await Client.findByPin(thePolicy.clinetPin);
+  
+  res.redirect(`/agents/clients/${client._id.toString()}`)  
+}
+
 module.exports = {
   getClient: getClient,
   getNewClient: getNewClient,
@@ -308,5 +318,6 @@ module.exports = {
   withdrawLawsuit: withdrawLawsuit, 
   enforcementAgent: enforcementAgent, 
   getEnforcementClients:getEnforcementClients,
-  deleteSinglePayment: deleteSinglePayment
+  deleteSinglePayment: deleteSinglePayment,
+  findByPolicy:findByPolicy
 };
