@@ -290,9 +290,28 @@ async function withdrawLawsuit(req, res, next) {
     res.redirect("/enforcement-agent");
   }
   async function getDebtClients(req, res, next) {
-  const clients = await Client.findAll();
-  res.render("agents/debtClients/debt-clients", {clients:clients});
-}
+
+    const policies = await Policy.findAll();
+    
+    let unPaidSixMonths = []
+    let unPaidThreeMonths = []
+    
+    for (policy of policies) {
+      const policyDate = moment(policy.policyNumber.policyDate);
+      const threeMonthsAgo = moment().subtract(3, 'months');
+      const sixMonthsAgo = moment().subtract(6, 'months');
+    
+      if(policy.policyNumber.totalPaid < policy.policyNumber.policyAmount && policyDate.isBefore(threeMonthsAgo)) {
+        unPaidThreeMonths.push(policy)
+      };
+    
+      if(policy.policyNumber.totalPaid < policy.policyNumber.policyAmount && policyDate.isBefore(sixMonthsAgo)) {
+        unPaidSixMonths.push(policy)
+      };
+    }
+      const clients = await Client.findAll();
+      res.render("agents/debtClients/debt-clients", {clients:clients, unPaidSixMonths:unPaidSixMonths, unPaidThreeMonths:unPaidThreeMonths, moment:moment});
+    }
 
 async function getEnforcementClients(req, res, next) {
   const clients =  await db.getDb().collection("clients").find().toArray();//to be moved in the model

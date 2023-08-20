@@ -9,6 +9,60 @@
 <section class="debtClientLists">
 <!-- <ul class="toStartProcedure">
     <ul class="debtUl">   -->
+        <section>
+            <h3>Неплатени полиси, направени повеќе од шест месеци</h3>
+            <table id="debt-table">
+              <thead>
+                <tr>
+                  <th>Клиент</th>
+                  <th>Број на полиса</th>
+                  <th>Износ на полиса</th>
+                  <th>Исплатен долг</th>
+                  <th>Датум на полиса</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const policy of unPaidSixMonths ) { %>
+                  <tr>
+                    <td><%= policy.policyNumber.clientName %></td>
+                    <td><%= policy.policyNumber.policyNumber %></td>
+                    <td><%= policy.policyNumber.policyAmount.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= policy.policyNumber.totalPaid.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= moment(policy.policyNumber.policyDate).format('DD.MM.YYYY') %></td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </section>
+          
+          <section>
+            <h3>Неплатени полиси, направени повеќе од три месеци</h3>
+            <table id="debt-table">
+              <thead>
+                <tr>
+                  <th>Клиент</th>
+                  <th>Број на полиса</th>
+                  <th>Износ на полиса</th>
+                  <th>Исплатен долг</th>
+                  <th>Датум на полиса</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const policy of unPaidThreeMonths ) { %>
+                  <tr>
+                    <td><%= policy.policyNumber.clientName %></td>
+                    <td><%= policy.policyNumber.policyNumber %></td>
+                    <td><%= policy.policyNumber.policyAmount.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= policy.policyNumber.totalPaid.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= moment(policy.policyNumber.policyDate).format('DD.MM.YYYY') %></td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </section>
+
+
+
         <% for (const client of clients ) { %>
         <% if (client.startedLawsuit) {%> 
             <section>
