@@ -48,6 +48,9 @@ return x + y;
 
 const percentagePayment = ((totalPaidAmounts / totalAmountsPremium)*100).toFixed(2)
 
+totalPaidAmounts = totalPaidAmounts.toLocaleString('de-DE');
+totalAmountsPremium = totalAmountsPremium.toLocaleString('de-DE');
+
     res.render("agents/clients/all-clients", {
       clients: clients,
       total: total,
