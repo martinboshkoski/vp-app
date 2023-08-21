@@ -53,8 +53,8 @@
             <p><%= policy.policyNumber.policyNumber %></p>
             <p><%= policy.policyNumber.policyType %></p>
             <p><%= policy.policyNumber.registrationNumber %></p>
-            <p><%= policy.policyNumber.policyAmount %>,00 денари</p>
-            <p><%= policy.policyNumber.totalPaid %>,00 денари</p>
+            <p><%= policy.policyNumber.policyAmount.toLocaleString('de-DE') %>,00 денари</p>
+            <p><%= policy.policyNumber.totalPaid.toLocaleString('de-DE') %>,00 денари</p>
             <p><%= moment(policy.policyNumber.policyDate).format('DD.MM.YYYY') %></p>
             <form action="/find-by-policy" method="POST">
               <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
