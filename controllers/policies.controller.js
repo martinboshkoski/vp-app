@@ -27,8 +27,9 @@ async function getPolicies(req, res, next) {
       const policyDate = moment(policy.policyNumber.policyDate);
       const threeMonthsAgo = moment().subtract(3, 'months');
 
+      policy.isUnpaid = (policy.policyNumber.totalPaid || 0) < policy.policyNumber.policyAmount && policyDate.isBefore(threeMonthsAgo);
       // policy.isUnpaid = policy.policyNumber.totalPaid < policy.policyNumber.policyAmount && policyDate.isBefore(threeMonthsAgo);
-      policy.isUnpaid = policy.policyNumber.totalPaid < policy.policyNumber.policyAmount;
+      // policy.isUnpaid = policy.policyNumber.totalPaid < policy.policyNumber.policyAmount;
     }
     let totalAmountsPremium = totalPremium.reduce(function (x, y) {
       return x + y;
