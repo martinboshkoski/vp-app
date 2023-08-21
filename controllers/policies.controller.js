@@ -128,7 +128,8 @@ let totalPolicyAmount = 0
 requiredPoliciesByDate.forEach(policy => {
   const policyDate = moment(policy.policyDate);
   const threeMonthsAgo = moment().subtract(3, 'months');
-  policy.isUnpaid = policy.totalPaid < policy.policyAmount && policyDate.isBefore(threeMonthsAgo);
+  
+  policy.isUnpaid = (policy.policyNumber.totalPaid || 0) < policy.policyNumber.policyAmount;
   //
   totalPolicyAmount += policy.policyAmount
 })
