@@ -86,7 +86,7 @@ if (agentSeller !== "vp") {
     theRequiredAgentPolicy = moment(policy.policyDate).isBetween(startDate, endDate);
     if (theRequiredAgentPolicy) {
       for (payment of policy.thePayment) {
-        console.log(payment)
+        // console.log(payment)
         if (payment.amount !== 0) {
           requiredPoliciesByPayment.push(policy);
           totalPremium.push(policy.policyAmount);
