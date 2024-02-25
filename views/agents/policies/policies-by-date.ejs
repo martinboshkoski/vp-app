@@ -4,13 +4,15 @@
     <script src="/scripts/client-managment.js" defer></script>
 </head>
 <body>
- <%- include('../../shared/includes/header')%>
+  <div id="navUnpaid">
+    <%- include('../../shared/includes/header')%>
+  </div>
 <main>
     <br>
     <h3>Полиси по избран датум: <%=moment(startDate).format('DD/MM/YYYY')%>  година до <%=moment(endDate).format('DD/MM/YYYY')%>  година</h3>
     <hr>
     <button id="showUnpaidBtn" class="btn">Покажи не наплатени</button>
-    <!-- <button id="" class="btn">Принтај</button> -->
+    <button id="printPoliciesByDate" class="btn">Принтај</button>
     <table>
       <thead>
         <tr>
@@ -50,6 +52,6 @@
         </tr>
       </thead>
     </table>    
-
+<h3 id="totalUnpaid">Вкупно ненаплатен износ: <%=totalUnPaidPolicyAmount%>,00 денари</h3>
 </main>
 <%- include('../../shared/includes/footer')%>

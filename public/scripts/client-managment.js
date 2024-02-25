@@ -49,7 +49,7 @@ const lastRow = document.getElementById('lastRow')
 
 const showUnpaid = function () {
     lastRow.style.display="none"
-    
+
     allRows.forEach(row => {
         if (row.classList.contains('unpaid')) {
             // If the row has 'unpaid' class, show it
@@ -63,3 +63,18 @@ const showUnpaid = function () {
 
 showUnpaidBtn.addEventListener('click', showUnpaid);
 
+////
+// Add this script to your client-managment.js
+document.getElementById("printPoliciesByDate").addEventListener("click", function () {
+    // Hide elements you don't want to print
+    document.getElementById("navUnpaid").style.display = "none";
+    document.getElementById("showUnpaidBtn").style.display = "none";
+    document.getElementById("printPoliciesByDate").style.display = "none";
+    document.getElementById("totalUnpaid").style.display = "none";
+
+    // Print the page
+    window.print();
+    // Show the hidden elements after printing
+    document.getElementById("showUnpaidBtn").style.display = "block";
+    document.getElementById("printPoliciesByDate").style.display = "block";
+});
