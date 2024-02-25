@@ -28,7 +28,7 @@ async function getClient(req, res, next) {
 const payments = await Payment.findAll();
 let paidAmounts = []
 for (payment of payments) {
-    paidAmounts.push(payment.clientName.paymentAmount)
+    paidAmounts.push(payment.paymentAmount)
 }
 let totalPaidAmounts = paidAmounts.reduce(function (x, y) {
     return x + y;
@@ -38,7 +38,7 @@ let totalPaidAmounts = paidAmounts.reduce(function (x, y) {
 const policies = await Policy.findAll();   
 let totalPremium = []
 for (policy of policies) {
-totalPremium.push(policy.policyAmount)
+totalPremium.push(policy.policyNumber.policyAmount)
 }
 let totalAmountsPremium = totalPremium.reduce(function (x, y) {
 return x + y;
