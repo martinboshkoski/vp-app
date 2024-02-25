@@ -7,10 +7,12 @@ const mongodb = require("mongodb");
 const moment = require("moment");
 const db = require("../data/database");
 
+////////////////////////////////////////////////////////////////////////
 async function getPayments(req, res, next) {
   try {
     const agent = await Agent.getAgentWithSameId(req.session.uid);
     const agentName = agent.name;
+
     const payments = await Payment.findAll();
     let sum = 0;
     let pickedDate = '___/___/______'
@@ -21,26 +23,28 @@ async function getPayments(req, res, next) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////
 async function getByDate(req, res, next) {
   try {
     const agent = await Agent.getAgentWithSameId(req.session.uid);
-    const agentName = agent.name;
-
-//da se generiraat samo tie uplati sto se povrzani/primeni od konkretniot
+    const inputAgent = req.body.agentName;
+    const agentName = inputAgent || agent.name;
 
     const payments = await Payment.findByDateAndAgent(req.body.date, agentName);
 
 /// Sum of all payments
 let allPayments = []
 for (payment of payments) {
-  allPayments.push(payment.paymentAmount)
+  allPayments.push(+payment.paymentAmount)
 }
-/////
-let sum = allPayments.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+let unformatedSum = (allPayments.reduce((accumulator, currentValue) => accumulator + currentValue, 0))
+
+let sum = unformatedSum.toLocaleString('de-DE');
+
 ////
 const pickedDate = moment(req.body.date).format('DD/MM/YYYY')
 
-res.render("agents/payment/all-payments", {
+res.render("agents/payment/by-date", {
       payments: payments,
       agentName:agentName, 
       sum:sum, 
@@ -51,24 +55,30 @@ res.render("agents/payment/all-payments", {
     return;
   }
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function generatePerDate(req, res, next) {
+  try {
+    let payments = await Payment.findAll();
+    let todayPayments = [];
+    for (todayPayment of payments) {
+      if (
+        moment(req.body.date).format("MM/DD/YYYY") ==
+        moment(todayPayment.date).format("DD/MM/YYYY")
+      ) {
+        todayPayments.push(todayPayment);
+      }
+    }
+    res.render("agents/payment/all-payments", { payments: payments });
+  } catch (error) {
+    next(error);
+    return;
+  }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertPayment(req, res, next) {
   try {
     const policy = await Policy.findById(req.body.policyId);
     const policyNumber = req.body.policyNumber;
-
-//Different percentage for different agents:
-// console.log(req.body.agentSeller)
-// let percentage;
-// if (req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
-// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
-// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
-// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
-// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
-// req.body.agentSeller == "Канцеларија Кузман Јосифоски" || 
-// ) else {
-//   percentage = 0.15;
-// }
 
     let agentCommision;
     if (policy.policyAmount > +req.body.payment) {
@@ -150,26 +160,63 @@ async function insertPayment(req, res, next) {
     return;
   }
 }
-
-async function generatePerDate(req, res, next) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function insertLawsuitPayment(req, res, next) {
   try {
-    let payments = await Payment.findAll();
-    let todayPayments = [];
-    for (todayPayment of payments) {
-      if (
-        moment(req.body.date).format("MM/DD/YYYY") ==
-        moment(todayPayment.date).format("DD/MM/YYYY")
-      ) {
-        todayPayments.push(todayPayment);
-      }
-    }
-    res.render("agents/payment/all-payments", { payments: payments });
+    const thePayment = {
+      suedClientName: req.body.suedClientName,
+      principal: +req.body.principal,
+      interest: +req.body.interest,
+      costs: +req.body.costs,
+      date: moment().format("DD-MM-YYYY"),
+      paidCash: "paidCash"
+    };
+
+    const agent = await Agent.getAgentWithSameId(req.session.uid);
+    let clientPin = "/"; // Ensure this variable is correctly assigned a value
+    let policyNumber = "/"; // Ensure this variable is correctly assigned a value
+
+    // Create and save principal payment
+    const principalPayment = new Payment(
+      thePayment.suedClientName,
+      clientPin,
+      thePayment.principal, // This assumes you corrected the order of arguments in the constructor
+      "Главен долг (по тужба)",
+      agent.name,
+      thePayment.paidCash
+    );
+    await principalPayment.save();
+
+    // Create and save interest payment
+    const interestPayment = new Payment(
+      thePayment.suedClientName,
+      clientPin,
+      thePayment.interest,
+      "Законска казнена камата (по тужба)",
+      agent.name,
+      thePayment.paidCash
+    );
+    await interestPayment.save();
+
+    // Create and save costs payment
+    const costsPayment = new Payment(
+      thePayment.suedClientName,
+      clientPin,
+      thePayment.costs,
+      "Судски трошоци (по тужба)",
+      agent.name,
+      thePayment.paidCash
+    );
+    await costsPayment.save();
+
+    res.redirect("/all-payments");
   } catch (error) {
     next(error);
     return;
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function editPayment(req, res, next) {
   const policyId = req.body.policyId;
   const policyNumber = req.body.policyNumber;
@@ -190,8 +237,6 @@ async function editPayment(req, res, next) {
     if (!payment) {
       throw new Error('Payment not found');
     }
-
-
     //go to the same client page
     const clientPin = req.body.pin;
     const clientThroughPayment = await Payment.findByPin(clientPin.toString());
@@ -205,12 +250,10 @@ async function editPayment(req, res, next) {
   }
 }
 
-
-
-
 module.exports = {
   getPayments: getPayments,
   insertPayment: insertPayment,
+  insertLawsuitPayment: insertLawsuitPayment,
   generatePerDate: generatePerDate,
   getByDate: getByDate,
   editPayment:editPayment

@@ -3,6 +3,7 @@ const Payment = require("../models/payment.model");
 const moment = require("moment");
 const db = require('../data/database')
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function getPolicies(req, res, next) {
   try {
     const policies = await Policy.findAll();
@@ -27,18 +28,28 @@ async function getPolicies(req, res, next) {
       const policyDate = moment(policy.policyNumber.policyDate);
       const threeMonthsAgo = moment().subtract(3, 'months');
 
-      policy.isUnpaid = (policy.policyNumber.totalPaid || 0) < policy.policyNumber.policyAmount;
+      const paymentPercentage = (policy.policyNumber.totalPaid || 0) / policy.policyNumber.policyAmount;
+      // Determine policy status based on payment percentage
+      if (paymentPercentage >= 1) {
+          // Policy is fully paid
+          policy.isUnpaid = false;
+          policy.discount = false;
+      } else if (paymentPercentage >= 0.79) {
+          // Policy is paid 80% or more but less than 100%
+          policy.discount = true;
+          policy.isUnpaid = false;
+      } else {
+          // Policy is paid less than 80%
+          policy.isUnpaid = true;
+          policy.discount = false;
+      }
 
-      // policy.isUnpaid = (policy.policyNumber.totalPaid || 0) < policy.policyNumber.policyAmount && policyDate.isBefore(threeMonthsAgo);
-      // policy.isUnpaid = policy.policyNumber.totalPaid < policy.policyNumber.policyAmount && policyDate.isBefore(threeMonthsAgo);
-      // policy.isUnpaid = policy.policyNumber.totalPaid < policy.policyNumber.policyAmount;
+
     }
     let totalAmountsPremium = totalPremium.reduce(function (x, y) {
       return x + y;
     }, 0);
-
-    //Calculates the percentage of premium vs paid
-
+    
     const percentagePayment = (
       (totalPaidAmounts / totalAmountsPremium) *
       100
@@ -61,6 +72,7 @@ async function getPolicies(req, res, next) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertNewPolicy(req, res, next) {
   const clientPin = req.body.pin;
   const clientName = req.body.name;
@@ -118,6 +130,7 @@ async function insertNewPolicy(req, res, next) {
   res.redirect(theClientPage);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function getByDate(req, res, next) {
 const startDate = req.body.startDate
 const endDate = req.body.endDate
@@ -129,8 +142,22 @@ requiredPoliciesByDate.forEach(policy => {
   const policyDate = moment(policy.policyDate);
   const threeMonthsAgo = moment().subtract(3, 'months');
 
-  policy.isUnpaid = (policy.policyNumber.totalPaid || 0) < policy.policyNumber.policyAmount;
-  //
+  const paymentPercentage = (policy.totalPaid || 0) / policy.policyAmount;
+  // Determine policy status based on payment percentage
+  if (paymentPercentage >= 1) {
+      // Policy is fully paid
+      policy.isUnpaid = false;
+      policy.discount = false;
+  } else if (paymentPercentage >= 0.79) {
+      // Policy is paid 80% or more but less than 100%
+      policy.discount = true;
+      policy.isUnpaid = false;
+  } else {
+      // Policy is paid less than 80%
+      policy.isUnpaid = true;
+      policy.discount = false;
+  }
+    //
   totalPolicyAmount += policy.policyAmount
 })
 
@@ -143,6 +170,7 @@ res.render("agents/policies/policies-by-date", {
 });
 } 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function deleteSinglePolicy(req, res, next) {
   const policyNumber = req.body.policyNumber;
   const deletePolicyId = req.body.policyId;
@@ -155,6 +183,7 @@ async function deleteSinglePolicy(req, res, next) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports = {
   getPolicies: getPolicies,
   insertNewPolicy: insertNewPolicy,

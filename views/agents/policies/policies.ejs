@@ -48,7 +48,7 @@
     <section id="allPolicies">
    <ul id="policy-list">  
       <% for (const policy of policies) { %>
-        <li class="<%= policy.isUnpaid ? 'unpaid' : '' %>">
+        <li class="<%= policy.isUnpaid ? 'unpaid' : policy.discount ? 'discount' : '' %>">
           <div class="client">
             <p><%= policy.policyNumber.policyNumber %></p>
             <p><%= policy.policyNumber.policyType %></p>

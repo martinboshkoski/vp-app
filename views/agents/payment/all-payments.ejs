@@ -1,52 +1,56 @@
-<%- include('../../shared/includes/head', {pageTitle: 'All Clients'})%>
+<%- include('../../shared/includes/head', {pageTitle: 'Уплати'})%>
     <link rel="stylesheet" href="/styles/forms.css">
     <link rel="stylesheet" href="/styles/policies.css">
     <script src="/scripts/client-managment.js" defer></script>
 </head>
-<body>
- <%- include('../../shared/includes/header')%>
-<main id="payments-main">
-<!-- 
-    <form action="/dailyPaymentsReport" method="POST">
-      <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-      <input type="date" name="date">
-      <!-- <input type="hidden" name="dailyPayments" value="<%=payments%>"> -->
-      <!-- <button class="btn">Дневен извештај</button> -->
-    <!-- </form>  -->
-    <div class=" ">
-      <form action="/get-by-date" method="POST">
+<body style="background-color: white;">
+  <main id="payments-main">
+    <div id="paymentNav">
+    <%- include('../../shared/includes/header')%>
+  </div>
+  <section id="paymentPanel" style="display: block;">
+    <div >
+      <form action="/get-by-date" method="POST" class="quickPaymentForm">
+        <h3 style="margin-bottom: 1rem;">Благајна по датум </h3>
         <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-<!-- <select name="agentName" >
-  <option value="Канцеларија 1">Канцеларија 1</option>
-  <option value="Канцеларија 2">Канцеларија 2</option>
-</select> -->
+        <% if(locals.isAdmin) {%>
+          <select name="agentName">
+            <option value="Седиште - K.Јосифоски 8">Канцеларија 1</option>
+            <option value="Подружница 2 - ВАШ ПРИЈАТЕЛ АД Прилеп">Канцеларија 2</option>
+          </select>
+        <% } %>
         <input type="date" name="date" >
         <button id="searchPaymentsBtn" class="btn">Барај</button>
       </form>
     </div>
-<hr>
-<!-- 
-    <div class="searchBar" >
-      <input type="text" placeholder="Пребарувај (Име на клиент, ЕМБГ/ЕМБС, износ)" id="searchBar" onkeyup="searchClients()"> 
-  </div> -->
-  <h3>Дневник на благајна од <%=pickedDate%> година</h3>
-  <h4>Подружница: <%=agentName%> </h4>
-
-    <div class="paymentsSection-alt">
+<form action="/lawsuit-payment" method="POST" class="quickPaymentForm">
+    <h3>Уплата по тужба </h3>
+    <h4>(во готовина)</h4>
+    <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+    <input type="text" name="suedClientName" id="" placeholder="Тужен (име и презиме)">
+    <input type="number" name="principal" id="" placeholder="Главен долг">
+    <input type="number" name="interest" id="" placeholder="Камата">
+    <input type="number" name="costs" id="" placeholder="Трошоци">
+    <button>Внеси</button>
+<!-- </form>
+</section>
+  <h3>Благајна, за подружница: <%=agentName%> </h4>
+    <h3>________________________________ </h3>
+    <div class="paymentsSection-alt" style="font-size: small;">
       <p>Клиент:</p>
       <p>Влез</p>
-      <p>Број на полиса: </p>
+      <p>Број на полиса / друг основ: </p>
       <p>Забелешка</p>
     </div>
     <hr>    
     <% for (const payment of payments ) { %>
-        <li>
-          <div class="paymentsSection">
+      <li>
+          <div class="paymentsSection" style="font-size: small;">
             <p><%=payment.clientName.clientName || payment.clientName %></p>
             <p><%= payment.paymentAmount || payment.clientName.paymentAmount%>,00 денари</p>
             <p><%=payment.clientName.policyNumber || payment.policyNumber %></p>
             <p>
-              <% if (payment.clientName.paidCash) { %>
+              <% if (payment.paidCash) { %>
                 Во готово - благајна
               <% } else { %>
                 На сметка (извод)
@@ -68,7 +72,7 @@
   <p>Одговорно лице на подружница (потпис)</p>
   <p></p>
 </div>
-
+<button id="printBtn" onclick="printPage()" class="btn">Print</button> -->
 
 </main>
 <%- include('../../shared/includes/footer')%>

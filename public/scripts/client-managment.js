@@ -30,14 +30,14 @@ for (let i = 0; i < policyDebt.length; i++) {
         policyDebt[i].className="debt-par"
     }
 }
-  
 
-// const insurancePolicyTypeAO = document.getElementById('#ao')
+/////
 
-// const insurancePolicyTypeF = function() {
-
-//     console.log(insurancePolicyTypeAO)
-
-// }
-
-// insurancePolicyTypeAO.addEventListener('click', insurancePolicyTypeF)
+function printPage() {
+    // var paymentPanel = document.getElementById("paymentPanel");
+    var paymentNav = document.getElementById("paymentNav");
+    var printBtn = document.getElementById("printBtn")
+        paymentNav.style.display = "none";
+        printBtn.style.display = "none";
+    window.print();
+  }

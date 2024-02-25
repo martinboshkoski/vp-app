@@ -1,0 +1,103 @@
+<%- include('../../shared/includes/head', {pageTitle: 'Debt Clients'})%>
+    <link rel="stylesheet" href="/styles/debt.css">
+    <script src="/scripts/client-managment.js" defer></script>
+</head>
+<body>
+ <%- include('../../shared/includes/header')%>
+<main>
+    <h1>Должници и тужени клиенти</h1>
+<section class="debtClientLists">
+<!-- <ul class="toStartProcedure">
+    <ul class="debtUl">   -->
+        <section>
+            <!-- <h3>Неплатени полиси, направени повеќе од шест месеци</h3>
+            <table id="debt-table">
+              <thead>
+                <tr>
+                  <th>Клиент</th>
+                  <th>Број на полиса</th>
+                  <th>Износ на полиса</th>
+                  <th>Исплатен долг</th>
+                  <th>Датум на полиса</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const policy of unPaidSixMonths ) { %>
+                  <tr>
+                    <td> <form action="/find-by-policy" method="POST">
+                        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                        <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
+                        <button id="clientByPolicyBtn"><%= policy.policyNumber.clientName %></button>
+                      </form>
+                    </td>
+                    <td><%= policy.policyNumber.policyNumber %></td>
+                    <td><%= policy.policyNumber.policyAmount.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= policy.policyNumber.totalPaid.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= moment(policy.policyNumber.policyDate).format('DD.MM.YYYY') %></td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </section>
+          
+          <section>
+            <h3>Неплатени полиси, направени повеќе од три месеци</h3>
+            <table id="debt-table">
+              <thead>
+                <tr>
+                  <th>Клиент</th>
+                  <th>Број на полиса</th>
+                  <th>Износ на полиса</th>
+                  <th>Исплатен долг</th>
+                  <th>Датум на полиса</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const policy of unPaidThreeMonths ) { %>
+                  <tr>
+                    <td> <form action="/find-by-policy" method="POST">
+                        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                        <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
+                        <button id="clientByPolicyBtn"><%= policy.policyNumber.clientName %></button>
+                      </form>
+                    </td>
+                    <td><%= policy.policyNumber.policyNumber %></td>
+                    <td><%= policy.policyNumber.policyAmount.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= policy.policyNumber.totalPaid.toLocaleString('de-DE') %>,00 денари</td>
+                    <td><%= moment(policy.policyNumber.policyDate).format('DD.MM.YYYY') %></td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </section> -->
+
+
+
+        <% for (const client of clients ) { %>
+        <% if (client.startedLawsuit) {%> 
+            <section>
+            <div class="singleClient">
+                <p>Тужен клиент: <%=client.name%>. Долг по премија од: <%=client.debt%>,00 денари (без судски трошоци, види вкупен долг во картица на клиент).                
+                Одговорен агент за продажба и наплата е: <%=client.agentName%>. Датум кога клиентот е даден на утужување е: <%=client.lawsuitDate%> година.</p>
+                <% if (locals.isAdmin) {%> 
+            <form class="startLawsuitForm" action="/withdraw-lawsuit/<%=client.id%>" method="POST">
+                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                <input type="hidden" name="pin" value="<%=client.pin%>"> 
+                <button data-clientid="<%= client._id%>" data-csrf="<%=locals.csrfToken%>" class="startLawsuitBtn"> Повлечи тужба</button>
+            </form> 
+            <% } %>
+            <form class="startLawsuitForm" action="/enforcment-procedure/<%=client.id%>" method="POST">
+                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                <input type="hidden" name="pin" value="<%=client.pin%>"> 
+                <button data-clientid="<%= client._id%>" data-csrf="<%=locals.csrfToken%>" class="startLawsuitBtn"> За извршител</button>
+            </form>      
+            <% if (client.enforcement) {%> 
+<p>Клиентот е даден на извршител</p>
+                <% } %>
+    </div>
+    <% } %>
+        <% } %>
+    </ul>
+    </section>
+</main>
+<%- include('../../shared/includes/footer')%>

@@ -133,7 +133,7 @@ border-radius: 4rem;
     display: grid;
     grid-template-columns: 1fr;
     margin: 0.5rem;
-    border: #b63131 solid 1px;
+    border: #b79191 solid 1px;
     text-align: justify; 
     padding: 0.5rem;
     border-radius: 4px;
@@ -288,7 +288,8 @@ border: #555555 1px solid;
   table {
     border-collapse: collapse;
     width: 100%;
-    margin: auto
+    margin: auto;
+    font-size: small;
   }
   
   th, td {
@@ -319,13 +320,21 @@ border: #555555 1px solid;
 
   .unpaid {
     background-color: #fddcdc;
+    color: #7c3131;
+  }
+
+  .discount {
+    background-color: #eae3ba;
+    color: #816c47;
   }
 
 
 button#clientByPolicyBtn {
-    padding: var(--space-2) var(--space-4);
-    background-color: var(--color-green-500);
-    color: white;
+    padding: 5px;
+    margin-top: 3px;
+    font-size: small;
+    background-color:inherit;
+    color: inherit;
     border: none;
     border-radius: var(--border-radius-medium);
     cursor: pointer;
@@ -333,7 +342,8 @@ button#clientByPolicyBtn {
   
     /* Hover effect */
     &:hover {
-      background-color: var(--color-green-300);
+      background-color: var(--color-green-500);
+      color: white;
     }
   
     /* Active (clicked) effect */
@@ -341,3 +351,100 @@ button#clientByPolicyBtn {
       transform: translateY(1px);
     }
   }
+
+
+  .blagajna {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 3rem;
+  }
+  .blagajna button {
+    width: 30%;
+  }
+
+/* Payment panel */
+
+#paymentPanel {
+    width: 80%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin: auto;
+    margin-top: 3rem;
+}
+
+#paymentPanel form {
+    border: var(--color-green-500), 1px, solid;
+    border-radius: 5px;
+    background-color: inherit;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px var(--color-green-500) solid;
+    background-color: #f1f1f1;
+
+}
+
+.quickPaymentForm {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+}
+
+.quickPaymentForm input{
+    text-align: center;
+    width: 65%;
+    margin: auto;
+    margin-top: 5px;
+    font-size: small;
+}
+.quickPaymentForm button{
+    text-align: center;
+    width: 30%;
+    margin: auto;
+    padding: 3px;
+    margin-top: 10px;
+    padding: 5px;
+    font-size: small;
+    background-color:inherit;
+    color: var(--color-green-500);
+    border: 1px var(--color-green-500) solid;
+    border-radius: var(--border-radius-medium);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    &:hover {
+        background-color: white;
+        color: var(--color-green-300);
+      }
+    
+      /* Active (clicked) effect */
+      &:active {
+        transform: translateY(1px);
+      }
+  
+}
+
+.quickPaymentForm h3{
+    color: var(--color-green-500);
+    margin: 0;
+}
+
+.quickPaymentForm h4{
+    color: var(--color-green-500);
+    margin: 0;
+    margin-bottom: 3px;
+    font-size: small;
+}
+
+@media print {
+    /* Add your print-specific styles here */
+    body {
+      font-size: 12pt;
+    }
+  
+    /* Hide non-essential elements */
+    .no-print {
+      display: none;
+    }
+  }
+  

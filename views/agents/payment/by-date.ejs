@@ -1,18 +1,53 @@
+<%- include('../../shared/includes/head', {pageTitle: 'Уплати'})%>
     <link rel="stylesheet" href="/styles/forms.css">
     <link rel="stylesheet" href="/styles/policies.css">
+    <script src="/scripts/client-managment.js" defer></script>
 </head>
-<body>
- <main>
-
-  <h1>Payments on <%= theDate %> </h1>
-
-    <br>
-    <hr>
-    <br>
-
+<body style="background-color: white;">
+  <main id="payments-main">
+    <div id="paymentNav">
+    <%- include('../../shared/includes/header')%>
+  </div>
+</section>
+  <h3>Благајна, за подружница: <%=agentName%> </h4>
+    <h3>________________________________ </h3>
+    <div class="paymentsSection-alt" style="font-size: small;">
+      <p>Клиент:</p>
+      <p>Влез</p>
+      <p>Број на полиса / друг основ: </p>
+      <p>Забелешка</p>
+    </div>
     <hr>    
- 
+    <% for (const payment of payments ) { %>
+      <li>
+          <div class="paymentsSection" style="font-size: small;">
+            <p><%=payment.clientName.clientName || payment.clientName %></p>
+            <p><%= payment.paymentAmount || payment.clientName.paymentAmount%>,00 денари</p>
+            <p><%=payment.clientName.policyNumber || payment.policyNumber %></p>
+            <p>
+              <% if (payment.paidCash) { %>
+                Во готово - благајна
+              <% } else { %>
+                На сметка (извод)
+              <% } %>
+            </p>  
+          </div>
+        </li>
+       <% } %>    
+       <div class="paymentsSection-alt">
+        <p>ВКУПНО:</p>
+        <p><%=sum%>,00 денари</p>
+        <p> </p>
+        <p></p>
+      </div>
 <hr>
-</main>
+<div class="paymentsSection">
+  <p>Број на прилози:</p>
+  <p></p>
+  <p>Одговорно лице на подружница (потпис)</p>
+  <p></p>
+</div>
+<button id="printBtn" onclick="printPage()" class="btn">Print</button>
 
- 
+</main>
+<%- include('../../shared/includes/footer')%>

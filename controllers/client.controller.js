@@ -239,6 +239,19 @@ async function getDebtClients(req, res, next) {
   res.render("agents/debtClients/debt-clients", {clients:clients});
 }
 
+async function getAnnex(req, res, next) {
+
+const policyId = new ObjectID(req.body.policyId) 
+
+  client = await Client.findById(req.body.clientId);
+  policy = await Policy.findById(policyId.toHexString());
+
+let installments = policy.installments
+
+  res.render("agents/clients/annex", {client:client, policy:policy, installments: installments});
+}
+
+
 async function startLawsut(req, res, next) {
   const agent = await Agent.getAgentWithSameId(req.session.uid)
   const agentName = agent.name;
@@ -259,17 +272,6 @@ async function startLawsut(req, res, next) {
 
   const clients = await Client.findAll();
   res.render("agents/debtClients/debt-clients", {clients:clients});
-}
-async function getAnnex(req, res, next) {
-
-const policyId = new ObjectID(req.body.policyId) 
-
-  client = await Client.findById(req.body.clientId);
-  policy = await Policy.findById(policyId.toHexString());
-
-let installments = policy.installments
-
-  res.render("agents/clients/annex", {client:client, policy:policy, installments: installments});
 }
 
 async function withdrawLawsuit(req, res, next) {

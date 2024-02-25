@@ -203,7 +203,7 @@ article {
     background-color: var(--color-green-500);
     color: white;
     margin-top: 0.5rem;
-    font-size: medium;
+    font-size: small;
 }
 
 .client li{
@@ -362,6 +362,7 @@ margin: 0rem;}
 
 
 #payments-main {
+    background-color: white;
     margin: auto;
     width: 95%;
 }

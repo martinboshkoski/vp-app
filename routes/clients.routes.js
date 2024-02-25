@@ -10,13 +10,37 @@ const router = express.Router();
 //to do:
 //the controller functions must be transfered to a new file in the controllers folder
 
-router.post('/payments-per-date', paymentsController.generatePerDate)
+// Payments
+// router.post('/debtClient/clients/:id', debtController.getNewDebtClient)
 
-router.get('/all-invoices', invoiceController.getInvoices)
-
-router.get('/all-policies', policiesController.getPolicies)
+router.get('/new-payment', function(req, res){
+    res.render('agents/payment/new-payment')
+})
 
 router.get('/all-payments', paymentsController.getPayments)
+
+router.post('/new-payment', paymentsController.insertPayment)
+
+router.post('/lawsuit-payment', paymentsController.insertLawsuitPayment)
+
+router.post('/edit-payment', paymentsController.editPayment)
+
+router.post('/payments-per-date', paymentsController.generatePerDate)
+
+router.post('/get-by-date', paymentsController.getByDate)
+
+// router.post('/dailyPaymentsReport', paymentsController.generatePaymentsReport)
+
+///////////////////////////////////////////////////////////////
+
+// router.get('/all-invoices', invoiceController.getInvoices)
+// router.post('/invoice/:id', invoiceController.getInvoice)
+// router.post('/single-invoice/client', invoiceController.findInvoice)
+// router.get('/invoice/:id', invoiceController.viewInvoice)
+
+///////////////////////////////////////////////////////////////
+
+router.get('/all-policies', policiesController.getPolicies)
 
 router.get('/all-clients', clientController.getClient)
 
@@ -32,12 +56,6 @@ router.get('/enforcement-agent', clientController.getEnforcementClients)
 
 router.post('/annex/:id', clientController.getAnnex)
 
-router.post('/invoice/:id', invoiceController.getInvoice)
-
-router.post('/single-invoice/client', invoiceController.findInvoice)
-
-router.get('/invoice/:id', invoiceController.viewInvoice)
-
 router.get('/new-client', function(req, res){
     res.render('agents/clients/new-client')
 })
@@ -48,18 +66,7 @@ router.get('/new-policy', function(req, res){
     res.render('agents/policy/new-policy')
 })
 
-router.get('/new-payment', function(req, res){
-    res.render('agents/payment/new-payment')
-})
-
-///payments
-
-router.post('/new-payment', paymentsController.insertPayment)
-
-router.post('/edit-payment', paymentsController.editPayment)
-
 ///
-
 
 router.get('/agents/clients/:id', clientController.getUpdateClient)
 
@@ -70,9 +77,6 @@ router.post('/update-client/:id', clientController.updateClient)
 router.post('/find-by-policy', clientController.findByPolicy)
 
 //////Daily report (generate)
-
-// router.post('/dailyPaymentsReport', paymentsController.generatePaymentsReport)
-
 
 //////withdraw lawsuit/enforcement agent
 
@@ -94,21 +98,15 @@ router.post('/agents/clients/deletePolicy', policiesController.deleteSinglePolic
 
 //////////////////debt section
 
-// router.post('/debtClient/clients/:id', debtController.getNewDebtClient)
-
 router.get('/debt-clients', clientController.getDebtClients)
 
 router.post('/debt-client/:id', clientController.startLawsut)
 
 /////////
-router.post('/get-by-date', paymentsController.getByDate)
-
 
 router.post('/policy-by-date', policiesController.getByDate)
 
-
 //// agents
-
 router.post('/outside-agent', agentController.getAgent)
 
 

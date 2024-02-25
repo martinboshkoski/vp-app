@@ -24,7 +24,7 @@
       <tbody>
         <% let count = 1 %>
         <% requiredPoliciesByDate.forEach(policy => { %>
-          <tr class="<%= policy.isUnpaid ? 'unpaid' : '' %>">
+          <tr class="<%= policy.isUnpaid ? 'unpaid' : policy.discount ? 'discount' : '' %>">
             <td><%= count %></td>
             <td><%= policy.policyNumber %></td>
             <td style="font-size: smaller;"><%= policy.policyType %></td>
