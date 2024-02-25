@@ -43,8 +43,6 @@ async function getPolicies(req, res, next) {
           policy.isUnpaid = true;
           policy.discount = false;
       }
-
-
     }
     let totalAmountsPremium = totalPremium.reduce(function (x, y) {
       return x + y;
@@ -138,6 +136,8 @@ const endDate = req.body.endDate
 const requiredPoliciesByDate = await Policy.findByDate(startDate, endDate)
 
 let totalPolicyAmount = 0
+let totalUnPaidPolicyAmount = 0;
+
 requiredPoliciesByDate.forEach(policy => {
   const policyDate = moment(policy.policyDate);
   const threeMonthsAgo = moment().subtract(3, 'months');
@@ -156,6 +156,7 @@ requiredPoliciesByDate.forEach(policy => {
       // Policy is paid less than 80%
       policy.isUnpaid = true;
       policy.discount = false;
+      totalUnPaidPolicyAmount += policy.policyAmount;
   }
     //
   totalPolicyAmount += policy.policyAmount
@@ -166,7 +167,8 @@ res.render("agents/policies/policies-by-date", {
   startDate: startDate, 
   endDate: endDate, 
   moment: moment, 
-  totalPolicyAmount:totalPolicyAmount
+  totalPolicyAmount:totalPolicyAmount,
+  totalUnPaidPolicyAmount:totalUnPaidPolicyAmount.toLocaleString("de-DE")
 });
 } 
 
