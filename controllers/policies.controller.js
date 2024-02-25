@@ -13,7 +13,7 @@ async function getPolicies(req, res, next) {
     let paidAmounts = [];
     const payments = await Payment.findAll();
     for (payment of payments) {
-      paidAmounts.push(payment.clientName.paymentAmount);
+      paidAmounts.push(payment.paymentAmount);
     }
     let totalPaidAmounts = paidAmounts.reduce(function (x, y) {
       return x + y;

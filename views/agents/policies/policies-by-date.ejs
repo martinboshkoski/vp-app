@@ -9,16 +9,18 @@
     <br>
     <h3>Полиси по избран датум: <%=moment(startDate).format('DD/MM/YYYY')%>  година до <%=moment(endDate).format('DD/MM/YYYY')%>  година</h3>
     <hr>
+    <button id="showUnpaidBtn" class="btn">Покажи не наплатени</button>
+    <!-- <button id="" class="btn">Принтај</button> -->
     <table>
       <thead>
         <tr>
           <th>#</th>
           <th>Број на полиса:</th>
           <th>Класа</th>
-          <th>Премија на полиса:</th>
           <th>Датум на полиса</th>
           <th>Договорувач</th>
-          <th>Регистрација</th>
+          <th>Премија на полиса:</th>
+          <th>Платен износ</th>
         </tr>
       </thead>
       <tbody>
@@ -28,16 +30,16 @@
             <td><%= count %></td>
             <td><%= policy.policyNumber %></td>
             <td style="font-size: smaller;"><%= policy.policyType %></td>
-            <td><%= policy.policyAmount%>,00 денари</td>
             <td><%=moment(policy.policyDate).format('DD/MM/YYYY')%></td>
             <td><%= policy.clientName %></td>
-            <td><%= policy.registrationNumber %></td>
+            <td><%= policy.policyAmount%>,00 денари</td>
+            <td><%= policy.totalPaid%>,00 денари</td>
           </tr>
           <% count++ %>
         <% }); %>
       </tbody>
       <thead>
-        <tr>
+        <tr id="lastRow">
           <th></th>
           <th></th>
           <th style="font-size:larger">ВКУПНО</th>
@@ -48,5 +50,6 @@
         </tr>
       </thead>
     </table>    
+
 </main>
 <%- include('../../shared/includes/footer')%>

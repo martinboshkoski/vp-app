@@ -41,3 +41,25 @@ function printPage() {
         printBtn.style.display = "none";
     window.print();
   }
+
+////policy-by-date
+const showUnpaidBtn = document.getElementById('showUnpaidBtn');
+const allRows = document.querySelectorAll('tbody tr'); // Select all rows in the tbody
+const lastRow = document.getElementById('lastRow')
+
+const showUnpaid = function () {
+    lastRow.style.display="none"
+    
+    allRows.forEach(row => {
+        if (row.classList.contains('unpaid')) {
+            // If the row has 'unpaid' class, show it
+            row.style.display = 'table-row';
+        } else {
+            // For other rows, hide them
+            row.style.display = 'none';
+        }
+    });
+};
+
+showUnpaidBtn.addEventListener('click', showUnpaid);
+
