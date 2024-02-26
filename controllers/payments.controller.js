@@ -89,18 +89,19 @@ async function insertPayment(req, res, next) {
     }
 
     const thePayment = {
+      // clientName: req.body.clientName,
       amount: +req.body.payment,
       agentCommision: Math.round(agentCommision),
       agent: req.body.agentName,
       date: moment().format("YYYY-MM-DD"),
       paidCash: req.body.paidCash
     };
-
+console.log(thePayment)
     await db
       .getDb()
       .collection("policies")
       .updateOne(
-        { policyNumber: policyNumber },
+        { policyNumber: policyNumber},
         { $push: { thePayment: thePayment } }
       ); //needs to go into the model
 
@@ -113,8 +114,8 @@ async function insertPayment(req, res, next) {
     const payment = new Payment(
       clientName,
       clientPin,
-      policy.policyNumber,
       thePayment.amount,
+      policy.policyNumber,
       thePayment.agent, 
       thePayment.paidCash
     );
@@ -258,4 +259,3 @@ module.exports = {
   getByDate: getByDate,
   editPayment:editPayment
 };
-
