@@ -96,7 +96,6 @@ async function insertPayment(req, res, next) {
       date: moment().format("YYYY-MM-DD"),
       paidCash: req.body.paidCash
     };
-console.log(thePayment)
     await db
       .getDb()
       .collection("policies")
@@ -259,3 +258,4 @@ module.exports = {
   getByDate: getByDate,
   editPayment:editPayment
 };
+

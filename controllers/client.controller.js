@@ -125,9 +125,9 @@ async function getUpdateClient(req, res, next) {
     let clientPayments = [];
     let clientPaymentAmounts = [];
     for (payment of payments) {
-      if (payment.clientName.clientPin == client.pin) {
-        clientPayments.push(payment);
-        clientPaymentAmounts.push(payment.clientName.paymentAmount)
+      if (payment.clientPin == client.pin) {
+        clientPayments.push(+payment);
+        clientPaymentAmounts.push(+payment.paymentAmount)//
       }
     }
 
@@ -140,6 +140,71 @@ async function getUpdateClient(req, res, next) {
   let courtFeeDecision;
   let attorneyFee;
   let totalDebt
+
+// ////// Function to calculate penal interest for a single policy// /////// /////// /////// /////// /////// /////// /////// /////// /////// /////// /////// /////
+// Function to calculate penal interest for a single policy
+
+// Define reference rates for each half-year
+const referenceRates = [
+  { start: '2023-01-01', end: '2023-06-30', rate: 12.75 },
+  { start: '2023-07-01', end: '2023-12-31', rate: 14.00 },
+  { start: '2024-01-01', end: '2024-06-30', rate: 14.30 },
+  // Add more half-year periods as needed
+];
+
+// Function to calculate interest for a single period
+function calculateInterestForPeriod(debt, start, end, rate) {
+  const periodStart = moment(start);
+  const periodEnd = moment(end);
+  const daysInPeriod = periodEnd.diff(periodStart, 'days') + 1; // Including both start and end date
+  const dailyRate = rate / 100 / 365;
+  const interest = debt * dailyRate * daysInPeriod;
+  return interest;
+}
+
+// Function to calculate total interest across all periods for a single policy
+function calculateTotalInterest(debt, startDate, endDate) {
+  let totalInterest = 0;
+  let currentStartDate = moment(startDate);
+
+  for (const period of referenceRates) {
+    if (currentStartDate.isBefore(moment(period.end))) {
+      // If the debt spans into the current period
+      const currentEndDate = moment.min(endDate, moment(period.end));
+      const interestForPeriod = calculateInterestForPeriod(debt, currentStartDate.format('YYYY-MM-DD'), currentEndDate.format('YYYY-MM-DD'), period.rate);
+      totalInterest += interestForPeriod;
+
+      // Move to the next period
+      currentStartDate = moment(period.end).add(1, 'days');
+      if (endDate.isBefore(currentStartDate)) {
+        break; // If the debt is settled before the next period starts, we are done
+      }
+    }
+  }
+
+  return totalInterest;
+}
+
+const filteredPolicies = clientPolicies.filter(policy => {
+  return (policy.policyNumber.totalPaid || 0) <= policy.policyNumber.policyAmount * 0.8;
+});
+
+// Calculate interest for each policy and accumulate the total interest
+let grandTotalInterest = 0;
+const interestDetailsPerPolicy = filteredPolicies.map(policy => {
+  const endDate = moment(); // The current date, replace with actual date as needed
+  const totalInterestAmount = calculateTotalInterest((policy.policyNumber.policyAmount - (policy.policyNumber.totalPaid || 0 )), policy.policyNumber.policyDate, endDate);
+  grandTotalInterest += totalInterestAmount;
+  return {
+    Број: policy.policyNumber.policyNumber,
+    Камата: totalInterestAmount.toFixed(2)
+  };
+});
+
+totalInterestAll = grandTotalInterest.toFixed(2);
+
+// /////// /////// /////// /////// /////// /////// /////// /////// /////// /////// /////// /////
+
 if (startLawsut) {
   
   if (debt<10000) {
@@ -167,7 +232,10 @@ if (startLawsut) {
  courtFeeDecision:courtFeeDecision,
  attorneyFee:attorneyFee,
  totalDebt:totalDebt,
- moment:moment
+ moment:moment, 
+ interestDetailsPerPolicy:interestDetailsPerPolicy, 
+ totalInterestAll: totalInterestAll
+
     });
   } catch (error) {
     next(error);

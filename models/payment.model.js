@@ -24,14 +24,14 @@ class Payment {
     };
     await db.getDb().collection('payments').insertOne(paymentData);
   }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Assuming the static methods below are part of the same class
 
   static async findAll() {
     const payments = await db.getDb().collection('payments').find().toArray();
     return payments.map(paymentDocument => new Payment(paymentDocument.clientName, paymentDocument.clientPin, paymentDocument.paymentAmount, paymentDocument.policyNumber, paymentDocument.agentName, paymentDocument.paidCash));
   }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   static async findPaymentByPolicyNumberAndDate(policyNumber, paymentDateOld) {
     const payment = await db.getDb().collection("payments").findOne({ policyNumber: policyNumber, date: paymentDateOld });
     if (!payment) {
@@ -39,7 +39,7 @@ class Payment {
     }
     return new Payment(payment.clientName, payment.clientPin, payment.paymentAmount, payment.policyNumber, payment.agentName, payment.paidCash);
   }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   static async findByDateAndAgent(date, agentName) {
     const theDate = moment(date).format('DD/MM/YYYY').toString();
     const paymentsOnDate = await db.getDb().collection("payments").find({ date: theDate, agentName: agentName, paidCash: "paidCash" }).toArray();
@@ -48,7 +48,7 @@ class Payment {
     }
     return paymentsOnDate.map(payment => new Payment(payment.clientName, payment.clientPin, payment.paymentAmount, payment.policyNumber, payment.agentName, payment.paidCash));
   }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   static async findByPin(pin) {
     const theWantedClient = await db.getDb().collection("clients").findOne({ pin: pin });
     if (!theWantedClient) {
@@ -56,7 +56,7 @@ class Payment {
     }
     return theWantedClient; // Assuming you want to return the client document directly
   }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   static async deletePaymentsByPolicyNumber(policyNumber) {
     const deleteResult = await db.getDb().collection('payments').deleteMany({ policyNumber: policyNumber });
     if (!deleteResult.deletedCount) {
@@ -64,7 +64,7 @@ class Payment {
     }
     return deleteResult;
   }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   static async updatePayment(paymentId, paymentAmount, paymentDate, paidCash) {
     const updatedPaymentData = {
       paymentAmount: paymentAmount,

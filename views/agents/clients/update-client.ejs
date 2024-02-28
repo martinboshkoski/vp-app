@@ -63,10 +63,20 @@
             <p>ЕМБГ / ЕМБС: <%=client.pin%> </p>
             <p>Телефон: <%=client.phone%> </p>
 <hr>
-            <p>Агент: <%=client.agentName%> </p>
+            <!-- <p>Агент: <%=client.agentName%> </p> -->
             <p>Вкупна премија (за сите полиси): <%=totalPremium%>,00 денари </p>
             <p>Вкупна платена премија (за сите полиси): <%=totalPaid%>,00 денари </p>
             <p>Вкупна должна премија (за сите полиси): <%=debt%>,00 денари </p>
+            <hr>
+<p >Камата по полиси одделно:</p>
+<ul>
+  <% interestDetailsPerPolicy.forEach(policy => { %>
+    <li>
+      <p> - Полиса: <%= policy.Број %>, камата: <%= policy.Камата %> денари</p>
+    </li>
+  <% }); %>
+</ul>
+<!-- <p>Вкупно камата за сите полиси: <%=totalInterestAll  %> денари</p> -->
             <hr>
             <% if (!client.startedLawsuit) {%> 
                 <section>
@@ -199,9 +209,10 @@
             <p>Број на рати: <%=policy.policyNumber.installmentsNumber%></p>
             <p>Вкупно платено: <%=policy.policyNumber.totalPaid%>,00 денари </p>
             <p>Агент/Продавач: <%=policy.policyNumber.agentSeller%></p>
-            <p class="debtParagraph" data-debt="<%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>">Преостанато за плаќање: <%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>,00 денари </p>
+            <p class="debtParagraph" data-debt="<%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>">Преостанато за плаќање: <%= policy.policyNumber.policyAmount - (isNaN(policy.policyNumber.totalPaid) ? 0 : policy.policyNumber.totalPaid) %>,00 денари </p>
+
             <hr>
-            <h4>Уплати по полиса <%= policy.policyNumber.policyNumber %> </h4>
+            <h4>Уплати по полиса:</h4>
             <section id="single-payments">
                 <div id="payments-tables">
                     <p>Износ</p>
@@ -263,12 +274,12 @@
                 <button class="btn"> Анекс </button>
                 </form>
                 <% } %>
-                <form action="/invoice/<%=client._id%>" method="POST">
+                <!-- <form action="/invoice/<%=client._id%>" method="POST">
                 <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
                 <input type="hidden" name="clientId" value="<%=client._id%>">
                 <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
                 <button class="btn"> Фактура </button>
-                </form>
+                </form> -->
                 </div>
                 <% if(locals.isAdmin) { %>
                 <form action="/agents/clients/deletePolicy" method="POST">
