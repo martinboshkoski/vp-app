@@ -223,11 +223,10 @@
                 <div id="payments-table">
                     <p><%=payment.amount%>,00 денари</p>
                     <p><%=moment(payment.date).format('DD/MM/YYYY')%></p>
-                    <p><%=payment.agent%></p>
+                    <p style="font-size: small;"><%=payment.agent%></p>
                 </div>
-                <div > 
+                <div style="display: grid; grid-template-columns: 4.5fr 1fr;"> 
                     <% if(locals.isAdmin) {%>
-
                     <form class="change-payment" method="POST" action="/edit-payment">
                         <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
                         <input type="hidden" name="pin" value="<%=client.pin%>"> 
@@ -240,6 +239,14 @@
                         <input type="text" name="paymentAmount" value="<%=payment.amount%>">
                         <input type="text" name="paymentDate" value="<%=moment(payment.date).format('DD/MM/YYYY')%>">
                         <button>Измени</button>
+                    </form>
+                    <form method="POST" action="/delete-payment" style="margin-left: 3px;">
+                        <input type="hidden" name="policyId" value="<%= policy.policyNumber._id %>">
+                        <input type="hidden" name="pin" value="<%=client.pin%>"> 
+                        <input type="hidden" name="paymentDate" value="<%= moment(payment.date).format('DD/MM/YYYY') %>">
+                        <input type="hidden" name="paymentAmount" value="<%=payment.amount%>">
+                        <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                        <button type="submit">Избриши</button>
                     </form>
                     <% } %>
                 </div>

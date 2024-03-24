@@ -28,11 +28,12 @@ async function getClient(req, res, next) {
 const payments = await Payment.findAll();
 let paidAmounts = []
 for (payment of payments) {
-    paidAmounts.push(payment.paymentAmount)
+    paidAmounts.push(+payment.paymentAmount)
 }
 let totalPaidAmounts = paidAmounts.reduce(function (x, y) {
     return x + y;
 }, 0);
+
 
 //Calculates the total amount of the premium
 const policies = await Policy.findAll();   

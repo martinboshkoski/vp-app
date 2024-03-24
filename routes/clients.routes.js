@@ -25,6 +25,8 @@ router.post('/lawsuit-payment', paymentsController.insertLawsuitPayment)
 
 router.post('/edit-payment', paymentsController.editPayment)
 
+router.post('/delete-payment', paymentsController.deletePayment);
+
 router.post('/payments-per-date', paymentsController.generatePerDate)
 
 router.post('/get-by-date', paymentsController.getByDate)

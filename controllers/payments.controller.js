@@ -219,34 +219,108 @@ async function insertLawsuitPayment(req, res, next) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function editPayment(req, res, next) {
   const policyId = req.body.policyId;
-  const policyNumber = req.body.policyNumber;
   const paymentDateOld = req.body.paymentDateOld;
   const paymentAmountOld = req.body.paymentAmountOld;
   const paidCash = req.body.paidCash;
 
   const paymentAmount = req.body.paymentAmount;
-  const paymentDate = req.body.paymentDate;
+  const paymentDate = moment(req.body.paymentDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+  const policyNumber = req.body.policyNumber;
 
   try {
-    const payment = await Payment.findPaymentByPolicyNumberAndDate(policyNumber, paymentDateOld);
-    const policy = await Policy.findById(policyId)
-
-    await Payment.updatePayment(payment._id, paymentAmount, paymentDate, paidCash);
-    await Policy.updatePolicyPayment(policyId, paymentDateOld, paymentAmountOld, paymentAmount, paymentDate, paidCash);
-
-    if (!payment) {
-      throw new Error('Payment not found');
+      const payment = await Payment.findPaymentByPolicyNumberAndDate(policyNumber, paymentDateOld);
+      if (!payment) {
+          throw new Error('Payment not found');
+      }
+      const policy = await Policy.findById(policyId);
+      if (!policy) {
+          throw new Error('Policy not found');
+      }
+//updating
+    // #1 total paid for one policy (result)
+    const allPayments = policy.thePayment;
+    let totalPaymentAmounts = [];
+    for (singlePayment of allPayments) {
+      totalPaymentAmounts.push(+singlePayment.amount);
     }
-    //go to the same client page
-    const clientPin = req.body.pin;
-    const clientThroughPayment = await Payment.findByPin(clientPin.toString());
-    const objectId = clientThroughPayment._id;
-    const theClientPage = "/agents/clients/" + objectId;
-    res.redirect(theClientPage);
+    let totalPaid = totalPaymentAmounts.reduce(function (x, y) {
+      return x + y;
+    }, 0);
 
+    const finalResult = +totalPaid + (+paymentAmount - +payment.policyNumber);
+    await db
+      .getDb()
+      .collection("policies")
+      .updateOne(
+        { policyNumber: policyNumber },
+        { $set: { totalPaid: finalResult } }
+      ); //this needs to go into the model
+
+    // #2 updating the payments collection
+      await Payment.updatePayment(paymentDateOld, paymentAmount, paymentDate, paidCash, policyNumber); //finished
+    // #3 updating the policy and the policies collection
+      await Policy.updatePolicyPayment(policyId, paymentDateOld, paymentAmountOld, paymentAmount, paymentDate, paidCash);
+
+      //////
+      // Redirect to the client page
+      const clientPin = req.body.pin;
+      const clientThroughPayment = await Payment.findByPin(clientPin.toString());
+      if (!clientThroughPayment) {
+          throw new Error('Client not found through payment');
+      }
+
+      const objectId = clientThroughPayment._id;
+      const theClientPage = "/agents/clients/" + objectId;
+      res.redirect(theClientPage);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'An error occurred while editing the payment' });
+      console.error(error);
+      res.status(500).json({ message: 'An error occurred while editing the payment' });
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function deletePayment(req, res, next) {
+  const { policyId, paymentDate, paymentAmount } = req.body;
+
+  const policy = await Policy.findById(req.body.policyId);
+  const policyNumber = policy.policyNumber;
+
+  try {
+    const allPayments = policy.thePayment;
+    let totalPaymentAmounts = [];
+    for (singlePayment of allPayments) {
+      totalPaymentAmounts.push(+singlePayment.amount);
+    }
+    let totalPaid = totalPaymentAmounts.reduce(function (x, y) {
+      return x + y;
+    }, 0);
+
+    const finalResult = +totalPaid - +paymentAmount;
+    await db
+      .getDb()
+      .collection("policies")
+      .updateOne(
+        { policyNumber: policyNumber },
+        { $set: { totalPaid: finalResult } }
+      ); //this needs to go into the model
+
+
+      await Payment.deletePayment(paymentDate, policyNumber);
+      await Policy.deletePolicyPayment(policyId, paymentDate);
+
+      // Redirect to the client page
+      const clientPin = req.body.pin;
+      const clientThroughPayment = await Payment.findByPin(clientPin.toString());
+      if (!clientThroughPayment) {
+          throw new Error('Client not found through payment');
+      }
+
+      const objectId = clientThroughPayment._id;
+      const theClientPage = "/agents/clients/" + objectId;
+      res.redirect(theClientPage);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'An error occurred while deleting the payment' });
   }
 }
 
@@ -256,6 +330,7 @@ module.exports = {
   insertLawsuitPayment: insertLawsuitPayment,
   generatePerDate: generatePerDate,
   getByDate: getByDate,
-  editPayment:editPayment
+  editPayment:editPayment, 
+  deletePayment:deletePayment
 };
 

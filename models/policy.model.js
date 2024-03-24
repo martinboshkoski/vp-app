@@ -44,8 +44,6 @@ static async findByAgent(agentSeller) {
     return agentPolicies
 }
 
-
-
 // static async findOneByPolicyNumber(policyNumber) {
 // const thePolicyNumber = policyNumber.thePolicyNumber
 //     try {
@@ -156,68 +154,41 @@ await db.getDb().collection('policies').insertOne(policyData)
         return db.getDb().collection('policies').deleteMany({ clientName:theClientName });
       }
 
-///edit policy single payment
-
+//////////////////////////////////////////////////////////edit policy single payment
 static async updatePolicyPayment(policyId, paymentDateOld, paymentAmountOld, paymentAmount, paymentDate, paidCash) {
-    const moment = require('moment');
-    const filter = {
-      _id: mongodb.ObjectId(policyId),
-      thePayment: {
-        $elemMatch: {
-          date: moment(paymentDateOld, 'DD/MM/YYYY').format('YYYY-MM-DD'),
-          amount: +paymentAmountOld
-        }
+  const policyIdObj = new mongodb.ObjectId(policyId);
+  const paymentDateOldFormatted = moment(paymentDateOld, 'DD/MM/YYYY').format('YYYY-MM-DD');
+
+  const filter = {
+      _id: policyIdObj,
+      'thePayment.date': paymentDateOldFormatted,
+      'thePayment.amount': parseFloat(paymentAmountOld)
+  };
+  const update = {
+      $set: {
+          "thePayment.$.amount": parseFloat(paymentAmount),
+          "thePayment.$.date": paymentDate, 
+          "thePayment.$.paidCash": paidCash
       }
-    };     
-      const update = {
-        $set: {
-          "thePayment.$.amount": +paymentAmount,
-          "thePayment.$.date": moment(paymentDate, 'DD/MM/YYYY').format('YYYY-MM-DD'), 
-          "paidCash":paidCash
-        }
-      };
-
-    const result = await db
-      .getDb()
-      .collection('policies')
-      .updateOne(
-        filter,
-        update
-      );
-  
-    if (result.modifiedCount === 0) {
-      throw new Error('Payment not found or not updated');
-    }    
-
-    const policy = await db
-    .getDb()
-    .collection('policies')
-    .findOne({ _id: mongodb.ObjectId(policyId) });
-
-    const paymentAmounts = []; // Array to store payment amounts
-
-    policy.thePayment.forEach(payment => {
-      if (typeof payment.amount === 'number') {
-        paymentAmounts.push(payment.amount);
-      }
-    });
-
-    const totalPaid = paymentAmounts.reduce((sum, amount) => sum + amount, 0);
-
-    const resultTotal = await db
-    .getDb()
-    .collection('policies')
-    .updateOne(
-      { _id: mongodb.ObjectId(policyId) },
-      { $set: { totalPaid } }
-    );
-
-  if (resultTotal.modifiedCount === 0) {
-    throw new Error('Payment not updated');
+  };
+  const result = await db.getDb().collection('policies').updateOne(filter, update);
+  if (result.modifiedCount === 0) {
+      throw new Error('Payment not found or not updated in policy.');
   }
-
+  return result;
+}
+////////////////
+static async deletePolicyPayment(policyId, paymentDate) {
+  const paymentDateFormatted = moment(paymentDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+  const result = await db.getDb().collection('policies').updateOne(
+      { _id: new mongodb.ObjectId(policyId) },
+      { $pull: { thePayment: { date: paymentDateFormatted } } }
+  );
+  if (result.modifiedCount === 0) {
+      throw new Error('Payment not found or not deleted in policy.');
   }
-
+}
+///////////////////////////////////
 
 static async findByPolicy(policyNumber) {
 
