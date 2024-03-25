@@ -34,7 +34,6 @@ let totalPaidAmounts = paidAmounts.reduce(function (x, y) {
     return x + y;
 }, 0);
 
-
 //Calculates the total amount of the premium
 const policies = await Policy.findAll();   
 let totalPremium = []
@@ -44,9 +43,44 @@ totalPremium.push(policy.policyNumber.policyAmount)
 let totalAmountsPremium = totalPremium.reduce(function (x, y) {
 return x + y;
 }, 0);
+/////
+const year = 2023
+const policies23 = await Policy.findPoliciesByYear(year);
+    const policyNumbers = policies23.map(policy => policy.policyNumber);
+    // Get all payments for those policies
+    const payments23 = await Payment.findPaymentsByPolicyNumbers(policyNumbers);
+
+    // Calculate totals
+    const totalPremiums23 = policies23.reduce((sum, policy) => sum + policy.policyAmount, 0);
+    const totalPayments23 = payments23.reduce((sum, payment) => sum + payment.paymentAmount, 0);
+    const percentagePayment23 = ((totalPayments23 / totalPremiums23) * 100).toFixed(2);
+
+    // Format for response
+    const totals23 = {
+      totalPremiums23: totalPremiums23.toLocaleString('de-DE'),
+      totalPayments23: totalPayments23.toLocaleString('de-DE'),
+      percentagePayment23
+    };
+///2024
+const year24 = 2024
+const policies24 = await Policy.findPoliciesByYear(year24);
+    const policyNumbers24 = policies24.map(policy => policy.policyNumber);
+    // Get all payments for those policies
+    const payments24 = await Payment.findPaymentsByPolicyNumbers(policyNumbers24);
+
+    // Calculate totals
+    const totalPremiums24 = policies24.reduce((sum, policy) => sum + policy.policyAmount, 0);
+    const totalPayments24 = payments24.reduce((sum, payment) => sum + payment.paymentAmount, 0);
+    const percentagePayment24 = ((totalPayments24 / totalPremiums24) * 100).toFixed(2);
+
+    // Format for response
+    const totals24 = {
+      totalPremiums24: totalPremiums24.toLocaleString('de-DE'),
+      totalPayments24: totalPayments24.toLocaleString('de-DE'),
+      percentagePayment24
+    };
 
 //Calculates the percentage of premium vs paid
-
 const percentagePayment = ((totalPaidAmounts / totalAmountsPremium)*100).toFixed(2)
 
 totalPaidAmounts = totalPaidAmounts.toLocaleString('de-DE');
@@ -62,6 +96,9 @@ totalAmountsPremium = totalAmountsPremium.toLocaleString('de-DE');
       totalAmountsPremium: totalAmountsPremium,
       totalPaidAmounts: totalPaidAmounts,
       percentagePayment: percentagePayment,
+      totals23:totals23,
+      totals24:totals24
+
     });
   } catch (error) {
     next(error);

@@ -203,8 +203,15 @@ static async findByPolicy(policyNumber) {
   }
   return thePolicy;
 }
-
-
+/////////////////////////////
+static async findPoliciesByYear(year) {
+    const startDate = moment(`${year}-01-01`).format('YYYY-MM-DD');
+    const endDate = moment(`${year}-12-31`).format('YYYY-MM-DD');
+  
+    return db.getDb().collection('policies').find({
+      policyDate: { $gte: startDate, $lte: endDate }
+    }).toArray();
+  }
 }
 module.exports = Policy;
    

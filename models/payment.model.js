@@ -110,6 +110,12 @@ static async deletePayment(paymentDate, policyNumber) {
       throw new Error('Payment not found or not deleted.');
   }
 }
+static async findPaymentsByPolicyNumbers(policyNumbers) {
+  return db.getDb().collection('payments').find({
+    policyNumber: { $in: policyNumbers }
+  }).toArray();
+}
+
 }
 
 module.exports = Payment;
