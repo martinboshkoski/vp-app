@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Индивидуален клиент</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
         <div id="logo"> <a href="/"> ВАШ ПРИЈАТЕЛ АД</a></div>
         <nav>
             <ul class="nav-items"> 
-                <% if(locals.isAuth) {%>
+                <% if(locals.isAuth && locals.isEditor) {%>
                     <!-- <li><a href="/all-invoices"> Фактури </a></li> -->
                     <li><a href="/all-payments"> Уплати </a></li>
                     <li><a href="/all-policies"> Полиси </a></li>
@@ -31,6 +31,12 @@
                     <li><a href="/all-clients"> Kлиенти </a></li>
                     <li><a href="/debt-clients">Тужени</a></li>
                     <li><a href="/enforcement-agent">Извршител</a></li>
+                <% } else if (!locals.isEditor) { %>
+                    <li style="display: none;"><a href="/all-payments"> Уплати </a></li>
+                    <li><a href="/all-policies"> Полиси </a></li>
+                    <li><a href="/all-clients"> Kлиенти </a></li>
+                    <li style="display: none;"><a href="/debt-clients">Тужени</a></li>
+                    <li style="display: none;"><a href="/enforcement-agent">Извршител</a></li>
                 <% }%>
                 <% if(locals.isAdmin) {%>
                     <li class="adminA"><a href="/admin/daily-report">Агенти</a></li>
@@ -55,7 +61,6 @@
             <span></span>
         </button>
     </header>
-    
 <section class="updateClientMain"> 
         <div id="updateClientInfo">
             <h3>Клиент/Договорувач: <%=client.name%> </h3>
@@ -84,7 +89,11 @@
                         <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
                         <input type="hidden" name="clientId" value="<%=client._id%>">
                         <input type="hidden" name="clientDebt" value="<%=debt%>">
-                        <button class="btn">За тужење</button>
+                        <% if (!locals.isEditor) {%>
+                        <button style="display: none;">За тужење</button>
+                        <% } else { %>
+                            <button class="btn">За тужење</button>
+                            <% } %>
                     </form>
                 </section>             
                 <%} else {%>
@@ -190,7 +199,11 @@
                     <option value="Севџан Османоски">Севџан Османоски</option>
                     <option value="Изабела Цуцулоска">Изабела Цуцулоска</option>
                 </select> 
+                <% if (locals.isEditor) {%>
                 <button class="btn" <% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса </button>
+                <% } else {%>
+                    <button style="display: none;"<% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса </button>
+                    <% } %>
         </form>
         <%}%>
     </section>
@@ -267,7 +280,11 @@
                         <input type="checkbox" name="paidCash" value="paidCash">
                         Благајна
                     </label>
+                    <% if (locals.isEditor) {%>
                     <button class="btn" id="paymentBtn"> Внеси уплата </button>
+                    <% } else { %>
+                        <button style="display: none;" id="paymentBtn"> Внеси уплата </button>
+                        <% } %>
                 </div>
                 </form>
                 </div>
@@ -299,95 +316,7 @@
                 <% } %>
 <!-- 
 <% if(locals.isAdmin) { %>
-    <p>Измени полиса</p>
-    <form action="/agents/clients/editPolicy" method="POST">
-                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-                <input type="hidden" name="clientId" value="<%=client._id%>">
-                <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
-                <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
-                <label for="policyNumber"> Број на полиса</label>
-                <input type="text" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
-                <label for="insurancePolicyType"> Вид на полиса</label>
-                <select type="text" name="insurancePolicyType" id="insurancePolicyType"> 
-                    <option value="<%=policy.policyNumber.policyType%>" placeholder="<%=policy.policyNumber.policyType%>"><%=policy.policyNumber.policyType%></option>
-                    <option id="" value="Осигурување од одговорност од употреба на моторни возила (AO)">  Осигурување од одговорност од употреба на моторни возила (AO)</option>
-                    <option id="" value="Осигурување од одговорност од употреба на моторни возила (ЗК)">  Осигурување од одговорност од употреба на моторни возила (ЗК)</option>
-                    <option id="" value="Осигурувањето на имот од пожар и природни непогоди">Осигурувањето на имот од пожар и природни непогоди</option>
-                    <option id="" value="Други осигурувања на имот"> Други осигурувања на имот</option>
-                    <option id="" value="Несреќен случај - незгода">Несреќен случај - незгода</option>
-                    <option id="" value="Здравствено осигурување">Здравствено осигурување</option>
-                    <option id="" value="Осигурување на стока во превоз (CMR)">Осигурување на стока во превоз (CMR)</option>
-                    <option id="" value="АО за странски возила (гранично осигурувања)">АО за странски возила (гранично осигурувања)</option>
-                    <option id="" value="Осигурувањето на моторни возила (каско)">Осигурувањето на моторни возила (каско)</option>
-                    <option id="" value="Општото осигурување од одговорностт">Општото осигурување од одговорност</option>
-                    <option id="" value="Осигурувањето на шински возила (каско)">Осигурувањето на шински возила (каско)</option>
-                    <option id="" value="Осигурувањето на воздухоплови (каско) ">Осигурувањето на воздухоплови (каско) </option>
-                    <option id="" value="Осигурувањето на пловни објекти (каско)">Осигурувањето на пловни објекти (каско)</option>
-                    <option id="" value="Осигурувањето од одговорност од употреба на воздухоплови">Осигурувањето од одговорност од употреба на воздухоплови</option>
-                    <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето од одговорност од употреба на пловни објекти</option>
-                    <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето од одговорност од употреба на пловни објекти</option>
-                    <option id="" value="Осигурувањето на кредити">Осигурувањето на кредити</option>
-                    <option id="" value="Осигурувањето на гаранции">Осигурувањето на гаранции</option>
-                    <option id="" value="Осигурувањето од финансиски загуби">Осигурувањето од финансиски загуби</option>
-                    <option id="" value="Осигурувањето на правна заштита">Осигурувањето на правна заштита</option>
-                    <option id="" value="Осигурувањето на туристичка помош">Осигурувањето на туристичка помош</option>
-                    <option id="" value="Осигурувањето на живот">Осигурувањето на живот</option>
-                    <option id="" value="Осигурувањето на брак или породување">Осигурувањето на брак или породување</option>
-                    <option id="" value="Осигурувањето на живот во врска со удели во инвестициони фондови">Осигурувањето на живот во врска со удели во инвестициони фондови </option>
-                    <option id="" value="Осигурувањето на тонтина (здружение на рентиери)">Осигурувањето на тонтина (здружение на рентиери)</option>
-                    <option id="" value="Осигурувањето на средства за исплата">Осигурувањето на средства за исплата</option>
-                </select>    
-                <label for="policyAmount"> Премија</label>
-                <input type="text" name="policyAmount" value="<%=policy.policyNumber.policyAmount%>">
-                <label for="policyDate"> Датум на издавање</label>
-                <input type="text" name="policyDate" value="<%=moment(policy.policyNumber.policyDate).format('DD/MM/YYYY')%>">
-                <label for="installmentsNumber"> Број на рати</label>
-                <input type="text" name="installmentsNumber" value="<%=policy.policyNumber.installmentsNumber%>">
-                <label for="agentSeller"> Агент продавач</label>
-                <select type="text" name="agentSeller" id="agentSeller"> 
-                    <option value="<%=policy.policyNumber.agentSeller%>"><%=policy.policyNumber.agentSeller%></option>
-                    <option value="БРАЦО ДООЕЛ">БРАЦО ДООЕЛ</option>
-                    <option value="Борче ЕУРОАГЕНТ">Борче ЕУРОАГЕНТ</option>
-                    <option value="БОШКОСКИ">БОШКОСКИ</option>
-                    <option value="----"> -----------------Агенти под Канцеларија Кузман Јосифоски Питу---------------</option>
-                    <option value="Васе Стефаноска">Васе Стефаноска</option>
-                    <option value="Пеце Мицакоски">Пеце Мицакоски</option>
-                    <option value="Ана Марија Димоска">Ана Марија Димоска</option>
-                    <option value="Дејан Петровски">Дејан Петровски</option>
-                    <option value="Лумјан Крензи"> Лумјан Крензи </option>
-                    <option value="Билјана Мирческа"> Билјана Мирческа </option>
-                    <option value="Александра Цуцулоска"> Александра Цуцулоска</option>
-                    <option value="Владимир Ѓорѓимајкоски">Владимир Ѓорѓимајкоски</option>
-                    <option value="Анита Бошева">Анита Бошева</option>
-                    <option value="Далиборка Башеска Јорданоска">Далиборка Башеска Јорданоска</option>
-                    <option value="Ненад Митиќ">Ненад Митиќ</option>
-                    <option value="Оливер Бузлески">Оливер Бузлески</option>
-                    <option value="Слаѓана Николоска">Слаѓана Николоска</option>
-                    <option value="Маре Петреска">Маре Петреска</option>
-                    <option value="Денис Трајчески">Денис Трајчески</option>
-                    <option value="Виктор Митрески">Виктор Митрески</option>
-                    <option value="Владимир Мандароски">Владимир Мандароски</option>
-                    <option value="Бране Јованоски">Бране Јованоски</option>
-                    <option value="СН Брокер">СН Брокер</option>
-                    <option value="----"> -----------------Агенти под Канцеларија Димо Наредникот---------------</option>
-                    <option value="Ана Видеска">Ана Видеска</option>
-                    <option value="Нури Мустафа">Нури Мустафа</option>
-                    <option value="Дино Ташкоски">Дино Ташкоски</option>
-                    <option value="Алмир Хаjро">Алмир Хаjро</option>
-                    <option value="Џеват Дајтоски">Џеват Дајтоски</option>
-                    <option value="Фатмир Демоски">Фатмир Демоски</option>
-                    <option value="Филип Трајкоски">Филип Трајкоски</option>
-                    <option value="Коле Јовески">Коле Јовески</option>
-                    <option value="Мартин Димоски">Мартин Димоски</option>
-                    <option value="Борче Јосифоски">Борче Јосифоски</option>
-                    <option value="Недзми Јусуфи">Недзми Јусуфи</option>
-                    <option value="АЛМА БЕЈЗ">АЛМА БЕЈЗ</option>
-                    <option value="Севџан Османоски">Севџан Османоски</option>
-                    <option value="Изабела Цуцулоска">Изабела Цуцулоска</option>
-                </select> 
-                <br>
-                <br>
-    </form>
+
     <% } %> -->
     </section>
     <% } %>

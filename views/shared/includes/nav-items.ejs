@@ -1,31 +1,31 @@
 <ul class="nav-items"> 
-    <% if(locals.isAuth) {%>
-        <!-- <li><a href="/all-invoices"> Фактури </a></li> -->
+    <% if(locals.isAdmin) { %>
         <li><a href="/all-payments"> Уплати </a></li>
         <li><a href="/all-policies"> Полиси </a></li>
-        <li> |</li>
-
         <li><a href="/all-clients"> Kлиенти </a></li>
         <li><a href="/debt-clients">Тужени</a></li>
         <li><a href="/enforcement-agent">Извршител</a></li>
-
-
-    <% }%>
-    <% if(locals.isAdmin) {%>
         <li class="adminA"><a href="/admin/daily-report">Агенти</a></li>
-        <!-- <li class="adminA"><a href="/admin/daily-report">Дневен извештај</a></li>
-        <li class="adminA"><a href="/admin/admin-report">Админ панел</a></li> -->
         <li><a href="/signup">Креирај агент</a></li>
-        <% }%>
-    <% if(locals.isAuth) {%>
-    <li>
-        <form id="nav-form" action="/logout" method="POST">
-            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-            <button class="btn">Одјава</button>
-        </form>
-    </li>
-   <% }%>      
-   <% if(!locals.isAuth) {%>
-    <li><a href="/login">Логирај се</a></li>
-<% }%>
+    <% } else if(locals.isEditor) { %>
+        <li><a href="/all-payments"> Уплати </a></li>
+        <li><a href="/all-policies"> Полиси </a></li>
+        <li><a href="/all-clients"> Kлиенти </a></li>
+        <li><a href="/debt-clients">Тужени</a></li>
+        <li><a href="/enforcement-agent">Извршител</a></li>
+    <% } else if(locals.isAuth) { %>
+        <li><a href="/all-policies"> Полиси </a></li>
+        <li><a href="/all-clients"> Kлиенти </a></li>
+    <% } %>
+    
+    <% if(locals.isAuth) { %>
+        <li>
+            <form id="nav-form" action="/logout" method="POST">
+                <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                <button class="btn">Одјава</button>
+            </form>
+        </li>
+    <% } else { %>
+        <li><a href="/login">Логирај се</a></li>
+    <% } %>
 </ul>
