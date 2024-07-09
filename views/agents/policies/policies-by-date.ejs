@@ -52,6 +52,8 @@
         </tr>
       </thead>
     </table>    
+    <% if (locals.isEditor) { %>
 <h3 id="totalUnpaid">Вкупно ненаплатен износ: <%=totalUnPaidPolicyAmount%>,00 денари</h3>
+<% } %>
 </main>
 <%- include('../../shared/includes/footer')%>

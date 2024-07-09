@@ -2,17 +2,23 @@ const bcrypt = require('bcryptjs')
 
 const mongodb = require('mongodb')
 
+const { ObjectId } = require('mongodb');
 const db = require('../data/database')
 
 class Agent {
-    constructor(email, password, fullname) {
+    constructor(email, password, fullname, uid) {
         this.email = email;
         this.password = password;
         this.name = fullname;
+        this.uid = uid
     }
 
     getAgentWithSameEmail() {
         return db.getDb().collection('agents').findOne({ email: this.email })
+    }
+
+    static async getAgentWithSameUid(uid) {
+      return db.getDb().collection('agents').findOne({ _id: new ObjectId(uid) });
     }
 
         static async getAgentWithSameId(agentId) {

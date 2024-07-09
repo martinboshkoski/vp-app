@@ -1,13 +1,20 @@
 const Policy = require("../models/policy.model");
 const Payment = require("../models/payment.model");
+const Agent = require("../models/agent.model");
 const moment = require("moment");
 const db = require('../data/database')
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function getPolicies(req, res, next) {
   try {
-    const policies = await Policy.findAll();
+    let policies = await Policy.findAll();
     const policiesNumber = await Policy.countAll();
+
+    const loggedAgent = await Agent.getAgentWithSameUid(req.session.uid)
+
+    if (!loggedAgent.isEditor) {
+      policies = policies.filter(policy => policy.policyNumber.agentSeller == loggedAgent.name);
+    }
 
     //Calculates the total paid amount
     let paidAmounts = [];
@@ -133,7 +140,7 @@ async function getByDate(req, res, next) {
 const startDate = req.body.startDate
 const endDate = req.body.endDate
 
-const requiredPoliciesByDate = await Policy.findByDate(startDate, endDate)
+let requiredPoliciesByDate = await Policy.findByDate(startDate, endDate)
 
 let totalPolicyAmount = 0
 let totalUnPaidPolicyAmount = 0;
@@ -161,6 +168,13 @@ requiredPoliciesByDate.forEach(policy => {
     //
   totalPolicyAmount += policy.policyAmount
 })
+
+const loggedAgent = await Agent.getAgentWithSameUid(req.session.uid)
+
+if (!loggedAgent.isEditor) {
+  requiredPoliciesByDate = requiredPoliciesByDate.filter(policy => policy.agentSeller == loggedAgent.name);
+}
+totalPolicyAmount = requiredPoliciesByDate.reduce((total, policy) => total + policy.policyAmount, 0);
 
 res.render("agents/policies/policies-by-date", {
   requiredPoliciesByDate: requiredPoliciesByDate,
