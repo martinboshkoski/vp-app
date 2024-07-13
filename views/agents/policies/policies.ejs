@@ -27,7 +27,7 @@
       <div class="search-bar-div">
         <label for="start-date">Почетен датум:</label>
         <input type="date" name="startDate" id="startDate">
-        <label for="start-date">Краен датум:</label>
+        <label for="endDate">Краен датум:</label>
         <input type="date" name="endDate" id="endDate">
       </div> 
       <button id="searchBtn" class="btn">Барај</button>
@@ -67,4 +67,10 @@
    </ul>
   </section>
 </main>
+<script>
+  // Get today's date
+  const today = new Date().toISOString().split('T')[0];
+  // Set the value of the date input field to today's date
+  document.getElementById('endDate').value = today;
+</script>
 <%- include('../../shared/includes/footer')%>
