@@ -10,17 +10,14 @@
     <hr>
     <br>
     <% if(locals.isAdmin) {%>
-        <section class="totalReportSection">
-            <p>Вкупен број на полиси: <%=policiesNumber%></p>
-            <p>Вкупен износ на полисирана премија: <%=totalAmountsPremium%>,00 денари</p>
-            <p>Вкупен износ на наплатена премија: <%=totalPaidAmounts%>,00 денари </p>
-            <p>Процент на наплата на премија: <%=percentagePayment%> %</p>
+        <!-- <section class="totalReportSection">
+ 
           </section>
           <section class="totalReportSection">
           </section>
         <br>
         <hr>
-        <br>
+        <br> -->
     <% }%>
      <form action="/policy-by-date" method="POST" class="search-agent">
       <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
