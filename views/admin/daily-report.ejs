@@ -1,5 +1,6 @@
 <%- include('../shared/includes/head', {pageTitle: 'Agents info'})%>
-<link rel="stylesheet" href="/styles/policies.css">
+<link rel="stylesheet" href="/styles/policy-trends.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 <body>
@@ -7,56 +8,92 @@
 <main>
 <h1>Податоци и други показатели за агенти</h1>
 <form action="/outside-agent" method="POST" class="search-agent">
-    <section class="search-agent">
-<input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-<select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
-    <option value="">Избери агент</option>
-    <option value="БРАЦО ДООЕЛ">БРАЦО ДООЕЛ</option>
-    <option value="Борче ЕУРОАГЕНТ">Борче ЕУРОАГЕНТ</option>
-    <option value="БОШКОСКИ">БОШКОСКИ</option>
-    <option value="----"> -----------------Агенти под Канцеларија Кузман Јосифоски Питу---------------</option>
-    <option value="Васе Стефаноска">Васе Стефаноска</option>
-    <option value="Пеце Мицакоски">Пеце Мицакоски</option>
-    <option value="Ана Марија Димоска">Ана Марија Димоска</option>
-    <option value="Дејан Петровски">Дејан Петровски</option>
-    <option value="Лумјан Крензи"> Лумјан Крензи </option>
-    <option value="Билјана Мирческа"> Билјана Мирческа </option>
-    <option value="Александра Цуцулоска"> Александра Цуцулоска</option>
-    <option value="Владимир Ѓорѓимајкоски">Владимир Ѓорѓимајкоски</option>
-    <option value="Анита Бошева">Анита Бошева</option>
-    <option value="Далиборка Башеска Јорданоска">Далиборка Башеска Јорданоска</option>
-    <option value="Ненад Митиќ">Ненад Митиќ</option>
-    <option value="Оливер Бузлески">Оливер Бузлески</option>
-    <option value="Слаѓана Николоска">Слаѓана Николоска</option>
-    <option value="Маре Петреска">Маре Петреска</option>
-    <option value="Денис Трајчески">Денис Трајчески</option>
-    <option value="Виктор Митрески">Виктор Митрески</option>
-    <option value="Владимир Мандароски">Владимир Мандароски</option>
-    <option value="Бране Јованоски">Бране Јованоски</option>
-    <option value="СН Брокер">СН Брокер</option>
-    <option value="----"> -----------------Агенти под Канцеларија Димо Наредникот---------------</option>
-    <option value="Ана Видеска">Ана Видеска</option>
-    <option value="Нури Мустафа">Нури Мустафа</option>
-    <option value="Дино Ташкоски">Дино Ташкоски</option>
-    <option value="Алмир Хаjро">Алмир Хаjро</option>
-    <option value="Џеват Дајтоски">Џеват Дајтоски</option>
-    <option value="Фатмир Демоски">Фатмир Демоски</option>
-    <option value="Филип Трајкоски">Филип Трајкоски</option>
-    <option value="Коле Јовески">Коле Јовески</option>
-    <option value="Мартин Димоски">Мартин Димоски</option>
-    <option value="Борче Јосифоски">Борче Јосифоски</option>
-    <option value="Недзми Јусуфи">Недзми Јусуфи</option>
-    <option value="АЛМА БЕЈЗ">АЛМА БЕЈЗ</option>
-    <option value="Севџан Османоски">Севџан Османоски</option>
-    <option value="Изабела Цуцулоска">Изабела Цуцулоска</option>
-</select> 
-<div>
-<label for="start-date">Почетен датум:</label>
-<input type="date" name="startDate" id="startDate">
-<label for="start-date">Краен датум:</label>
-<input type="date" name="endDate" id="endDate">
-</div>
-<button class="btn">Барај</button>
-</section>
+    <div class="search-agent-div">
+        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+        <select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
+            <option value="">Избери агент</option>
+            <option value="БРАЦО ДООЕЛ">БРАЦО ДООЕЛ</option>
+            <option value="Борче ЕУРОАГЕНТ">Борче ЕУРОАГЕНТ</option>
+            <option value="БОШКОСКИ">БОШКОСКИ</option>
+            <option value="----"> -----------------Агенти под Канцеларија Кузман Јосифоски Питу---------------</option>
+            <option value="Васе Стефаноска">Васе Стефаноска</option>
+            <option value="Пеце Мицакоски">Пеце Мицакоски</option>
+            <option value="Ана Марија Димоска">Ана Марија Димоска</option>
+            <option value="Дејан Петровски">Дејан Петровски</option>
+            <option value="Лумјан Крензи"> Лумјан Крензи </option>
+            <option value="Билјана Мирческа"> Билјана Мирческа </option>
+            <option value="Александра Цуцулоска"> Александра Цуцулоска</option>
+            <option value="Владимир Ѓорѓимајкоски">Владимир Ѓорѓимајкоски</option>
+            <option value="Анита Бошева">Анита Бошева</option>
+            <option value="Далиборка Башеска Јорданоска">Далиборка Башеска Јорданоска</option>
+            <option value="Ненад Митиќ">Ненад Митиќ</option>
+            <option value="Оливер Бузлески">Оливер Бузлески</option>
+            <option value="Слаѓана Николоска">Слаѓана Николоска</option>
+            <option value="Маре Петреска">Маре Петреска</option>
+            <option value="Денис Трајчески">Денис Трајчески</option>
+            <option value="Виктор Митрески">Виктор Митрески</option>
+            <option value="Владимир Мандароски">Владимир Мандароски</option>
+            <option value="Бране Јованоски">Бране Јованоски</option>
+            <option value="СН Брокер">СН Брокер</option>
+            <option value="----"> -----------------Агенти под Канцеларија Димо Наредникот---------------</option>
+            <option value="Ана Видеска">Ана Видеска</option>
+            <option value="Нури Мустафа">Нури Мустафа</option>
+            <option value="Дино Ташкоски">Дино Ташкоски</option>
+            <option value="Алмир Хаjро">Алмир Хаjро</option>
+            <option value="Џеват Дајтоски">Џеват Дајтоски</option>
+            <option value="Фатмир Демоски">Фатмир Демоски</option>
+            <option value="Филип Трајкоски">Филип Трајкоски</option>
+            <option value="Коле Јовески">Коле Јовески</option>
+            <option value="Мартин Димоски">Мартин Димоски</option>
+            <option value="Борче Јосифоски">Борче Јосифоски</option>
+            <option value="Недзми Јусуфи">Недзми Јусуфи</option>
+            <option value="АЛМА БЕЈЗ">АЛМА БЕЈЗ</option>
+            <option value="Севџан Османоски">Севџан Османоски</option>
+            <option value="Изабела Цуцулоска">Изабела Цуцулоска</option>
+        </select> 
+        <label for="start-date">Почетен датум:</label>
+        <input type="date" name="startDate" id="startDate">
+        <label for="start-date">Краен датум:</label>
+        <input type="date" name="endDate" id="endDate">
+        <button class="btn">Барај</button>
+    </div>
+    <hr>
+</form>
+
+<h1>Месечни трендови на полиси по вид на осигурување</h1>
+<select id="policyType">
+    <option value="">Избери класа</option>
+    <option id="" value="Осигурување од одговорност од употреба на моторни возила (AO)">  Осигурување од одговорност од употреба на моторни возила (AO)</option>
+    <option id="" value="Осигурување од одговорност од употреба на моторни возила (ЗК)">  Осигурување од одговорност од употреба на моторни возила (ЗК)</option>
+    <option id="" value="Осигурувањето на имот од пожар и природни непогоди">Осигурувањето на имот од пожар и природни непогоди</option>
+    <option id="" value="Други осигурувања на имот"> Други осигурувања на имот</option>
+    <option id="" value="Несреќен случај - незгода">Несреќен случај - незгода</option>
+    <option id="" value="Здравствено осигурување">Здравствено осигурување</option>
+    <option id="" value="Осигурување на стока во превоз (CMR)">Осигурување на стока во превоз (CMR)</option>
+    <option id="" value="АО за странски возила (гранично осигурувања)">АО за странски возила (гранично осигурувања)</option>
+    <option id="" value="Осигурувањето на моторни возила (каско)">Осигурувањето на моторни возила (каско)</option>
+    <option id="" value="Општото осигурување од одговорностт">Општо осигурување од одговорност</option>
+    <option id="" value="Осигурувањето на шински возила (каско)">Осигурувањето на шински возила (каско)</option>
+    <option id="" value="Осигурувањето на воздухоплови (каско) ">Осигурувањето на воздухоплови (каско) </option>
+    <option id="" value="Осигурувањето на пловни објекти (каско)">Осигурувањето на пловни објекти (каско)</option>
+    <option id="" value="Осигурувањето од одговорност од употреба на воздухоплови">Осигурувањето од одговорност од употреба на воздухоплови</option>
+    <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето од одговорност од употреба на пловни објекти</option>
+    <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето од одговорност од употреба на пловни објекти</option>
+    <option id="" value="Осигурувањето на кредити">Осигурувањето на кредити</option>
+    <option id="" value="Осигурувањето на гаранции">Осигурувањето на гаранции</option>
+    <option id="" value="Осигурувањето од финансиски загуби">Осигурувањето од финансиски загуби</option>
+    <option id="" value="Осигурувањето на правна заштита">Осигурувањето на правна заштита</option>
+    <option id="" value="Осигурувањето на туристичка помош">Осигурувањето на туристичка помош</option>
+    <option id="" value="Осигурувањето на живот">Осигурувањето на живот</option>
+    <option id="" value="Осигурувањето на брак или породување">Осигурувањето на брак или породување</option>
+    <option id="" value="Осигурувањето на живот во врска со удели во инвестициони фондови">Осигурувањето на живот во врска со удели во инвестициони фондови </option>
+    <option id="" value="Осигурувањето на тонтина (здружение на рентиери)">Осигурувањето на тонтина (здружение на рентиери)</option>
+    <option id="" value="Осигурувањето на средства за исплата">Осигурувањето на средства за исплата</option>
+</select>
+
+<canvas id="policyCountChart" width="400" height="200"></canvas>
+<canvas id="policyAmountChart" width="400" height="200"></canvas>
+
+<script src="/scripts/policy-trends.js"></script>
 </main>
 <%- include('../shared/includes/footer')%>
