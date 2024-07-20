@@ -8,7 +8,6 @@ router.get('/admin-report', adminController.getPageReport);
 
 // router.get('/reports', adminController.getReports);
 
-
 // Add the API route for policy trends
 router.get('/api/policy-trends', adminController.getPolicyTrends);
 

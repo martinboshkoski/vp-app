@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const policyType = this.value;
         if (policyType) {
             console.log(policyType); // Debug: log the selected policy type
-            fetch(`/api/policy-trends?policyType=${policyType}`)
+            fetch(`/admin/api/policy-trends?policyType=${policyType}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data); // Debug: log the received data
