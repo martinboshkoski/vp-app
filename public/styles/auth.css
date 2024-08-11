@@ -6,7 +6,7 @@ h1 {
 form {
     max-width: 25rem;
     margin: auto;
-    padding: var(--space-8);
+    padding: 0.25rem;
     background-color: var( --color-gray-200);
     border-radius: var(--border-radius-small);
     text-align: center;
