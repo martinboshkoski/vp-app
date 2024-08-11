@@ -1,35 +1,32 @@
-<article >
-  <li class="client" id="allpolicies-top" >
-    <p>Име / назив на клиент: </p>
-    <p>ЕМБГ/ЕМБС на клиент:</p>
-    <!-- <p>Вкупна премија </p> -->
-    <!-- <p>Платена премија </p> -->
-    <!-- <p>Датум </p> -->
-<p>Канцеларија</p>
-<p>Контакт</p>
-<p>Статус</p>
-<p></p>
-<p>Детали</p>
-</li>
-<br>
-    <% for (const client of clients ) { %>
-        <li>
-          <div class="client">
-            <p><%=client.name%></p>
-            <p><%=client.pin%></p>
-            <!-- <p >< %=client.insurancePolicy[0][0][2]%>,00 денари</p>         -->
-            <!-- <p > < %=client.payment%>,00 денари  </p>        -->
-            <p > <%=client.agentName%></p>
-            <p > <%=client.phone%></p>
-            <% if(client.startedLawsuit) {%>
-            <p>Клиентот е тужен</p>
-              <%}else {%>
-<p></p>
-                <%}%>
-                <p></p>
-           <a class="btn " href="/agents/clients/<%=client.id%>">Види</a>    
-          </div>
-        </li>
-       <% } %>    
-       
+<article>
+  <table class="clients-table">
+    <thead>
+      <tr>
+        <th>Име / назив на клиент</th>
+        <th>ЕМБГ/ЕМБС на клиент</th>
+        <th>Канцеларија</th>
+        <th>Статус</th>
+        <th>Детали</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (const client of clients ) { %>
+      <tr class="client-row">
+        <td><%=client.name%></td>
+        <td><%=client.pin%></td>
+        <td style="font-size: smaller;"><%=client.agentName%></td>
+        <td>
+          <% if(client.startedLawsuit) {%>
+          Клиентот е тужен
+          <%} else { %>
+          <span>---</span>
+          <% } %>
+        </td>
+        <td>
+          <a class="btn" href="/agents/clients/<%=client.id%>">Види</a>
+        </td>
+      </tr>
+      <% } %>    
+    </tbody>
+  </table>
 </article>
