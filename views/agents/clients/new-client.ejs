@@ -8,17 +8,16 @@
     <h1>Внеси нов клиент</h1>
     <form action="/new-client" method="POST">
         <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-        <!-- <h4>Податоци за клиент</h4> -->
         <label for="name"></label>
         <input type="text" name="name" id="name" placeholder="Име и презиме" required>
         <label for="address"></label>
-        <input type="text" name="address" id="address" placeholder="Адреса на живеење" required >
+        <input type="text" name="address" id="address" placeholder="Адреса на живеење (улица и град)" required>
         <label for="pin"></label>
-        <input type="number" name="pin" id="pin" placeholder="ЕМБГ / ЕМБС" minlength="6" maxlength="13" required> 
+        <input type="number" name="pin" id="pin" placeholder="ЕМБГ / ЕМБС" required min="7" max="13">
         <label for="phone"></label>
-        <input type="tel" name="phone" placeholder="Телефонски број"> 
+        <input type="tel" name="phone" placeholder="Телефонски број">
         <hr>
-        <button class="btn"> Креирај клиент </button>
+        <button class="btn" type="submit"> Креирај клиент </button>
     </form>
 </main>
 <%- include('../../shared/includes/footer')%>

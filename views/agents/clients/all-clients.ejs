@@ -9,58 +9,50 @@
     <h1>Агент: <%=agentName%> </h1>
 <section class="center-section">
     <div class="div-helper" >
-        <p><a href="/new-client" class="btn">Внеси нов клиент</a></p>
+        <p ><a href="/new-client" class="">Внеси нов клиент</a></p>
     </div>
 </section>
-    <br>
-    <hr>
+
     <br>
     <% if(locals.isAdmin) {%>
-        <section class="totalReportSection">
-            <p>Вкупен број на клиенти: </p>
-            <p>Вкупен износ на полисирана премија:</p>
-            <p>Вкупен износ на наплатена премија: </p>
-            <p>Процент на наплата на премија: </p>
-          </section>
-          <section  class="totalReportSection">
-            <p><%=clients.length%></p>
-            <p><%=totalAmountsPremium%>,00 денари</p>
-            <p><%=totalPaidAmounts%>,00 денари </p>
-            <p> <%=percentagePayment%> %</p>
-          </section>
-        <br>
-        <hr>
-        <section class="totalReportSection">
-          <p>Пресметки за 2023та година</p>
-          <p>Вкупно полисирана премија:</p>
-          <p>Вкупно наплатена премија: </p>
-          <p>Процент на наплата: </p>
-        </section>
-        <section  class="totalReportSection">
-          <p></p>
-          <p><%=totals23.totalPremiums23%>,00 денари</p>
-          <p><%=totals23.totalPayments23%>,00 денари </p>
-          <p> <%=totals23.percentagePayment23%> %</p>
-        </section>
-        <hr>
-        <section class="totalReportSection">
-          <p>Пресметки за 2024та година</p>
-          <p>Вкупно полисирана премија:</p>
-          <p>Вкупно наплатена премија: </p>
-          <p>Процент на наплата: </p>
-        </section>
-        <section  class="totalReportSection">
-          <p></p>
-          <p><%=totals24.totalPremiums24%>,00 денари</p>
-          <p><%=totals24.totalPayments24%>,00 денари </p>
-          <p> <%=totals24.percentagePayment24%> %</p>
-        </section>
-        <hr>
-        <hr>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <colgroup>
+            <col style="width: 20%;"> <!-- First column (35%) -->
+            <col style="width: 15%;"> <!-- Second column (65%) -->
+            <col style="width: 60%;"> <!-- Second column (65%) -->
+            <col style="width: 15%;"> <!-- Second column (65%) -->
+            <col style="width: 10%;"> <!-- Second column (65%) -->
+
+
+        </colgroup>
+        <thead>
+            <tr style="background-color: #ccc;">
+                <th style="padding: 10px; border: 1px solid #ccc;">Година</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Вкупно полисирана премија</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Вкупно наплатена премија</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Процент на наплата</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ccc; background-color: #ccc;">Пресметки за 2023та година</td>
+                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals23.totalPremiums23.toLocaleString('de-DE') %>,00 денари</td>
+                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals23.totalPayments23.toLocaleString('de-DE') %>,00 денари</td>
+                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals23.percentagePayment23 %> %</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ccc; background-color: #ccc;">Пресметки за 2024та година</td>
+                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals24.totalPremiums24.toLocaleString('de-DE') %>,00 денари</td>
+                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals24.totalPayments24.toLocaleString('de-DE') %>,00 денари</td>
+                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals24.percentagePayment24 %> %</td>
+            </tr>
+        </tbody>
+    </table>
+ 
         <br>
     <% }%>
     <div class="searchBar">
-        <input type="text" placeholder="Пребарувај (име и презиме, ЕМБГ/ЕМБС, број полиса)" id="searchBar" onkeyup="searchClients()"> 
+        <input type="text" placeholder="Пребарувај (име и презиме, ЕМБГ/ЕМБС)" id="searchBar" onkeyup="searchClients()"> 
     </div>
       <ul id="myUL">
         <%-include('../../shared/includes/client') %>
