@@ -3,15 +3,15 @@ const db = require('../data/database');
 const mongodb = require('mongodb')
 
 class Payment {
-  constructor(clientName, clientPin, paymentAmount, policyNumber, agentName, paidCash) {
-    // this._id = _id; // Add this line to store the _id
+  constructor(clientName, clientPin, paymentAmount, policyNumber, agentName, paidCash, paymentMethodDetail) {
     this.clientName = clientName;
     this.clientPin = clientPin;
-    this.paymentAmount = paymentAmount; // Assuming paymentAmount is already a number, no need for unary plus
+    this.paymentAmount = paymentAmount;
     this.policyNumber = policyNumber;
     this.agentName = agentName;
-    this.date = moment().format('DD/MM/YYYY'); // Ensure date format is consistent with your DB queries
+    this.date = moment().format('DD/MM/YYYY');
     this.paidCash = paidCash;
+    this.paymentMethodDetail = paymentMethodDetail; // Add this line to include payment method detail
   }
 
   async save() {
@@ -20,9 +20,10 @@ class Payment {
       clientPin: this.clientPin,
       policyNumber: this.policyNumber,
       paymentAmount: this.paymentAmount,
-      agentName: this.agentName, 
-      date: this.date, 
-      paidCash: this.paidCash
+      agentName: this.agentName,
+      date: this.date,
+      paidCash: this.paidCash,
+      paymentMethodDetail: this.paymentMethodDetail // Ensure this is saved in the database
     };
     await db.getDb().collection('payments').insertOne(paymentData);
   }
@@ -43,14 +44,37 @@ static async findPaymentByPolicyNumberAndDate(policyNumber, paymentDateOld) {
   return new Payment(payment._id, payment.clientName, payment.clientPin, payment.paymentAmount, payment.policyNumber, payment.agentName, payment.paidCash, payment.date);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // static async findByDateAndAgent(date, agentName) {
+  //   const theDate = moment(date).format('DD/MM/YYYY').toString();
+  //   const paymentsOnDate = await db.getDb().collection("payments").find({ date: theDate, agentName: agentName, paidCash: "paidCash",  }).toArray();
+  //   if (!paymentsOnDate.length) {
+  //     throw new Error("Нема уплати за избраната дата.");
+  //   }
+  //   return paymentsOnDate.map(payment => new Payment(payment.clientName, payment.clientPin, payment.paymentAmount, payment.policyNumber, payment.agentName, payment.paidCash));
+  // }
   static async findByDateAndAgent(date, agentName) {
     const theDate = moment(date).format('DD/MM/YYYY').toString();
-    const paymentsOnDate = await db.getDb().collection("payments").find({ date: theDate, agentName: agentName, paidCash: "paidCash" }).toArray();
+    const paymentsOnDate = await db.getDb().collection("payments").find({
+      date: theDate,
+      agentName: agentName,
+      paidCash: "paidCash"
+    }).toArray();
+  
     if (!paymentsOnDate.length) {
       throw new Error("Нема уплати за избраната дата.");
     }
-    return paymentsOnDate.map(payment => new Payment(payment.clientName, payment.clientPin, payment.paymentAmount, payment.policyNumber, payment.agentName, payment.paidCash));
+  
+    return paymentsOnDate.map(payment => new Payment(
+      payment.clientName,
+      payment.clientPin,
+      payment.paymentAmount,
+      payment.policyNumber,
+      payment.agentName,
+      payment.paidCash,
+      payment.paymentMethodDetail // Include this field in the constructor
+    ));
   }
+  
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   static async findById(paymentId) {
     try {

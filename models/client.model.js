@@ -48,18 +48,18 @@ class Client {
 ////////
 
 static async findByPin(clientPin) {
-
-  const client = await db
-    .getDb()
-    .collection("clients")
-    .findOne({ pin: clientPin });
-  if (!client) {
-    const error = new Error(" Не може да се најде клиентот");
-    error.code = 404;
-    throw error;
+  try {
+    const client = await db.getDb().collection("clients").findOne({ pin: clientPin });
+    if (!client) {
+      return null; // Or throw a custom error if you prefer to handle it differently
+    }
+    return client;
+  } catch (error) {
+    console.error('Error finding client by pin:', error);
+    throw error; // Or return null depending on your needs
   }
-  return client;
 }
+
   ///////////////////////////////////////////////////////////////
   static async findAll() {
     const clients = await db.getDb().collection("clients").find().toArray();
