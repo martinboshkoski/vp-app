@@ -176,6 +176,94 @@ async function insertPayment(req, res, next) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function insertPaymentOld(req, res, next) {
+  try {
+    const policy = await Policy.findById(req.body.policyId);
+    const policyNumber = req.body.policyNumber;
+    const agentName = req.body.paymentPlace;
+
+    let agentCommision;
+    if (policy.policyAmount > +req.body.payment) {
+      agentCommision = +req.body.payment * 0.15;
+    } else if (policy.policyAmount === +req.body.payment) {
+      agentCommision = +req.body.payment * 0.20;
+    }
+
+    // Determine paidCash and additional element based on paymentMethod
+    let paidCash;
+    let paymentMethodDetail;
+
+    switch (req.body.paymentMethod) {
+      case 'paidCash1':
+        paidCash = 'paidCash';
+        paymentMethodDetail = 'Благајна - готовина';
+        break;
+      case 'paidCash2':
+        paidCash = 'paidCash';
+        paymentMethodDetail = 'Благајна - картичка';
+        break;
+      case 'bankTransfer':
+        paidCash = null; // Not considered as paidCash
+        paymentMethodDetail = 'Банкарска уплата (извод)';
+        break;
+      default:
+        throw new Error('Invalid payment method selected');
+    }
+
+    const thePayment = {
+      amount: +req.body.payment,
+      agentCommision: Math.round(agentCommision),
+      agentName: agentName,
+      date: moment().format("YYYY-MM-DD"),  // Ensuring the correct date format
+      paidCash: paidCash,
+      paymentMethodDetail: paymentMethodDetail  // Storing the payment method detail in the document
+    };
+
+    // Update the policy with the new payment
+    await db.getDb().collection("policies2022").updateOne(
+      { policyNumber: policyNumber },
+      { $push: { thePayment: thePayment } }
+    );
+
+    const newTotalPaid = (policy.totalPaid || 0) + thePayment.amount;
+
+    // Update the `totalPaid` field in the policy
+    await db.getDb().collection("policies2022").updateOne(
+      { policyNumber: policyNumber },
+      { $set: { totalPaid: newTotalPaid } }
+    );
+
+    // Creating a payment entry in the payments collection
+    const payment = new Payment(
+      req.body.clientName,
+      policy.clinetPin || '',  // Use an empty string if clientPin is missing
+      thePayment.amount,
+      policy.policyNumber,
+      agentName,
+      thePayment.paidCash,
+      paymentMethodDetail
+    );
+
+    await payment.save();
+
+    // Recalculate totalPaid and update the policy
+    const allPayments = policy.thePayment.concat(thePayment);  // Combine old and new payments
+    const totalPaid = allPayments.reduce((total, payment) => total + payment.amount, 0);
+
+    await db.getDb().collection("policies").updateOne(
+      { policyNumber: policyNumber },
+      { $set: { totalPaid: totalPaid } }
+    );
+
+    // Redirect to the correct client page if `clientPin` exists, otherwise to the home page
+    const theClientPage = policy.clinetPin ? `/agents/clients/${req.body.policyId}` : '/';
+    res.redirect(theClientPage);
+  } catch (error) {
+    next(error);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertLawsuitPayment(req, res, next) {
   try {
     const thePayment = {
@@ -342,6 +430,7 @@ async function deletePayment(req, res, next) {
 module.exports = {
   getPayments: getPayments,
   insertPayment: insertPayment,
+  insertPaymentOld:insertPaymentOld,
   insertLawsuitPayment: insertLawsuitPayment,
   generatePerDate: generatePerDate,
   getByDate: getByDate,

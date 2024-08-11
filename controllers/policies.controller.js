@@ -236,8 +236,7 @@ async function findPolicy(req, res, next) {
         clientPayments.push(+payment);
         clientPaymentAmounts.push(+payment.paymentAmount)//
       }
-    }
-    let totalPaid = clientPaymentAmounts.reduce(function (x, y) {
+    }    let totalPaid = clientPaymentAmounts.reduce(function (x, y) {
       return x + y;
   }, 0);
   let debt = totalPremium - totalPaid
@@ -245,7 +244,6 @@ async function findPolicy(req, res, next) {
   const agent = await Agent.getAgentWithSameId(req.session.uid)
   const agentName = agent.name;
   
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     res.render("agents/policies/single-policy", {
       policy: policy, 
       debt:debt,
@@ -259,7 +257,68 @@ async function findPolicy(req, res, next) {
     next(error);
   }
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function findPolicyOld(req, res, next) {
+  try {
+    const policy = await Policy.findByPolicyOld(req.body.policyNumber);
 
+    const agent = await Agent.getAgentWithSameId(req.session.uid)
+    const agentName = agent.name;
+
+
+    res.render("agents/policies/single-policy-old", {
+      policy: policy, 
+      agentName:agentName,
+      moment:moment
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function get2021(req, res, next) {
+
+  try {
+    res.render("agents/policies/policies-by-date", {
+    });
+  } catch (error) {
+    next(error);
+    return;
+  }
+}
+//////
+async function get2022(req, res, next) {
+  try {
+    const policies2022 = await db.getDb().collection('policies2022').find().toArray();
+    
+    let startDate = "01.01.2022";
+    let endDate = "31.12.2022";
+    
+    let totalPolicyAmount = 0;
+    let totalUnPaidPolicyAmount = 0;    
+    policies2022.forEach(policy => {
+        totalPolicyAmount += policy.policyAmount;
+        totalUnPaidPolicyAmount += (policy.policyAmount - policy.totalPaid);
+    });
+
+    let percentagePaid = (totalUnPaidPolicyAmount / totalPolicyAmount) * 100;
+    percentagePaid = Math.round(percentagePaid);
+    
+    res.render("agents/policies/policies-by-date-old", {
+      requiredPoliciesByDate: policies2022, 
+      startDate:startDate,
+      endDate:endDate,
+      totalPolicyAmount:totalPolicyAmount,
+      totalUnPaidPolicyAmount:totalUnPaidPolicyAmount,
+      percentagePaid:percentagePaid,
+      moment:moment
+    });
+  } catch (error) {
+    next(error);
+    return;
+  }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,5 +327,8 @@ module.exports = {
   insertNewPolicy: insertNewPolicy,
   getByDateTypeAgent:getByDateTypeAgent, 
   deleteSinglePolicy:deleteSinglePolicy, 
-  findPolicy:findPolicy
+  findPolicy:findPolicy, 
+  findPolicyOld:findPolicyOld, 
+  get2021:get2021, 
+  get2022:get2022
 };
