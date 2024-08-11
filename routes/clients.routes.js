@@ -21,6 +21,8 @@ router.get('/new-payment', function(req, res){
 router.post('/edit-payment', paymentsController.editPayment)
 router.post('/delete-payment', paymentsController.deletePayment);
 router.post('/new-payment', paymentsController.insertPayment)
+router.post('/new-payment-old', paymentsController.insertPaymentOld)
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Group of payments
@@ -46,6 +48,9 @@ router.post('/agents/clients/deletePolicy', policiesController.deleteSinglePolic
 //quick mode - single policy
 router.post('/find-policy', policiesController.findPolicy)
 
+router.post('/find-policy-old', policiesController.findPolicyOld)
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Group of policies 
 router.get('/all-policies', policiesController.getPolicies)
@@ -56,6 +61,12 @@ router.get('/at-court', function(req, res){
     res.render('agents/atCourt/at-court')
 })
 router.post('/policy-by-date', policiesController.getByDateTypeAgent)
+
+//old policies from Excel
+router.get('/get2021', policiesController.get2021)
+router.get('/get2022', policiesController.get2022)
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Clients
