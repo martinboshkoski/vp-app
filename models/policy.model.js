@@ -24,6 +24,7 @@ class Policy {
               };
         }
 
+        //i do not know why and where this is used:
 static async findById(policyNumber) {
     const policy =  await db.getDb()
     .collection('policies')
@@ -57,28 +58,57 @@ static async findByAgent(agentSeller) {
 //     }
 // }
 
+// static async findById(policyId) {
+//     let thePolicyId
+//     try {
+//         thePolicyId = new mongodb.ObjectId(policyId)
+//     }
+//     catch (error) {
+//         error.code = 404;
+//         throw error;
+//     }
+
+//     const policy =  await db.getDb()
+//     .collection('policies')
+//     .findOne({_id: thePolicyId})    
+//     if (!policy) {
+//         const error = new Error(' Не може да се најде полисата')
+//         error.code = 404;
+//         throw error
+//     }
+//     return policy;
+// }
 static async findById(policyId) {
-    let thePolicyId
+    let thePolicyId;
     try {
-        thePolicyId = new mongodb.ObjectId(policyId)
-    }
-    catch (error) {
+        thePolicyId = new mongodb.ObjectId(policyId);
+    } catch (error) {
         error.code = 404;
         throw error;
     }
 
-    const policy =  await db.getDb()
-    .collection('policies')
-    .findOne({_id: thePolicyId})    
+    // Search in the 'policies' collection first
+    let policy = await db.getDb()
+        .collection('policies')
+        .findOne({ _id: thePolicyId });
+
+    // If not found in 'policies', search in 'policies2022'
     if (!policy) {
-        const error = new Error(' Не може да се најде полисата')
-        error.code = 404;
-        throw error
+        policy = await db.getDb()
+            .collection('policies2022')
+            .findOne({ _id: thePolicyId });
     }
+
+    // If the policy is still not found, throw an error
+    if (!policy) {
+        const error = new Error('Не може да се најде полисата');
+        error.code = 404;
+        throw error;
+    }
+
     return policy;
 }
-
-
+///////////////////////////////////////////////////////////////////////////////////////////
 static async findByClientPin(clientPin) {
     const policy =  await db.getDb()
     .collection('policies')
@@ -91,7 +121,7 @@ static async findByClientPin(clientPin) {
     return policy;
 }
 
-
+///////////////////////////////////////////////////////////////////////////////////////////
 static async findByDate(startDate, endDate) {
     const requiredPoliciesByDate = await db.getDb()
       .collection('policies')
@@ -100,14 +130,14 @@ static async findByDate(startDate, endDate) {
     // console.log(await requiredPoliciesByDate.toArray());
     return await requiredPoliciesByDate.toArray();
   }
-
+///////////////////////////////////////////////////////////////////////////////////////////
   static async findAll() {
     const policies = await db.getDb().collection('policies').find().toArray()
     return policies.map(function(policyDocument){
         return new Policy(policyDocument);
     })
 }
-
+///////////////////////////////////////////////////////////////////////////////////////////
 static async countAll() {
     const policiesNumber = await db.getDb().collection('policies').find().count()
     return policiesNumber
@@ -119,7 +149,7 @@ static async countAll() {
 // }
 //in terminal>
 // vp-clients> db.policies.aggregate([{$group: {_id: null, sum_val:{$sum: "$policyAmount"}}}])
-
+///////////////////////////////////////////////////////////////////////////////////////////
     async save(policyNumber, policyType, policyAmount, installmentsNumber, policyDate, clinetPin, clientName, agentSeller, thePayment) {
         let installments = [];
         for (let i = 0; i < installmentsNumber; i++) {
@@ -144,7 +174,7 @@ static async countAll() {
 
 await db.getDb().collection('policies').insertOne(policyData)
     }
-
+///////////////////////////////////////////////////////////////////////////////////////////
     static async removePolicy(policyId) {
         const objectId = new mongodb.ObjectId(policyId);
         return db.getDb().collection('policies').deleteOne({ _id: objectId });
@@ -202,6 +232,20 @@ static async findByPolicy(policyNumber) {
   }
   return thePolicy;
 }
+///////////////////////////////////
+
+static async findByPolicyOld(policyNumber) {
+    const thePolicy = await db
+      .getDb()
+      .collection("policies2022")
+      .findOne({ policyNumber: policyNumber });
+    if (!thePolicy) {
+      const error = new Error(" Не може да се најде полисата");
+      error.code = 404;
+      throw error;
+    }
+    return thePolicy;
+  }
 /////////////////////////////
 static async findPoliciesByYear(year) {
     const startDate = moment(`${year}-01-01`).format('YYYY-MM-DD');
