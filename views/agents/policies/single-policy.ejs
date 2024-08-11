@@ -1,0 +1,114 @@
+<link rel="stylesheet" href="/styles/base.css">
+<link rel="stylesheet" href="/styles/navigation.css">
+<link rel="stylesheet" href="/styles/forms.css">
+<link rel="stylesheet" href="/styles/auth.css">
+<link rel="stylesheet" href="/styles/policies.css">
+</head>
+<body style="background-color: gray;">
+<main style="background-color: gray;">
+    <section id="singlePolicy">
+        <div style="color: red;">Вкупен долг на клиентот (за сите полиси): <%=debt.toLocaleString('de-DE')%>,00 денари</div>
+        <p style="font-size: 1rem; margin: 0.5rem 0;">
+            Клиент / осигуреник: 
+            <a href="/agents/clients/<%= clientId %>" 
+               style="display: inline-block; background-color: var(--color-green-500); color: white; padding: 0.3rem 0.75rem; text-decoration: none; border-radius: 3px; font-weight: bold; cursor: pointer; transition: background-color 0.3s; font-weight: 100;">
+               <%= policy.clientName %>
+            </a>
+        </p>
+        <hr>
+                <div>
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td colspan="2" style="padding: 0;">
+                    <h3 style="background-color: var(--color-green-500); color: white; padding: 0.5rem; margin: 2px;">Број на полиса: <%= policy.policyNumber %></h3>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;">Тип на полиса:</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;"><%= policy.policyType %></td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;">Датум на полиса:</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;"><%= moment(policy.policyDate).format('DD/MM/YYYY') %> година</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;">Регистарски број:</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;"><%= policy.registrationNumber %></td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;">Премија:</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;"><%= policy.policyAmount.toLocaleString('de-DE') %>,00 денари</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;">Исплатена премија:</td>
+                <td style="padding: 0.5rem; border-bottom: 1px solid #ccc;">
+                    <%= (policy.totalPaid || 0).toLocaleString('de-DE') %>,00 денари
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem;">Преостанато за плаќање:</td>
+                <td style="padding: 0.5rem;" class="debtParagraph" data-debt="<%= policy.policyAmount - (policy.totalPaid || 0) %>">
+                    <%= policy.policyAmount - (isNaN(policy.totalPaid) ? 0 : policy.totalPaid) %>,00 денари
+                </td>
+            </tr>
+        </table>
+        
+        <h4>Уплати за полиса <%= policy.policyNumber %>:</h4>
+        <section id="single-payments">
+            <!-- Table Header -->
+            <div id="payments-tables" style="display: grid; grid-template-columns: 2fr 2fr 4fr;">
+                <p>Износ</p>
+                <p>Датум</p>
+                <p>Примени од</p>
+            </div>
+            
+            <!-- List of Previous Payments -->
+            <% for (const payment of policy.thePayment ) { %>
+            <div id="payments-table" style="display: grid; grid-template-columns: 2fr 2fr 4fr;">
+                <p><%=payment.amount.toLocaleString('de-DE')%>,00 денари</p>
+                <p><%=moment(payment.date).format('DD/MM/YYYY')%></p>
+                <p><%=payment.agent%></p>
+            </div>
+            <hr>
+            <% } %>
+            <!-- Form to Add a New Payment (Displayed Once) -->
+            <form action="/new-payment" method="POST" id="payment-form">
+                <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                <input type="hidden" name="policyId" value="<%= policy._id %>"> 
+                <input type="hidden" name="policyNumber" value="<%= policy.policyNumber %>"> 
+                <input type="hidden" name="agentSeller" value="<%= policy.agentSeller %>"> 
+                <input type="hidden" name="pin" value="<%= client.pin %>"> 
+                <input type="hidden" name="clientName" value="<%= client.name %>"> 
+                <input type="hidden" name="agentName" value="<%= agentName %>"> 
+                <div class="policyPayment">
+                    <input type="number" name="payment" id="payment" placeholder="Износ (без децимали)" style="font-size: small;" required> 
+                    <label for="paymentMethod">Начин:</label>
+                    <select style="font-size: small; margin: 1px;" name="paymentMethod" id="paymentMethod" required>
+                        <option value="">Избери метод на плаќање</option>
+                        <option value="paidCash1">Благајна - готовина</option>
+                        <option value="paidCash2">Благајна - со картичка</option>
+                        <option value="bankTransfer">Банкарска уплата (извод)</option>
+                    </select>
+                    <% if (locals.isEditor) { %>
+                    <button class="btn" id="paymentBtn" style="margin: 8px; padding: 10px;"> Внеси уплата </button>
+                    <% } else { %>
+                    <button style="display: none;" id="paymentBtn"> Внеси уплата </button>
+                    <% } %>
+                </div>
+            </form>
+        </section>
+        
+
+    </section>
+    <script>
+        document.getElementById('payment-form').addEventListener('submit', function(event) {
+            const paymentMethodSelect = document.getElementById('paymentMethod');
+            if (paymentMethodSelect.value === "") {
+                event.preventDefault(); // Prevent form submission
+                alert('Ве молиме изберете метод на плаќање.'); // Show an alert asking the user to select a payment method
+            }
+        });
+    </script>
+</main>
+ 
