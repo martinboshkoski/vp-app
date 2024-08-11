@@ -14,8 +14,7 @@
             <label for="start-date">Почетен датум:</label>
             <input type="date" name="startDate" id="startDate">
             <label for="endDate">Краен датум:</label>
-            <input type="date" name="endDate" id="endDate">
-
+            <input type="date" name="endDate" id="endDate"> 
             <p>Класа на полиса:</p>
             <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса">
                 <option value="">Сите класи</option>
@@ -69,6 +68,22 @@
             <input type="text" name="policyNumber" id="policyNumber" placeholder="Број на полиса" required style="font-size: large;">
             <button class="btn"> Барај Полиса </button>
         </form>
+    </div>
+    <div style="text-align: left;">
+        <p>Постари записи (полиси превземени од ексел)</p>
+        <a href="/get2021" class="btn">2021 година</a>
+        <a href="/get2022" class="btn">2022 година</a>
+        <!-- <form action="/policy-by-date" method="POST" class="search-agent">
+            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+            <div class="search-bar-div">
+                <label for="start-date">Почетен датум:</label>
+                <input type="date" name="startDate" id="startDate">
+                <label for="endDate">Краен датум:</label>
+                <input type="date" name="endDate" id="endDate"> 
+                </select>
+            </div>
+            <button id="searchBtn" class="btn">Генерирај</button>
+        </form> -->
     </div>
 </main>
 <script>
