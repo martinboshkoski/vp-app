@@ -2,6 +2,7 @@ const Client = require("../models/client.model");
 const Agent = require("../models/agent.model");
 const Policy = require("../models/policy.model");
 const Payment = require("../models/payment.model");
+const Announcement = require('../models/announcement.model'); 
 
 const mongodb = require("mongodb");
 const moment = require("moment");
@@ -266,13 +267,13 @@ if (startLawsut) {
       totalPremium: totalPremium,
       debt:debt, 
       agentName:agentName, 
- courtFee:courtFee,
- courtFeeDecision:courtFeeDecision,
- attorneyFee:attorneyFee,
- totalDebt:totalDebt,
- moment:moment, 
- interestDetailsPerPolicy:interestDetailsPerPolicy, 
- totalInterestAll: totalInterestAll
+      courtFee:courtFee,
+      courtFeeDecision:courtFeeDecision,
+      attorneyFee:attorneyFee,
+      totalDebt:totalDebt,
+      moment:moment, 
+      interestDetailsPerPolicy:interestDetailsPerPolicy, 
+      totalInterestAll: totalInterestAll
 
     });
   } catch (error) {
@@ -331,6 +332,17 @@ async function deleteSinglePayment(req, res, next) {
   res.redirect("/all-clients");
 }
 ////////////////////////////////////////////////////////////////////////////////
+async function getHomepage(req, res, next) {
+  try {
+    const allAnnouncements = await db.getDb().collection('announcements').find().toArray();
+    res.render('homepage', {
+        allAnnouncements: allAnnouncements // Pass any other data needed in the view
+    });
+} catch (error) {
+    next(error); // Pass error to the error handling middleware
+}
+}
+////////////////////////////////////////////////////////////////////////////////
 async function getDebtClients(req, res, next) {
   const clients = await Client.findAll();
 
@@ -344,7 +356,7 @@ async function getDebtClients(req, res, next) {
 
   res.render("agents/debtClients/debt-clients", {clients:clients});
 }
-
+////////////////////////////////////////////////////////////////////////////////
 async function getAnnex(req, res, next) {
 
 const policyId = new ObjectID(req.body.policyId) 
@@ -356,8 +368,7 @@ let installments = policy.installments
 
   res.render("agents/clients/annex", {client:client, policy:policy, installments: installments});
 }
-
-
+////////////////////////////////////////////////////////////////////////////////
 async function startLawsut(req, res, next) {
   const agent = await Agent.getAgentWithSameId(req.session.uid)
   const agentName = agent.name;
@@ -379,7 +390,7 @@ async function startLawsut(req, res, next) {
   const clients = await Client.findAll();
   res.render("agents/debtClients/debt-clients", {clients:clients});
 }
-
+////////////////////////////////////////////////////////////////////////////////
 async function withdrawLawsuit(req, res, next) {
       //1. Find client by pin
   client = await Client.findByPin(req.body.pin);
@@ -389,7 +400,7 @@ async function withdrawLawsuit(req, res, next) {
   res.redirect("/all-clients");
     //3. Make it only avaliable to the admin in ejs
 }
-
+////////////////////////////////////////////////////////////////////////////////
   async function enforcementAgent(req, res, next) {
     //1. find client by pin
     client = await Client.findByPin(req.body.pin);
@@ -397,6 +408,7 @@ async function withdrawLawsuit(req, res, next) {
     const clients = await Client.findAll();
     res.redirect("/enforcement-agent");
   }
+  ////////////////////////////////////////////////////////////////////////////////
   async function getDebtClients(req, res, next) {
 
     const policies = await Policy.findAll();
@@ -426,6 +438,7 @@ async function getEnforcementClients(req, res, next) {
   res.render("agents/enforcementAgent/enforcement-agent", {clients:clients});
 }
 
+////////////////////////////////////////////////////////////////////////////////
 async function findByPolicy(req, res, next) {
 
   const policyNumber = req.body.policyNumber
@@ -436,10 +449,26 @@ async function findByPolicy(req, res, next) {
   res.redirect(`/agents/clients/${client._id.toString()}`)  
 }
 
+////////////////////////////////////////////////////////////////////////////////
+async function findByClientId(req, res, next) {
+
+  const clientPin = req.body.clientPin
+  
+  const client = await Client.findByPin(req.body.clientPin);
+  if (!client) {
+    return res.status(404).render('error-page', { message: 'Клиентот не е најден' });
+  }
+
+  res.redirect(`/agents/clients/${client._id.toString()}`)  
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 module.exports = {
   getClient: getClient,
   getNewClient: getNewClient,
   getUpdateClient: getUpdateClient,
+  getHomepage:getHomepage,
   getDebtClients: getDebtClients,
   updateClient: updateClient,
   deleteClient: deleteClient,
@@ -449,5 +478,6 @@ module.exports = {
   enforcementAgent: enforcementAgent, 
   getEnforcementClients:getEnforcementClients,
   deleteSinglePayment: deleteSinglePayment,
-  findByPolicy:findByPolicy
+  findByPolicy:findByPolicy, 
+  findByClientId:findByClientId
 };

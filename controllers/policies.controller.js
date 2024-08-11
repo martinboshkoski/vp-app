@@ -1,81 +1,59 @@
 const Policy = require("../models/policy.model");
 const Payment = require("../models/payment.model");
 const Agent = require("../models/agent.model");
+const Client = require("../models/client.model");
+
 const moment = require("moment");
 const db = require('../data/database')
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function getPolicies(req, res, next) {
   try {
-    let policies = await Policy.findAll();
-    const policiesNumber = await Policy.countAll();
 
-    const loggedAgent = await Agent.getAgentWithSameUid(req.session.uid)
-
-    if (!loggedAgent.isEditor) {
-      policies = policies.filter(policy => policy.policyNumber.agentSeller == loggedAgent.name);
-    }
-
-    //Calculates the total paid amount
-    let paidAmounts = [];
-    const payments = await Payment.findAll();
-    for (payment of payments) {
-      paidAmounts.push(payment.paymentAmount);
-    }
-    let totalPaidAmounts = paidAmounts.reduce(function (x, y) {
-      return x + y;
-    }, 0);
-
-    //Calculates the total amount of the premium
-    let totalPremium = [];
-    for (policy of policies) {
-
-      totalPremium.push(policy.policyNumber.policyAmount);
-
-      const policyDate = moment(policy.policyNumber.policyDate);
-      const threeMonthsAgo = moment().subtract(3, 'months');
-
-      const paymentPercentage = (policy.policyNumber.totalPaid || 0) / policy.policyNumber.policyAmount;
-      // Determine policy status based on payment percentage
-      if (paymentPercentage >= 1) {
-          // Policy is fully paid
-          policy.isUnpaid = false;
-          policy.discount = false;
-      } else if (paymentPercentage >= 0.79) {
-          // Policy is paid 80% or more but less than 100%
-          policy.discount = true;
-          policy.isUnpaid = false;
-      } else {
-          // Policy is paid less than 80%
-          policy.isUnpaid = true;
-          policy.discount = false;
-      }
-    }
-    let totalAmountsPremium = totalPremium.reduce(function (x, y) {
-      return x + y;
-    }, 0);
+    const loggedAgent = await Agent.getAgentWithSameUid(req.session.uid);
+    // console.log(loggedAgent)
     
-    const percentagePayment = (
-      (totalPaidAmounts / totalAmountsPremium) *
-      100
-    ).toFixed(2);
+    // if (!loggedAgent.isEditor) {
 
-    totalAmountsPremium = totalAmountsPremium.toLocaleString('de-DE');
-    totalPaidAmounts = totalPaidAmounts.toLocaleString('de-DE');
 
+    // }
+    // res.render("agents/policies/policies", {
+    //   moment:moment,
+    //   loggedAgent:loggedAgent
+    // });
+            // Assuming you have a method to get the current logged-in agent
+            const agent = await Agent.getAgentWithSameUid(req.session.uid);
+
+            // List of all agents
+            const allAgents = [
+                "", "БРАЦО ДООЕЛ", "Борче ЕУРОАГЕНТ", "БОШКОСКИ", 
+                "Васе Стефаноска", "Пеце Мицакоски", "Ана Марија Димоска",
+                "Дејан Петровски", "Лумјан Крензи", "Билјана Мирческа",
+                "Александра Цуцулоска", "Владимир Ѓорѓимајкоски", "Анита Бошева",
+                "Далиборка Башеска Јорданоска", "Ненад Митиќ", "Оливер Бузлески",
+                "Слаѓана Николоска", "Маре Петреска", "Денис Трајчески",
+                "Виктор Митрески", "Владимир Мандароски", "Бране Јованоски",
+                "СН Брокер", "Ана Видеска", "Нури Мустафа",
+                "Дино Ташкоски", "Алмир Хаjро", "Џеват Дајтоски",
+                "Фатмир Демоски", "Филип Трајкоски", "Коле Јовески",
+                "Мартин Димоски", "Борче Јосифоски", "Недзми Јусуфи",
+                "АЛМА БЕЈЗ", "Севџан Османоски", "Изабела Цуцулоска"
+            ];
+    
+            // Rendering the EJS template with the necessary data
     res.render("agents/policies/policies", {
-      policies: policies,
-      policiesNumber: policiesNumber,
-      totalAmountsPremium: totalAmountsPremium,
-      totalPaidAmounts: totalPaidAmounts,
-      percentagePayment: percentagePayment,
-      moment:moment
-    });
+      agentName: agent.name, // The name of the currently logged-in agent
+                allAgents: allAgents, // All agents available
+                isAdmin: agent.isAdmin, // Boolean flag to check if the user is an Admin
+                isEditor: agent.isEditor // Boolean flag to check if the user is an Editor
+            });
   } catch (error) {
     next(error);
     return;
   }
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertNewPolicy(req, res, next) {
@@ -136,55 +114,84 @@ async function insertNewPolicy(req, res, next) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-async function getByDate(req, res, next) {
-const startDate = req.body.startDate
-const endDate = req.body.endDate
+async function getByDateTypeAgent(req, res, next) {
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
+  let insurancePolicyType = req.body.insurancePolicyType;
+  let agentSeller = req.body.agentSeller;
 
-let requiredPoliciesByDate = await Policy.findByDate(startDate, endDate)
+  // Fetch policies based on date range
+  let requiredPoliciesByDate = await Policy.findByDate(startDate, endDate);
 
-let totalPolicyAmount = 0
-let totalUnPaidPolicyAmount = 0;
-
-requiredPoliciesByDate.forEach(policy => {
-  const policyDate = moment(policy.policyDate);
-  const threeMonthsAgo = moment().subtract(3, 'months');
-
-  const paymentPercentage = (policy.totalPaid || 0) / policy.policyAmount;
-  // Determine policy status based on payment percentage
-  if (paymentPercentage >= 1) {
-      // Policy is fully paid
-      policy.isUnpaid = false;
-      policy.discount = false;
-  } else if (paymentPercentage >= 0.79) {
-      // Policy is paid 80% or more but less than 100%
-      policy.discount = true;
-      policy.isUnpaid = false;
-  } else {
-      // Policy is paid less than 80%
-      policy.isUnpaid = true;
-      policy.discount = false;
-      totalUnPaidPolicyAmount += policy.policyAmount;
+  // Filter policies based on insurancePolicyType and agentSeller, if provided
+  if (insurancePolicyType) {
+      requiredPoliciesByDate = requiredPoliciesByDate.filter(policy => policy.policyType === insurancePolicyType);
   }
-    //
-  totalPolicyAmount += policy.policyAmount
-})
 
-const loggedAgent = await Agent.getAgentWithSameUid(req.session.uid)
+  if (agentSeller) {
+      requiredPoliciesByDate = requiredPoliciesByDate.filter(policy => policy.agentSeller === agentSeller);
+  }
 
-if (!loggedAgent.isEditor) {
-  requiredPoliciesByDate = requiredPoliciesByDate.filter(policy => policy.agentSeller == loggedAgent.name);
+  let totalPolicyAmount = 0;
+  let totalUnPaidPolicyAmount = 0;
+
+  requiredPoliciesByDate.forEach(policy => {
+      const policyDate = moment(policy.policyDate);
+      const threeMonthsAgo = moment().subtract(3, 'months');
+
+      const paymentPercentage = (policy.totalPaid || 0) / policy.policyAmount;
+
+      // Determine policy status based on payment percentage
+      if (paymentPercentage >= 1) {
+          // Policy is fully paid
+          policy.isUnpaid = false;
+          policy.discount = false;
+      } else if (paymentPercentage >= 0.79) {
+          // Policy is paid 80% or more but less than 100%
+          policy.discount = true;
+          policy.isUnpaid = true;
+      } else {
+          // Policy is paid less than 80%
+          policy.isUnpaid = true;
+          policy.discount = false;
+          totalUnPaidPolicyAmount += policy.policyAmount;
+      }
+
+      totalPolicyAmount += policy.policyAmount;
+  });
+
+  const loggedAgent = await Agent.getAgentWithSameUid(req.session.uid);
+
+  if (!loggedAgent.isEditor) {
+      requiredPoliciesByDate = requiredPoliciesByDate.filter(policy => policy.agentSeller === loggedAgent.name);
+  }
+
+  // Update totalPolicyAmount after filtering
+  totalPolicyAmount = requiredPoliciesByDate.reduce((total, policy) => total + policy.policyAmount, 0);
+
+
+  if (!insurancePolicyType) {
+    insurancePolicyType = "Сите класи"
+  } 
+
+  if (!agentSeller) {
+    agentSeller = "Сите агенти"
+  } 
+
+  const percentagePayment = Math.round((totalUnPaidPolicyAmount / totalPolicyAmount) * 100);
+
+  res.render("agents/policies/policies-by-date", {
+      requiredPoliciesByDate: requiredPoliciesByDate,
+      startDate: startDate,
+      endDate: endDate,
+      moment: moment,
+      totalPolicyAmount: totalPolicyAmount,
+      totalUnPaidPolicyAmount: totalUnPaidPolicyAmount.toLocaleString("de-DE"), 
+      insurancePolicyType:insurancePolicyType, 
+      agentSeller:agentSeller, 
+      percentagePayment:percentagePayment
+  });
 }
-totalPolicyAmount = requiredPoliciesByDate.reduce((total, policy) => total + policy.policyAmount, 0);
-
-res.render("agents/policies/policies-by-date", {
-  requiredPoliciesByDate: requiredPoliciesByDate,
-  startDate: startDate, 
-  endDate: endDate, 
-  moment: moment, 
-  totalPolicyAmount:totalPolicyAmount,
-  totalUnPaidPolicyAmount:totalUnPaidPolicyAmount.toLocaleString("de-DE")
-});
-} 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function deleteSinglePolicy(req, res, next) {
@@ -200,9 +207,66 @@ async function deleteSinglePolicy(req, res, next) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+async function findPolicy(req, res, next) {
+  try {
+    const policy = await Policy.findByPolicy(req.body.policyNumber);
+    const client = await Client.findByPin(policy.clinetPin);
+
+    const policies = await Policy.findAll();
+    const payments = await Payment.findAll();
+
+    const clientId = client._id.toString();    
+////calculating total debt for the client
+    let clientPolicies = [];
+    let clientPoliciesPremiums = [];
+    for (individualPolicy of policies) {
+      if (individualPolicy.policyNumber.clinetPin == client.pin) {
+        clientPolicies.push(individualPolicy);
+        clientPoliciesPremiums.push(individualPolicy.policyNumber.policyAmount)
+      }
+    }
+    let totalPremium = clientPoliciesPremiums.reduce(function (x, y) {
+      return x + y;
+  }, 0);
+
+    let clientPayments = [];
+    let clientPaymentAmounts = [];
+    for (payment of payments) {
+      if (payment.clientPin == client.pin) {
+        clientPayments.push(+payment);
+        clientPaymentAmounts.push(+payment.paymentAmount)//
+      }
+    }
+    let totalPaid = clientPaymentAmounts.reduce(function (x, y) {
+      return x + y;
+  }, 0);
+  let debt = totalPremium - totalPaid
+
+  const agent = await Agent.getAgentWithSameId(req.session.uid)
+  const agentName = agent.name;
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    res.render("agents/policies/single-policy", {
+      policy: policy, 
+      debt:debt,
+      moment:moment, 
+      clientId:clientId,
+      client:client, 
+      agentName:agentName
+
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports = {
   getPolicies: getPolicies,
   insertNewPolicy: insertNewPolicy,
-  getByDate:getByDate, 
-  deleteSinglePolicy:deleteSinglePolicy
+  getByDateTypeAgent:getByDateTypeAgent, 
+  deleteSinglePolicy:deleteSinglePolicy, 
+  findPolicy:findPolicy
 };

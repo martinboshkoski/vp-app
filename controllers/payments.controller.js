@@ -76,6 +76,7 @@ async function generatePerDate(req, res, next) {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertPayment(req, res, next) {
+
   try {
     const policy = await Policy.findById(req.body.policyId);
     const policyNumber = req.body.policyNumber;
@@ -88,35 +89,53 @@ async function insertPayment(req, res, next) {
       agentCommision = +req.body.payment * 0.20;
     }
 
+    // Determine paidCash and additional element based on paymentMethod
+    let paidCash;
+    let paymentMethodDetail;
+    
+    switch (req.body.paymentMethod) {
+      case 'paidCash1':
+        paidCash = 'paidCash';
+        paymentMethodDetail = 'Благајна - готовина';
+        break;
+      case 'paidCash2':
+        paidCash = 'paidCash';
+        paymentMethodDetail = 'Благајна - картичка';
+        break;
+      case 'bankTransfer':
+        paidCash = null; // Not considered as paidCash
+        paymentMethodDetail = 'Банкарска уплата (извод)';
+        break;
+      default:
+        throw new Error('Invalid payment method selected');
+    }
+
     const thePayment = {
-      // clientName: req.body.clientName,
       amount: +req.body.payment,
       agentCommision: Math.round(agentCommision),
       agent: req.body.agentName,
       date: moment().format("YYYY-MM-DD"),
-      paidCash: req.body.paidCash
+      paidCash: paidCash,
+      paymentMethodDetail: paymentMethodDetail  // Storing the payment method detail in the document
     };
-    await db
-      .getDb()
-      .collection("policies")
-      .updateOne(
-        { policyNumber: policyNumber},
-        { $push: { thePayment: thePayment } }
-      ); //needs to go into the model
 
-    //going to the same client page
+    await db.getDb().collection("policies").updateOne(
+      { policyNumber: policyNumber },
+      { $push: { thePayment: thePayment } }
+    ); 
+
     const clientPin = req.body.pin;
     const client = await Client.findByPin(clientPin);
     const clientName = client.name;
 
-    //registering payment in the paymentcs collection
     const payment = new Payment(
       clientName,
       clientPin,
       thePayment.amount,
       policy.policyNumber,
-      thePayment.agent, 
-      thePayment.paidCash
+      thePayment.agent,
+      thePayment.paidCash, 
+      paymentMethodDetail
     );
     try {
       await payment.save(
@@ -125,31 +144,26 @@ async function insertPayment(req, res, next) {
         thePayment.amount,
         policy.policyNumber,
         thePayment.agent,
-        thePayment.paidCash
+        thePayment.paidCash, 
+        paymentMethodDetail
       );
     } catch (error) {
       next(error);
       return;
     }
 
-    //total paid for one policy (result)
     const allPayments = policy.thePayment;
     let totalPaymentAmounts = [];
-    for (singlePayment of allPayments) {
+    for (let singlePayment of allPayments) {
       totalPaymentAmounts.push(singlePayment.amount);
     }
-    let totalPaid = totalPaymentAmounts.reduce(function (x, y) {
-      return x + y;
-    }, 0);
+    let totalPaid = totalPaymentAmounts.reduce((x, y) => x + y, 0);
     const finalResult = totalPaid + thePayment.amount;
 
-    await db
-      .getDb()
-      .collection("policies")
-      .updateOne(
-        { policyNumber: policyNumber },
-        { $set: { totalPaid: finalResult } }
-      ); //needs to go into the model
+    await db.getDb().collection("policies").updateOne(
+      { policyNumber: policyNumber },
+      { $set: { totalPaid: finalResult } }
+    );
 
     const clientThroughPayment = await Payment.findByPin(clientPin.toString());
     const objectId = clientThroughPayment._id;
@@ -160,6 +174,7 @@ async function insertPayment(req, res, next) {
     return;
   }
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertLawsuitPayment(req, res, next) {
   try {
