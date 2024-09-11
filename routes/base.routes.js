@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router();
 
 router.get('/', function(req, res){
-    res.redirect('/clients')
+    res.redirect('/login')
 })
 
 router.get('/401', function(req, res){
