@@ -10,6 +10,7 @@
 
     
     <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+        <% if (locals.isAuth) { %>
         <form action="/find-policy" method="POST">
             <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
             <label for="policyNumber"></label>
@@ -48,6 +49,8 @@
         </div>
     </section>
     
+
+<% } %>    
 </main>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
