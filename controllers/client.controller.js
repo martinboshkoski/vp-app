@@ -5,9 +5,11 @@ const Payment = require("../models/payment.model");
 const Announcement = require('../models/announcement.model'); 
 
 const mongodb = require("mongodb");
-const moment = require("moment");
+const moment = require("moment-timezone");
 const db = require("../data/database");
 const { ObjectID } = require("bson");
+
+const sgMail = require('@sendgrid/mail')
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -461,8 +463,251 @@ async function findByClientId(req, res, next) {
 
   res.redirect(`/agents/clients/${client._id.toString()}`)  
 }
+////////////////////////////////////////////////////////////////////////////////
+let VPapi = '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'
+sgMail.setApiKey(VPapi)
+
+const cron = require('node-cron');
+
+// Define the list of recipient emails
+const recipients = [
+  // 'info@vashprijatel.mk',
+  // 'vash.prijatel@yahoo.com',
+  'insubroker_zarko@yahoo.com',
+  'martinboshkoskilaw@gmail.com'
+];
+
+/**
+ * Schedules a daily email at 18:30 EET containing a list of unpaid policies.
+ */
+function scheduleUnpaidPoliciesEmail() {
+  // Cron expression for 18:30 every day
+  const cronExpression = '43 21 * * *'; // Minute Hour Day Month DayOfWeek
+
+  // Schedule the task
+  cron.schedule(cronExpression, async () => {
+    try {
+      // Define the timezone
+      const timezone = 'Europe/Skopje'; // EET timezone
+
+      // Calculate the cutoff date (330 days ago)
+      const cutoffDate = moment().tz(timezone).subtract(330, 'days').format('YYYY-MM-DD');
 
 
+        // Query the database for unpaid policies
+        const policies = await db.getDb().collection('policies').find({
+          policyDate: { $lte: cutoffDate },
+          $expr: { $lt: ['$totalPaid', '$policyAmount'] }
+        }).toArray();
+
+        if (policies.length === 0) {
+          console.log('No unpaid policies found for today.');
+          return;
+        }
+
+        // Initialize the total unpaid amount
+        let totalUnpaid = 0;
+
+        // Construct the email HTML content with a styled table
+        let emailContent = `
+          <h2 style="color: #333333;">Листа на ненаплатени полиси</h2>
+          <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+            <thead>
+              <tr style="background-color: #f2f2f2;">
+                <th style="text-align: left;">#</th>
+                <th style="text-align: left;">Број на полиса</th>
+                <th style="text-align: left;">Клиент</th>
+                <th style="text-align: left;">Премија</th>
+                <th style="text-align: left;">Платена премија</th>
+                <th style="text-align: left;">Ненаплатена премија</th>
+                <th style="text-align: left;">Агент</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        // Iterate over each policy to populate the table rows
+        policies.forEach((policy, index) => {
+          const totalToPay = policy.policyAmount - policy.totalPaid;
+          totalUnpaid += totalToPay; // Accumulate the total unpaid amount
+
+          emailContent += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${policy.policyNumber}</td>
+              <td>${policy.clientName}</td>
+              <td>${policy.policyAmount},00 денари</td>
+              <td>${policy.totalPaid},00 денари</td>
+              <td>${totalToPay},00 денари</td>
+              <td>${policy.agentSeller}</td>
+            </tr>
+          `;
+        });
+
+        // Add a summary row for the total unpaid amount
+        emailContent += `
+              <tr>
+                <td colspan="6" style="text-align: right;"><strong>Вкупно ненаплатена премија:</strong></td>
+                <td><strong>${totalUnpaid},00 денари</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+
+const todayDate = moment().format('DD.MM.YYYY')
+
+      // Prepare the email message
+      const msg = {
+        to: 'info@vashprijatel.mk', // Primary recipient
+        bcc: recipients.filter(email => email !== 'info@vashprijatel.mk'), // BCC other recipients
+        from: 'online@vashprijatel.mk', // Verified sender
+        subject:`Дневен извештај за ненаплатени полиси - ВАШ ПРИЈАТЕЛ АД Прилеп - датумм: ${todayDate}`,
+        html: emailContent,
+      };
+
+      // Send the email
+      await sgMail.send(msg);
+      console.log('Unpaid policies email sent successfully.');
+
+    } catch (error) {
+      console.error('Error sending unpaid policies email:', error);
+      if (error.response && error.response.body && error.response.body.errors) {
+        console.error('SendGrid errors:', error.response.body.errors);
+      }
+    }
+  }, {
+    scheduled: true,
+    timezone: 'Europe/Skopje' // Ensure the cron job uses EET timezone
+  });
+
+  console.log('Scheduled unpaid policies email at 18:30 EET daily.');
+}
+
+scheduleUnpaidPoliciesEmail();
+
+
+      // // Query the database for unpaid policies
+      // const policies = await db.getDb().collection('policies').find({
+      //   policyDate: { $lte: cutoffDate },
+      //   $expr: { $lt: ['$totalPaid', '$policyAmount'] }
+      // }).toArray();
+
+      // if (policies.length === 0) {
+      //   console.log('No unpaid policies found for today.');
+      //   return;
+      // }
+
+   
+      // // Construct the email HTML content with a styled table
+      // let emailContent = `
+      //   <h2 style="color: #333333;">Листа на ненаплатени полиси</h2>
+      //   <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+      //     <thead>
+      //       <tr style="background-color: #f2f2f2;">
+      //         <th style="text-align: left;">Број на полиса</th>
+      //         <th style="text-align: left;">Клиент</th>
+      //         <th style="text-align: left;">Премија</th>
+      //         <th style="text-align: left;">Платена премија</th>
+      //         <th style="text-align: left;">Ненаплатена премија</th>
+      //         <th style="text-align: left;">Агент</th>
+      //       </tr>
+      //     </thead>
+      //     <tbody>
+      // `;
+
+      // policies.forEach(policy => {
+      //   const totalToPay = policy.policyAmount - policy.totalPaid;
+      //   emailContent += `
+      //     <tr>
+      //       <td>${policy.policyNumber}</td>
+      //       <td>${policy.clientName}</td>
+      //       <td>${policy.policyAmount},00 денари</td>
+      //       <td>${policy.totalPaid},00 денари</td>
+      //       <td>${totalToPay},00 денари</td>
+      //       <td>${policy.agentSeller}</td>
+      //     </tr>
+      //   `;
+      // });
+
+      // emailContent += `
+      //     </tbody>
+      //   </table>
+      // `;
+////////////////////////////////////////////////////////////////////////////////
+async function newHomeInsurance(req, res, next) {
+
+  const newPolicy = {
+  clientName: req.body.clientName,
+  clientEmail: req.body.email,
+  clientAddress: req.body.clientAddress,
+  clientEmbg: req.body.embg,
+  propertyType: req.body.propertyType,
+  sheetNumber: req.body.sheetNumber,
+  propertySize: req.body.propertySize
+}
+
+const policyPremium = newPolicy.propertySize * 250;
+
+const vpStuff = ['insubroker_zarko@yahoo.com', "info@vashprijatel.mk"];
+
+try {
+  const msg = {
+    to: req.body.email, // Change to your recipient
+    from: 'online@vashprijatel.mk', // Change to your verified sender
+    bcc: vpStuff,
+    subject: `Домаќинско осигурување - барање за полиса од клиент: ${newPolicy.clientName}`,
+    text: 'Про - Фактура за домаќинско осигурување',
+    html: `
+    <div class="policy-details">
+      <table class="policy-table">
+        <tbody>
+          <tr><td><strong>Име на клиент:</strong></td><td>${newPolicy.clientName}</td></tr>
+          <tr><td><strong>Адреса на клиент:</strong></td><td>${newPolicy.clientAddress}</td></tr>
+          <tr><td><strong>ЕМБГ на клиент:</strong></td><td>${newPolicy.clientEmbg}</td></tr>
+          <tr><td><strong>Тип на имот:</strong></td><td>${newPolicy.propertyType}</td></tr>
+          <tr><td><strong>Број на лист:</strong></td><td>${newPolicy.sheetNumber}</td></tr>
+          <tr><td><strong>Големина на имот:</strong></td><td>${newPolicy.propertySize} m²</td></tr>
+        </tbody>
+      </table>
+      <div style="text-align: justify;">
+        <p>Цената на Вашата полиса изнесува ${policyPremium},00 денари.</p>
+        <p>При исплата на банкарска сметка со број: 200002894248065 при Стопанска Банка АД Скопје, назначете „премија за полиса за осигурување бр. ___".</p>
+        <p>Полисата е во важност 24 часа по првиот работен ден кој следи на денот на Вашата уплата.</p>
+        <p>Полисата во оригинал ќе Ви биде испратена на адреса ${newPolicy.clientAddress}, а преку пошта на адреса ${newPolicy.clientEmail}</p>
+        <h3>Ви благодариме на довербата</h3>
+      </div>
+    </div>
+  `,
+  };
+  
+  sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent');
+  })
+  .catch((error) => {
+    console.error('Error sending email:', error);
+    console.error('SendGrid response:', error.response.body.errors); // Logs detailed error messages
+  });
+
+    res.render("agents/online/home-policy",{newPolicy:newPolicy, policyPremium:policyPremium});
+} catch (error) {
+  console.error('Error sending email:', error);
+}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+async function getNewHomeInsurance(req, res, next) {
+
+  try {
+  } catch (error) {
+    next(error);
+    return;
+  }
+
+  const clients = await Client.findAll();
+  res.render("agents/online/online");
+}
 ////////////////////////////////////////////////////////////////////////////////
 module.exports = {
   getClient: getClient,
@@ -479,5 +724,8 @@ module.exports = {
   getEnforcementClients:getEnforcementClients,
   deleteSinglePayment: deleteSinglePayment,
   findByPolicy:findByPolicy, 
-  findByClientId:findByClientId
+  findByClientId:findByClientId, 
+
+  getNewHomeInsurance:getNewHomeInsurance,
+  newHomeInsurance:newHomeInsurance
 };
