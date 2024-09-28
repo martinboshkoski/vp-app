@@ -484,8 +484,8 @@ const recipients = [
  */
 function scheduleUnpaidPoliciesEmail() {
   // Cron expression for 18:30 every day
-  // const cronExpression = '21 22 * * *'; // Minute Hour Day Month DayOfWeek - every day
-  const cronExpression = '55 07 * * 2'; // Every Tuesday at 17:05
+  const cronExpression = '59 22 * * *'; // Minute Hour Day Month DayOfWeek - every day
+  // const cronExpression = '55 07 * * 2'; // Every Tuesday at 17:05
 
   // Schedule the task
   cron.schedule(cronExpression, async () => {
@@ -527,25 +527,28 @@ function scheduleUnpaidPoliciesEmail() {
             </thead>
             <tbody>
         `;
-
+        
         // Iterate over each policy to populate the table rows
         policies.forEach((policy, index) => {
-          const totalToPay = policy.policyAmount - policy.totalPaid;
+          // Ensure that totalPaid is set to 0 if it is undefined or null
+          const totalPaid = policy.totalPaid ?? 0; // Using the nullish coalescing operator (??)
+          
+          const totalToPay = policy.policyAmount - totalPaid;
           totalUnpaid += totalToPay; // Accumulate the total unpaid amount
-
+        
           emailContent += `
             <tr>
               <td>${index + 1}</td>
               <td>${policy.policyNumber}</td>
               <td>${policy.clientName}</td>
               <td>${policy.policyAmount},00 денари</td>
-              <td>${policy.totalPaid},00 денари</td>
+              <td>${totalPaid},00 денари</td>
               <td>${totalToPay},00 денари</td>
               <td>${policy.agentSeller}</td>
             </tr>
           `;
         });
-
+        
         // Add a summary row for the total unpaid amount
         emailContent += `
               <tr>
@@ -555,9 +558,9 @@ function scheduleUnpaidPoliciesEmail() {
             </tbody>
           </table>
         `;
-
-const todayDate = moment().format('DD.MM.YYYY')
-
+        
+        const todayDate = moment().format('DD.MM.YYYY');
+        
       // Prepare the email message
       const msg = {
         to: 'info@vashprijatel.mk', // Primary recipient
