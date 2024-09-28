@@ -465,7 +465,7 @@ async function findByClientId(req, res, next) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-const VPapi = process.env.SENDGRID_API_KEY || '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';
+const VPapi = process.env.SENDGRID_API_KEY;
 sgMail.setApiKey(VPapi);
 
 const cron = require('node-cron');
