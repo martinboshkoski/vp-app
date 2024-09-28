@@ -563,7 +563,7 @@ const todayDate = moment().format('DD.MM.YYYY')
         to: 'info@vashprijatel.mk', // Primary recipient
         bcc: recipients.filter(email => email !== 'info@vashprijatel.mk'), // BCC other recipients
         from: 'online@vashprijatel.mk', // Verified sender
-        subject:`Дневен извештај за ненаплатени полиси - ВАШ ПРИЈАТЕЛ АД Прилеп - датум: ${todayDate}`,
+        subject:`Извештај за ненаплатени полиси - ВАШ ПРИЈАТЕЛ АД Прилеп - датум: ${todayDate}`,
         html: emailContent,
       };
 
