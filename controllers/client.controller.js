@@ -464,8 +464,9 @@ async function findByClientId(req, res, next) {
   res.redirect(`/agents/clients/${client._id.toString()}`)  
 }
 ////////////////////////////////////////////////////////////////////////////////
-let VPapi = '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'
-sgMail.setApiKey(VPapi)
+
+const VPapi = process.env.SENDGRID_API_KEY || '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';
+sgMail.setApiKey(VPapi);
 
 const cron = require('node-cron');
 
