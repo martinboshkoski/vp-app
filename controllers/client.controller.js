@@ -473,7 +473,8 @@ const cron = require('node-cron');
 // Define the list of recipient emails
 const recipients = [
   // 'info@vashprijatel.mk',
-  // 'vash.prijatel@yahoo.com',
+  'vash.prijatel@yahoo.com',
+  'vash.prijatel1@yahoo.com',
   'insubroker_zarko@yahoo.com',
   'martinboshkoskilaw@gmail.com'
 ];
@@ -483,7 +484,8 @@ const recipients = [
  */
 function scheduleUnpaidPoliciesEmail() {
   // Cron expression for 18:30 every day
-  const cronExpression = '21 22 * * *'; // Minute Hour Day Month DayOfWeek
+  // const cronExpression = '21 22 * * *'; // Minute Hour Day Month DayOfWeek - every day
+  const cronExpression = '55 07 * * 2'; // Every Tuesday at 17:05
 
   // Schedule the task
   cron.schedule(cronExpression, async () => {
@@ -493,7 +495,6 @@ function scheduleUnpaidPoliciesEmail() {
 
       // Calculate the cutoff date (330 days ago)
       const cutoffDate = moment().tz(timezone).subtract(330, 'days').format('YYYY-MM-DD');
-
 
         // Query the database for unpaid policies
         const policies = await db.getDb().collection('policies').find({
@@ -511,7 +512,7 @@ function scheduleUnpaidPoliciesEmail() {
 
         // Construct the email HTML content with a styled table
         let emailContent = `
-          <h2 style="color: #333333;">Листа на ненаплатени полиси</h2>
+          <h2 style="color: #333333;">Листа на ненаплатени полиси (кои се направени повеќе од 330 денови)</h2>
           <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
             <thead>
               <tr style="background-color: #f2f2f2;">
@@ -562,7 +563,7 @@ const todayDate = moment().format('DD.MM.YYYY')
         to: 'info@vashprijatel.mk', // Primary recipient
         bcc: recipients.filter(email => email !== 'info@vashprijatel.mk'), // BCC other recipients
         from: 'online@vashprijatel.mk', // Verified sender
-        subject:`Дневен извештај за ненаплатени полиси - ВАШ ПРИЈАТЕЛ АД Прилеп - датумм: ${todayDate}`,
+        subject:`Дневен извештај за ненаплатени полиси - ВАШ ПРИЈАТЕЛ АД Прилеп - датум: ${todayDate}`,
         html: emailContent,
       };
 
