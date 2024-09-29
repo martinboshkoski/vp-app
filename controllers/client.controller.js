@@ -484,9 +484,9 @@ const recipients = [
  */
 function scheduleUnpaidPoliciesEmail() {
   // Cron expression for 18:30 every day
-  const cronExpression = '16 10 * * *'; // Minute Hour Day Month DayOfWeek - every day
+  // const cronExpression = '16 10 * * *'; // Minute Hour Day Month DayOfWeek - every day
   // const cronExpression = '55 07 * * 2'; // Every Tuesday at 17:05
-  // const cronExpression = '25 08 * * 1'; // Every Monday at 07:55
+  const cronExpression = '25 08 * * 1'; // Every Monday at 07:55
 
   // Schedule the task
   cron.schedule(cronExpression, async () => {
