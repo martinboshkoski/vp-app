@@ -484,8 +484,9 @@ const recipients = [
  */
 function scheduleUnpaidPoliciesEmail() {
   // Cron expression for 18:30 every day
-  const cronExpression = '59 22 * * *'; // Minute Hour Day Month DayOfWeek - every day
+  const cronExpression = '12 10 * * *'; // Minute Hour Day Month DayOfWeek - every day
   // const cronExpression = '55 07 * * 2'; // Every Tuesday at 17:05
+  // const cronExpression = '25 08 * * 1'; // Every Monday at 07:55
 
   // Schedule the task
   cron.schedule(cronExpression, async () => {
@@ -496,12 +497,21 @@ function scheduleUnpaidPoliciesEmail() {
       // Calculate the cutoff date (330 days ago)
       const cutoffDate = moment().tz(timezone).subtract(330, 'days').format('YYYY-MM-DD');
 
-        // Query the database for unpaid policies
         const policies = await db.getDb().collection('policies').find({
           policyDate: { $lte: cutoffDate },
-          $expr: { $lt: ['$totalPaid', '$policyAmount'] }
+          $expr: {
+            $and: [
+              { $lt: ['$totalPaid', '$policyAmount'] }, // Unpaid policies
+              { 
+                $gte: [ 
+                  { $subtract: ['$policyAmount', '$totalPaid'] }, // Calculate unpaid amount
+                  { $multiply: ['$policyAmount', 0.1] } // Compare to 10% of policyAmount
+                ]
+              }
+            ]
+          }
         }).toArray();
-
+        
         if (policies.length === 0) {
           console.log('No unpaid policies found for today.');
           return;
