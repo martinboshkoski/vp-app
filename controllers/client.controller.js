@@ -479,9 +479,9 @@ const recipients = [
   'martinboshkoskilaw@gmail.com'
 ];
 
-/**
- * Schedules a daily email at 18:30 EET containing a list of unpaid policies.
- */
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////Schedules an email containing a list of unpaid policies/////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function scheduleUnpaidPoliciesEmail() {
   // Cron expression for 18:30 every day
   // const cronExpression = '16 10 * * *'; // Minute Hour Day Month DayOfWeek - every day
@@ -598,56 +598,112 @@ function scheduleUnpaidPoliciesEmail() {
   console.log('Scheduled unpaid policies email at 18:30 EET daily.');
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////Schedules an email containing a list of policies to be renewed////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function scheduleRenewalReminderEmail() {
+  // Cron expression for 09:00 every Monday
+  const cronExpression = '0 9 * * 1'; // Every Monday at 09:00 AM
+
+  // Schedule the task
+  cron.schedule(cronExpression, async () => {
+    try {
+      // Define the timezone
+      const timezone = 'Europe/Skopje'; // EET timezone
+
+      // Calculate the cutoff dates
+      const startDate = moment().tz(timezone).subtract(364, 'days').format('YYYY-MM-DD');
+      const endDate = moment().tz(timezone).subtract(358, 'days').format('YYYY-MM-DD');
+
+      // Query for policies that are older than 358 days but not older than 364 days
+      const policies = await db.getDb().collection('policies').find({
+        policyDate: {
+          $gt: startDate,
+          $lte: endDate
+        }
+      }).toArray();
+
+      if (policies.length === 0) {
+        console.log('No policies found for renewal reminders this week.');
+        return;
+      }
+
+      // Construct the email HTML content with a styled table
+      let emailContent = `
+        <h2 style="color: #333333;">Листа на полиси за обновување (за потсетување на клиенти)</h2>
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="text-align: left;">#</th>
+              <th style="text-align: left;">Број на полиса</th>
+              <th style="text-align: left;">Клиент</th>
+              <th style="text-align: left;">Премија</th>
+              <th style="text-align: left;">Платена премија</th>
+              <th style="text-align: left;">Ненаплатена премија</th>
+              <th style="text-align: left;">Агент</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      // Iterate over each policy to populate the table rows
+      policies.forEach((policy, index) => {
+        const totalPaid = policy.totalPaid ?? 0; // Using the nullish coalescing operator (??)
+        const totalToPay = policy.policyAmount - totalPaid;
+
+        emailContent += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${policy.policyNumber}</td>
+            <td>${policy.clientName}</td>
+            <td>${policy.policyAmount},00 денари</td>
+            <td>${totalPaid},00 денари</td>
+            <td>${totalToPay},00 денари</td>
+            <td>${policy.agentSeller}</td>
+          </tr>
+        `;
+      });
+
+      // Close the table and add a message
+      emailContent += `
+          </tbody>
+        </table>
+        <p>Ве молиме контактирајте ги клиентите за обновување на полисите.</p>
+      `;
+
+      const todayDate = moment().format('DD.MM.YYYY');
+
+      // Prepare the email message
+      const msg = {
+        to: 'info@vashprijatel.mk', // Primary recipient
+        bcc: recipients.filter(email => email !== 'info@vashprijatel.mk'), // BCC other recipients
+        from: 'online@vashprijatel.mk', // Verified sender
+        subject: `Извештај за полиси за обновување - ВАШ ПРИЈАТЕЛ АД Прилеп - датум: ${todayDate}`,
+        html: emailContent,
+      };
+
+      // Send the email
+      await sgMail.send(msg);
+      console.log('Renewal reminder email sent successfully.');
+
+    } catch (error) {
+      console.error('Error sending renewal reminder email:', error);
+      if (error.response && error.response.body && error.response.body.errors) {
+        console.error('SendGrid errors:', error.response.body.errors);
+      }
+    }
+  }, {
+    scheduled: true,
+    timezone: 'Europe/Skopje' // Ensure the cron job uses EET timezone
+  });
+
+  console.log('Scheduled renewal reminder email at 09:00 EET every Monday.');
+}
+
 scheduleUnpaidPoliciesEmail();
+scheduleRenewalReminderEmail();
 
 
-      // // Query the database for unpaid policies
-      // const policies = await db.getDb().collection('policies').find({
-      //   policyDate: { $lte: cutoffDate },
-      //   $expr: { $lt: ['$totalPaid', '$policyAmount'] }
-      // }).toArray();
-
-      // if (policies.length === 0) {
-      //   console.log('No unpaid policies found for today.');
-      //   return;
-      // }
-
-   
-      // // Construct the email HTML content with a styled table
-      // let emailContent = `
-      //   <h2 style="color: #333333;">Листа на ненаплатени полиси</h2>
-      //   <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
-      //     <thead>
-      //       <tr style="background-color: #f2f2f2;">
-      //         <th style="text-align: left;">Број на полиса</th>
-      //         <th style="text-align: left;">Клиент</th>
-      //         <th style="text-align: left;">Премија</th>
-      //         <th style="text-align: left;">Платена премија</th>
-      //         <th style="text-align: left;">Ненаплатена премија</th>
-      //         <th style="text-align: left;">Агент</th>
-      //       </tr>
-      //     </thead>
-      //     <tbody>
-      // `;
-
-      // policies.forEach(policy => {
-      //   const totalToPay = policy.policyAmount - policy.totalPaid;
-      //   emailContent += `
-      //     <tr>
-      //       <td>${policy.policyNumber}</td>
-      //       <td>${policy.clientName}</td>
-      //       <td>${policy.policyAmount},00 денари</td>
-      //       <td>${policy.totalPaid},00 денари</td>
-      //       <td>${totalToPay},00 денари</td>
-      //       <td>${policy.agentSeller}</td>
-      //     </tr>
-      //   `;
-      // });
-
-      // emailContent += `
-      //     </tbody>
-      //   </table>
-      // `;
 ////////////////////////////////////////////////////////////////////////////////
 async function newHomeInsurance(req, res, next) {
 
