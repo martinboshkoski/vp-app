@@ -8,6 +8,10 @@
 !views/
 !public/
 
+# Always ignore specific files
+config/session.js
+data/database.js
+
 # Keep server.cert and server.key ignored
 server.cert
 server.key
