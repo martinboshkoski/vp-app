@@ -266,13 +266,36 @@ async function insertPaymentOld(req, res, next) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertLawsuitPayment(req, res, next) {
   try {
+
+    let paidCash;
+    let paymentMethodDetail;
+    
+    switch (req.body.paymentMethod) {
+      case 'paidCash1':
+        paidCash = 'paidCash';
+        paymentMethodDetail = 'Благајна - готовина';
+        break;
+      case 'paidCash2':
+        paidCash = 'paidCash';
+        paymentMethodDetail = 'Благајна - картичка';
+        break;
+      case 'bankTransfer':
+        paidCash = null; // Not considered as paidCash
+        paymentMethodDetail = 'Банкарска уплата (извод)';
+        break;
+      default:
+        throw new Error('Invalid payment method selected');
+    }
+
     const thePayment = {
       suedClientName: req.body.suedClientName,
       principal: +req.body.principal,
       interest: +req.body.interest,
       costs: +req.body.costs,
       date: moment().format("DD-MM-YYYY"),
-      paidCash: "paidCash"
+      paidCash: paidCash,
+      paymentMethodDetail:paymentMethodDetail
+      // description:req.body.description
     };
 
     const agent = await Agent.getAgentWithSameId(req.session.uid);
@@ -286,7 +309,8 @@ async function insertLawsuitPayment(req, res, next) {
       thePayment.principal, // This assumes you corrected the order of arguments in the constructor
       "Главен долг (по тужба)",
       agent.name,
-      thePayment.paidCash
+      thePayment.paidCash,
+      thePayment.paymentMethodDetail
     );
     await principalPayment.save();
 
@@ -297,7 +321,8 @@ async function insertLawsuitPayment(req, res, next) {
       thePayment.interest,
       "Законска казнена камата (по тужба)",
       agent.name,
-      thePayment.paidCash
+      thePayment.paidCash,
+      thePayment.paymentMethodDetail
     );
     await interestPayment.save();
 
@@ -308,7 +333,8 @@ async function insertLawsuitPayment(req, res, next) {
       thePayment.costs,
       "Судски трошоци (по тужба)",
       agent.name,
-      thePayment.paidCash
+      thePayment.paidCash, 
+      thePayment.paymentMethodDetail
     );
     await costsPayment.save();
 

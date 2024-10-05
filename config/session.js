@@ -5,11 +5,12 @@ function createSessionStore() {
     const MongoDBStore = mongoDbStore(expressSession);
   
     const store = new MongoDBStore({
-      uri: 'mongodb+srv://martinboshkoski:Mart1n990@cluster0.mo2jilq.mongodb.net/?retryWrites=true&w=majority',
+      // uri: 'mongodb+srv://martinboshkoski:Mart1n990@cluster0.mo2jilq.mongodb.net/?retryWrites=true&w=majority',
+      uri: 'mongodb://localhost:27017',  // Change this to use your local MongoDB
       databaseName: 'vp-clients',
       collection: 'sessions'
     });
-  
+      
     return store;
   }
 

@@ -44,40 +44,7 @@ static async findByAgent(agentSeller) {
     // })
     return agentPolicies
 }
-
-// static async findOneByPolicyNumber(policyNumber) {
-// const thePolicyNumber = policyNumber.thePolicyNumber
-//     try {
-//         const policyByNumber = await db.getDb().collection('policies').find({policyNumber:thePolicyNumber}).toArray()
-//         let thePolicyExists = true
-//         return thePolicyExists
-//     }
-//     catch (error) {
-//         error.code = 404;
-//         throw error;
-//     }
-// }
-
-// static async findById(policyId) {
-//     let thePolicyId
-//     try {
-//         thePolicyId = new mongodb.ObjectId(policyId)
-//     }
-//     catch (error) {
-//         error.code = 404;
-//         throw error;
-//     }
-
-//     const policy =  await db.getDb()
-//     .collection('policies')
-//     .findOne({_id: thePolicyId})    
-//     if (!policy) {
-//         const error = new Error(' Не може да се најде полисата')
-//         error.code = 404;
-//         throw error
-//     }
-//     return policy;
-// }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static async findById(policyId) {
     let thePolicyId;
     try {
@@ -143,12 +110,6 @@ static async countAll() {
     return policiesNumber
 }
 
-// static async totalPremium() {
-//     const totalPremium = await db.getDb().collection('policies').aggregate([{$group: {_id: null, sum_val:{$sum: "$policyAmount"}}}])
-//     return totalPremium
-// }
-//in terminal>
-// vp-clients> db.policies.aggregate([{$group: {_id: null, sum_val:{$sum: "$policyAmount"}}}])
 ///////////////////////////////////////////////////////////////////////////////////////////
     async save(policyNumber, policyType, policyAmount, installmentsNumber, policyDate, clinetPin, clientName, agentSeller, thePayment) {
         let installments = [];

@@ -23,56 +23,39 @@
         <button id="searchPaymentsBtn" class="btn">Барај</button>
       </form>
     </div>
-<form action="/lawsuit-payment" method="POST" class="quickPaymentForm">
-    <h3>Уплата по тужба </h3>
-    <h4>(во готовина)</h4>
-    <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-    <input type="text" name="suedClientName" id="" placeholder="Тужен (име и презиме)">
-    <input type="number" name="principal" id="" placeholder="Главен долг">
-    <input type="number" name="interest" id="" placeholder="Камата">
-    <input type="number" name="costs" id="" placeholder="Трошоци">
-    <button>Внеси</button>
-<!-- </form>
-</section>
-  <h3>Благајна, за подружница: <%=agentName%> </h4>
-    <h3>________________________________ </h3>
-    <div class="paymentsSection-alt" style="font-size: small;">
-      <p>Клиент:</p>
-      <p>Влез</p>
-      <p>Број на полиса / друг основ: </p>
-      <p>Забелешка</p>
-    </div>
-    <hr>    
-    <% for (const payment of payments ) { %>
-      <li>
-          <div class="paymentsSection" style="font-size: small;">
-            <p><%=payment.clientName.clientName || payment.clientName %></p>
-            <p><%= payment.paymentAmount || payment.clientName.paymentAmount%>,00 денари</p>
-            <p><%=payment.clientName.policyNumber || payment.policyNumber %></p>
-            <p>
-              <% if (payment.paidCash) { %>
-                Во готово - благајна
-              <% } else { %>
-                На сметка (извод)
-              <% } %>
-            </p>  
-          </div>
-        </li>
-       <% } %>    
-       <div class="paymentsSection-alt">
-        <p>ВКУПНО:</p>
-        <p><%=sum%>,00 денари</p>
-        <p> </p>
-        <p></p>
-      </div>
-<hr>
-<div class="paymentsSection">
-  <p>Број на прилози:</p>
-  <p></p>
-  <p>Одговорно лице на подружница (потпис)</p>
-  <p></p>
-</div>
-<button id="printBtn" onclick="printPage()" class="btn">Print</button> -->
-
+    <form action="/lawsuit-payment" method="POST" class="quickPaymentForm">
+      <h3>Уплата по тужба </h3>
+      <h4>(во готовина)</h4>
+      <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+      <input type="text" name="suedClientName" id="" placeholder="Тужен (име и презиме)">
+      <input type="number" name="principal" id="principal" placeholder="Главен долг" oninput="calculateTotal()">
+      <input type="number" name="interest" id="interest" placeholder="Камата" oninput="calculateTotal()">
+      <input type="number" name="costs" id="costs" placeholder="Трошоци" oninput="calculateTotal()">
+      <p>Вкупен износ: <span id="total">0</span> денари</p> <!-- Display the total here -->
+      <!-- <input type="text" name="description" id="" placeholder="Судски број / број на полиса/и за кој се уплаќа"> -->
+      <label for="paymentMethod"></label>
+      <select name="paymentMethod" id="paymentMethod" required style="font-size: small; width: 65%;">
+          <option value="" disabled selected>Избери метод на плаќање</option>
+          <option value="paidCash1">Благајна - готовина</option>
+          <option value="paidCash2">Благајна - со картичка</option>
+          <option value="bankTransfer">Банкарска уплата (извод)</option>
+      </select>
+      <button>Внеси</button>
+  </form>
 </main>
 <%- include('../../shared/includes/footer')%>
+
+<script>
+  function calculateTotal() {
+    // Get the input values and convert them to numbers (0 if empty or invalid)
+    let principal = parseFloat(document.getElementById('principal').value) || 0;
+    let interest = parseFloat(document.getElementById('interest').value) || 0;
+    let costs = parseFloat(document.getElementById('costs').value) || 0;
+
+    // Calculate the total
+    let total = principal + interest + costs;
+
+    // Display the total in the specified element
+    document.getElementById('total').textContent = total.toFixed(2); // Show 2 decimal places
+  }
+</script>
