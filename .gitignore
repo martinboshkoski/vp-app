@@ -11,6 +11,7 @@
 # Always ignore specific files
 config/session.js
 data/database.js
+package.json
 
 # Keep server.cert and server.key ignored
 server.cert
