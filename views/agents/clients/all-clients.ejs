@@ -13,41 +13,6 @@
     </div>
 </section>
 
-    <br>
-    <% if(locals.isAdmin) {%>
-      <table style="width: 105%; border-collapse: collapse; margin-top: 20px;">
-        <colgroup>
-            <col style="width: 25%;"> <!-- First column (35%) -->
-            <col style="width: 30%;"> <!-- Second column (65%) -->
-            <col style="width: 30%;"> <!-- Second column (65%) -->
-            <col style="width: 10%;"> <!-- Second column (65%) -->
-            <col style="width: 10%;"> <!-- Second column (65%) -->
-        </colgroup>
-        <thead>
-            <tr style="background-color: #ccc;">
-                <th style="padding: 10px; border: 1px solid #ccc;">Година</th>
-                <th style="padding: 10px; border: 1px solid #ccc;">Вкупно полисирана премија</th>
-                <th style="padding: 10px; border: 1px solid #ccc;">Вкупно наплатена премија</th>
-                <th style="padding: 10px; border: 1px solid #ccc;">Процент на наплата</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #ccc; background-color: #ccc;">Пресметки за 2023та година</td>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals23.totalPremiums23.toLocaleString('de-DE') %>,00 денари</td>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals23.totalPayments23.toLocaleString('de-DE') %>,00 денари</td>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals23.percentagePayment23 %> %</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #ccc; background-color: #ccc;">Пресметки за 2024та година</td>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals24.totalPremiums24.toLocaleString('de-DE') %>,00 денари</td>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals24.totalPayments24.toLocaleString('de-DE') %>,00 денари</td>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= totals24.percentagePayment24 %> %</td>
-            </tr>
-        </tbody>
-    </table>
- 
-        <br>
     <% }%>
     <div class="searchBar">
         <input type="text" placeholder="Пребарувај (име и презиме, ЕМБГ/ЕМБС)" id="searchBar" onkeyup="searchClients()"> 
