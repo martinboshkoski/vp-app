@@ -168,15 +168,17 @@ static async updatePolicyPayment(policyId, paymentDateOld, paymentAmountOld, pay
   }
   return result;
 }
-////////////////
-static async deletePolicyPayment(policyId, paymentDate) {
-  const paymentDateFormatted = moment(paymentDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+//////////////////
+static async deletePolicyPayment(policyId, { amount, date, paymentMethodDetail }) {
+
+  // Normalize date to 'YYYY-MM-DD' format for matching
+  const normalizedDate = moment(date, ['YYYY-MM-DD', 'DD/MM/YYYY']).format('YYYY-MM-DD');
   const result = await db.getDb().collection('policies').updateOne(
-      { _id: new mongodb.ObjectId(policyId) },
-      { $pull: { thePayment: { date: paymentDateFormatted } } }
+    { _id: new mongodb.ObjectId(policyId) },
+    { $pull: { thePayment: { amount: amount, date: normalizedDate, paymentMethodDetail: paymentMethodDetail } } }
   );
   if (result.modifiedCount === 0) {
-      throw new Error('Payment not found or not deleted in policy.');
+    throw new Error('Payment not found or not deleted in policy.');
   }
 }
 ///////////////////////////////////
@@ -218,4 +220,4 @@ static async findPoliciesByYear(year) {
   }
 }
 module.exports = Policy;
-   
+

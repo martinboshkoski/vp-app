@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,406 +18,588 @@
     <link rel="stylesheet" href="/styles/auth.css">
     <link rel="stylesheet" href="/styles/policies.css">
 </head>
+
 <body>
     <main>
-    <header id="main-header">
-        <div id="logo"> <a href="/"> ВАШ ПРИЈАТЕЛ АД</a></div>
-        <nav>
-            <ul class="nav-items">
-                <% if(locals.isAdmin) { %>
-                    <li><a href="/all-payments"> Уплати </a></li>
-                    <li><a href="/all-policies"> Полиси </a></li>
-                    <li><a href="/all-clients"> Kлиенти </a></li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropbtn">Присилна наплата</a>
-                        <div class="dropdown-content">
-                            <a href="/debt-clients">Тужени</a>
-                            <a href="/enforcement-agent">Извршител</a>
-                        </div>
-                    </li>
-            
-                    <li class="dropdown">
-                        <a href="#" class="dropbtn">Агенти</a>
-                        <div class="dropdown-content">
-                            <a href="/admin/daily-report">Агенти</a>
-                            <a href="/signup">Креирај агент</a>
-                        </div>
-                    </li>
-                <% } else if(locals.isEditor) { %>
-                    <li><a href="/all-payments"> Уплати </a></li>
-                    <li><a href="/all-policies"> Полиси </a></li>
-                    <li><a href="/all-clients"> Kлиенти </a></li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropbtn">Присилна наплата</a>
-                        <div class="dropdown-content">
-                            <a href="/debt-clients">Тужени</a>
-                            <a href="/enforcement-agent">Извршител</a>
-                        </div>
-                    </li>
-                <% } else if(locals.isAuth) { %>
-                    <li><a href="/all-policies"> Полиси </a></li>
-                <% } %>
-                
-                <% if(locals.isAuth) { %>
-                    <li>
-                        <form id="nav-form" action="/logout" method="POST">
-                            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-                            <button class="btn">Одјава</button>
-                        </form>
-                    </li>
-                <% } else { %>
-                    <li><a href="/login">Логирај се</a></li>
-                <% } %>
-            </ul>
-            
-        </nav>
-        <button id="mobile-menu-btn">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-    </header>
-<section class="updateClientMain"> 
-    <div id="updateClientInfo">
-        <h3>Клиент: <%= client.name %></h3>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <colgroup>
-                <col style="width: 48%;"> <!-- First column (35%) -->
-                <col style="width: 52%;"> <!-- Second column (65%) -->
-            </colgroup>
-            <tr>
-                <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Адреса на живеење:</th>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= client.address %></td>
-            </tr>
-            <tr>
-                <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">ЕМБГ / ЕМБС:</th>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= client.pin %></td>
-            </tr>
-            <tr>
-                <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Телефон:</th>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= client.phone %></td>
-            </tr>
-            <tr>
-                <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Вкупна премија (за сите полиси):</th>
-                <td style="padding: 10px; border: 1px solid #ccc;"><%= totalPremium.toLocaleString('de-DE') %>,00 денари</td>
-            </tr>
-            <tr>
-                <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Вкупна платена премија (за сите полиси):</th>
-                <td style="padding: 10px; border: 1px solid #ccc;">
-                    <%= (totalPaid !== undefined && totalPaid !== null && !isNaN(totalPaid) ? totalPaid.toLocaleString('de-DE') : "0") %>,00 денари
-                  </td>
-            </tr>
-            <tr>
-                <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Вкупна должна премија (за сите полиси):</th>
-                <td style="padding: 10px; border: 1px solid #ccc;">
-                    <%= (debt !== undefined && debt !== null && !isNaN(debt) ? debt.toLocaleString('de-DE') : "0") %>,00 денари
-                  </td>
-            </tr>
-        </table>
-        <p>Камата по полиси одделно:</p>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead>
-                <tr>
-                    <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Број на полиса</th>
-                    <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Камата (денари)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% interestDetailsPerPolicy.forEach(policy => { %>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ccc;"><%= policy.Број %></td>
-                    <td style="padding: 10px; border: 1px solid #ccc;"><%= policy.Камата %></td>
-                </tr>
-                <% }); %>
-            </tbody>
-        </table>
-        <% if (!client.startedLawsuit) { %> 
-        <section>
-            <form action="/debt-client/<%= client._id %>" method="POST">
-                <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-                <input type="hidden" name="clientId" value="<%= client._id %>">
-                <input type="hidden" name="clientDebt" value="<%= debt %>">
-                <% if (locals.isEditor) { %>
-                <button class="btn">За тужење</button>
-                <% } %>
-            </form>
-        </section>             
-        <% } else { %>
-        <section class="totalDebtSection">
-            <p>Клиентот е тужен на износ од <%= debt %>,00 денари (основен долг). Дополнително на основниот долг треба да бидат наплатени:</p>
-            <ul>
-                <li>Судска такса во износ од <%= courtFee %>,00 денари</li>
-                <li>Адвокатска награда во износ од <%= attorneyFee %>,00 денари</li>
-                <li>Судска такса за одлука во износ од <%= courtFeeDecision %>,00 денари</li>
-            </ul>
-            <hr>
-            <h3>Вкупно за наплата: <%= totalDebt %>,00 денари</h3>
-        </section>
-        <% } %>
-    </div>
-    
-        <% if (!client.startedLawsuit) {%> 
-        <form action="/new-policy" method="POST">
-                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-                <p>Нова полиса на Клиент/Договорувач</p>
-                <label for="pin"></label>
-                <input type="hidden" name="pin" value="<%=client.pin%>"> 
-                <label for="name"></label>
-                <input type="hidden" name="name" value="<%=client.name%>"> 
-                <hr>
-                <label for="insurancePolicy"></label>
-                <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Број на полиса" pattern="[a-zA-Z0-9]+" maxlength="21"> 
-                <label for="amount"></label>
-                <input type="number" name="amount" id="amount" placeholder="Премија по полиса" required 
-                min="1" max="500000">
-                <label for="insurancePolicyType"></label>
-                <select type="text" name="insurancePolicyType" id="insurancePolicyType" placeholder="Премија по полиса" required> 
-                    <option value="">Избери класа</option>
-                    <option id="" value="Осигурување од одговорност од употреба на моторни возила (AO)">  Осигурување од одговорност од употреба на моторни возила (AO)</option>
-                    <option id="" value="Осигурување од одговорност од употреба на моторни возила (ЗК)">  Осигурување од одговорност од употреба на моторни возила (ЗК)</option>
-                    <option id="" value="Осигурувањето на имот од пожар и природни непогоди">Осигурувањето на имот од пожар и природни непогоди</option>
-                    <option id="" value="Други осигурувања на имот"> Други осигурувања на имот</option>
-                    <option id="" value="Несреќен случај - незгода">Несреќен случај - незгода</option>
-                    <option id="" value="Здравствено осигурување">Здравствено осигурување</option>
-                    <option id="" value="Осигурување на стока во превоз (CMR)">Осигурување на стока во превоз (CMR)</option>
-                    <option id="" value="АО за странски возила (гранично осигурувања)">АО за странски возила (гранично осигурувања)</option>
-                    <option id="" value="Осигурувањето на моторни возила (каско)">Осигурувањето на моторни возила (каско)</option>
-                    <option id="" value="Општото осигурување од одговорностт">Општо осигурување од одговорност</option>
-                    <option id="" value="Осигурувањето на шински возила (каско)">Осигурувањето на шински возила (каско)</option>
-                    <option id="" value="Осигурувањето на воздухоплови (каско) ">Осигурувањето на воздухоплови (каско) </option>
-                    <option id="" value="Осигурувањето на пловни објекти (каско)">Осигурувањето на пловни објекти (каско)</option>
-                    <option id="" value="Осигурувањето од одговорност од употреба на воздухоплови">Осигурувањето од одговорност од употреба на воздухоплови</option>
-                    <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето од одговорност од употреба на пловни објекти</option>
-                    <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето од одговорност од употреба на пловни објекти</option>
-                    <option id="" value="Осигурувањето на кредити">Осигурувањето на кредити</option>
-                    <option id="" value="Осигурувањето на гаранции">Осигурувањето на гаранции</option>
-                    <option id="" value="Осигурувањето од финансиски загуби">Осигурувањето од финансиски загуби</option>
-                    <option id="" value="Осигурувањето на правна заштита">Осигурувањето на правна заштита</option>
-                    <option id="" value="Осигурувањето на туристичка помош">Осигурувањето на туристичка помош</option>
-                    <option id="" value="Осигурувањето на живот">Осигурувањето на живот</option>
-                    <option id="" value="Осигурувањето на брак или породување">Осигурувањето на брак или породување</option>
-                    <option id="" value="Осигурувањето на живот во врска со удели во инвестициони фондови">Осигурувањето на живот во врска со удели во инвестициони фондови </option>
-                    <option id="" value="Осигурувањето на тонтина (здружение на рентиери)">Осигурувањето на тонтина (здружение на рентиери)</option>
-                    <option id="" value="Осигурувањето на средства за исплата">Осигурувањето на средства за исплата</option>
-                </select>    
-                <label for="registrationNumber"></label>
-                <input type="text" name="registrationNumber" id="registrationNumber" placeholder="Број на регистрација" pattern="[a-zA-Z0-9]+"> 
-                <label for="insurancePolicyDate"></label>
-                <input type="date" name="insurancePolicyDate" id="insurancePolicyDate" placeholder="Датум на полиса"> 
-                <label for="installmentsNumber"></label>
-                <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати" max="12"> 
-                <hr>
-                <select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач"> 
-                    <option value="">Избери агент</option>
-                    <option value="БРАЦО ДООЕЛ">БРАЦО ДООЕЛ</option>
-                    <option value="Борче ЕУРОАГЕНТ">Борче ЕУРОАГЕНТ</option>
-                    <option value="БОШКОСКИ">БОШКОСКИ</option>
-                    <option value="----"> -----------------Агенти под Канцеларија Кузман Јосифоски Питу---------------</option>
-                    <option value="Васе Стефаноска">Васе Стефаноска</option>
-                    <option value="Пеце Мицакоски">Пеце Мицакоски</option>
-                    <option value="Ана Марија Димоска">Ана Марија Димоска</option>
-                    <option value="Дејан Петровски">Дејан Петровски</option>
-                    <option value="Лумјан Крензи"> Лумјан Крензи </option>
-                    <option value="Билјана Мирческа"> Билјана Мирческа </option>
-                    <option value="Александра Цуцулоска"> Александра Цуцулоска</option>
-                    <option value="Владимир Ѓорѓимајкоски">Владимир Ѓорѓимајкоски</option>
-                    <option value="Анита Бошева">Анита Бошева</option>
-                    <option value="Далиборка Башеска Јорданоска">Далиборка Башеска Јорданоска</option>
-                    <option value="Ненад Митиќ">Ненад Митиќ</option>
-                    <option value="Оливер Бузлески">Оливер Бузлески</option>
-                    <option value="Слаѓана Николоска">Слаѓана Николоска</option>
-                    <option value="Маре Петреска">Маре Петреска</option>
-                    <option value="Денис Трајчески">Денис Трајчески</option>
-                    <option value="Виктор Митрески">Виктор Митрески</option>
-                    <option value="Владимир Мандароски">Владимир Мандароски</option>
-                    <option value="Бране Јованоски">Бране Јованоски</option>
-                    <option value="СН Брокер">СН Брокер</option>
-                    <option value="----"> -----------------Агенти под Канцеларија Димо Наредникот---------------</option>
-                    <option value="Ана Видеска">Ана Видеска</option>
-                    <option value="Нури Мустафа">Нури Мустафа</option>
-                    <option value="Дино Ташкоски">Дино Ташкоски</option>
-                    <option value="Алмир Хаjро">Алмир Хаjро</option>
-                    <option value="Џеват Дајтоски">Џеват Дајтоски</option>
-                    <option value="Фатмир Демоски">Фатмир Демоски</option>
-                    <option value="Филип Трајкоски">Филип Трајкоски</option>
-                    <option value="Коле Јовески">Коле Јовески</option>
-                    <option value="Мартин Димоски">Мартин Димоски</option>
-                    <option value="Борче Јосифоски">Борче Јосифоски</option>
-                    <option value="Недзми Јусуфи">Недзми Јусуфи</option>
-                    <option value="АЛМА БЕЈЗ">АЛМА БЕЈЗ</option>
-                    <option value="Севџан Османоски">Севџан Османоски</option>
-                    <option value="Изабела Цуцулоска">Изабела Цуцулоска</option>
-                </select> 
-                <% if (locals.isEditor) {%>
-                <button class="btn" <% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса </button>
-                <% } else {%>
-                    <button style="display: none;"<% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса </button>
-                    <% } %>
-        </form>
-        <%}%>
-    </section>
+        <header id="main-header">
+            <div id="logo"> <a href="/"> ВАШ ПРИЈАТЕЛ АД</a></div>
+            <nav>
+                <ul class="nav-items">
+                    <% if(locals.isAdmin) { %>
+                        <li><a href="/all-payments"> Уплати </a></li>
+                        <li><a href="/all-policies"> Полиси </a></li>
+                        <li><a href="/all-clients"> Kлиенти </a></li>
 
-<!------------------------------------------------------------------------------------------------------------------------------------------------------------------>
-<section class="allPolicies">
-    <% for (const policy of clientPolicies) { %>
-    <section class="single-policy">
-        <div>
-            <h3 id="policy-title">Број на полиса: <%=policy.policyNumber.policyNumber%></h3>
-            <p style="font-size: small; margin: 0.25rem; padding: 0.25rem;"><%=policy.policyNumber.policyType%></p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
-                <tr>
-                  <th style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">Премија:</th>
-                  <td style="padding: 4px; border: 1px solid #ccc; width: 50%;"><%=policy.policyNumber.policyAmount.toLocaleString('de-DE')%>,00 денари</td>
-                </tr>
-                <tr>
-                  <th style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">Датум на издавање:</th>
-                  <td style="padding: 4px; border: 1px solid #ccc; width: 50%;"><%=moment(policy.policyNumber.policyDate).format('DD/MM/YYYY')%> година</td>
-                </tr>
-                <!-- <tr>
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Присилна наплата</a>
+                            <div class="dropdown-content">
+                                <a href="/debt-clients">Тужени</a>
+                                <a href="/enforcement-agent">Извршител</a>
+                            </div>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropbtn">Агенти</a>
+                            <div class="dropdown-content">
+                                <a href="/admin/daily-report">Агенти</a>
+                                <a href="/signup">Креирај агент</a>
+                            </div>
+                        </li>
+                        <% } else if(locals.isEditor) { %>
+                            <li><a href="/all-payments"> Уплати </a></li>
+                            <li><a href="/all-policies"> Полиси </a></li>
+                            <li><a href="/all-clients"> Kлиенти </a></li>
+
+                            <li class="dropdown">
+                                <a href="#" class="dropbtn">Присилна наплата</a>
+                                <div class="dropdown-content">
+                                    <a href="/debt-clients">Тужени</a>
+                                    <a href="/enforcement-agent">Извршител</a>
+                                </div>
+                            </li>
+                            <% } else if(locals.isAuth) { %>
+                                <li><a href="/all-policies"> Полиси </a></li>
+                                <% } %>
+
+                                    <% if(locals.isAuth) { %>
+                                        <li>
+                                            <form id="nav-form" action="/logout" method="POST">
+                                                <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                                                <button class="btn">Одјава</button>
+                                            </form>
+                                        </li>
+                                        <% } else { %>
+                                            <li><a href="/login">Логирај се</a></li>
+                                            <% } %>
+                </ul>
+
+            </nav>
+            <button id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </header>
+        <section class="updateClientMain">
+            <div id="updateClientInfo">
+                <h3>Клиент: <%= client.name %>
+                </h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <colgroup>
+                        <col style="width: 48%;"> <!-- First column (35%) -->
+                        <col style="width: 52%;"> <!-- Second column (65%) -->
+                    </colgroup>
+                    <tr>
+                        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Адреса на живеење:</th>
+                        <td style="padding: 10px; border: 1px solid #ccc;">
+                            <%= client.address %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">ЕМБГ / ЕМБС:</th>
+                        <td style="padding: 10px; border: 1px solid #ccc;">
+                            <%= client.pin %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Телефон:</th>
+                        <td style="padding: 10px; border: 1px solid #ccc;">
+                            <%= client.phone %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Вкупна премија (за сите
+                            полиси):</th>
+                        <td style="padding: 10px; border: 1px solid #ccc;">
+                            <%= totalPremium.toLocaleString('de-DE') %>,00 денари
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Вкупна платена премија (за
+                            сите полиси):</th>
+                        <td style="padding: 10px; border: 1px solid #ccc;">
+                            <%= (totalPaid !==undefined && totalPaid !==null && !isNaN(totalPaid) ?
+                                totalPaid.toLocaleString('de-DE') : "0" ) %>,00 денари
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Вкупна должна премија (за
+                            сите полиси):</th>
+                        <td style="padding: 10px; border: 1px solid #ccc;">
+                            <%= (debt !==undefined && debt !==null && !isNaN(debt) ? debt.toLocaleString('de-DE') : "0"
+                                ) %>,00 денари
+                        </td>
+                    </tr>
+                </table>
+                <p>Камата по полиси одделно:</p>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Број на полиса</th>
+                            <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Камата (денари)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% interestDetailsPerPolicy.forEach(policy=> { %>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ccc;">
+                                    <%= policy.Број %>
+                                </td>
+                                <td style="padding: 10px; border: 1px solid #ccc;">
+                                    <%= policy.Камата %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+                <% if (!client.startedLawsuit) { %>
+                    <section>
+                        <form action="/debt-client/<%= client._id %>" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                            <input type="hidden" name="clientId" value="<%= client._id %>">
+                            <input type="hidden" name="clientDebt" value="<%= debt %>">
+                            <% if (locals.isEditor) { %>
+                                <button class="btn">За тужење</button>
+                                <% } %>
+                        </form>
+                    </section>
+                    <% } else { %>
+                        <section class="totalDebtSection">
+                            <p>Клиентот е тужен на износ од <%= debt %>,00 денари (основен долг). Дополнително на
+                                    основниот долг треба да бидат наплатени:</p>
+                            <ul>
+                                <li>Судска такса во износ од <%= courtFee %>,00 денари</li>
+                                <li>Адвокатска награда во износ од <%= attorneyFee %>,00 денари</li>
+                                <li>Судска такса за одлука во износ од <%= courtFeeDecision %>,00 денари</li>
+                            </ul>
+                            <hr>
+                            <h3>Вкупно за наплата: <%= totalDebt %>,00 денари</h3>
+                        </section>
+                        <% } %>
+            </div>
+
+            <% if (!client.startedLawsuit) {%>
+                <form action="/new-policy" method="POST">
+                    <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                    <p>Нова полиса на Клиент/Договорувач</p>
+                    <label for="pin"></label>
+                    <input type="hidden" name="pin" value="<%=client.pin%>">
+                    <label for="name"></label>
+                    <input type="hidden" name="name" value="<%=client.name%>">
+                    <hr>
+                    <label for="insurancePolicy"></label>
+                    <input type="text" name="insurancePolicy" id="insurancePolicy" placeholder="Број на полиса"
+                        pattern="[a-zA-Z0-9]+" maxlength="21">
+                    <label for="amount"></label>
+                    <input type="number" name="amount" id="amount" placeholder="Премија по полиса" required min="1"
+                        max="500000">
+                    <label for="insurancePolicyType"></label>
+                    <select type="text" name="insurancePolicyType" id="insurancePolicyType"
+                        placeholder="Премија по полиса" required>
+                        <option value="">Избери класа</option>
+                        <option id="" value="Осигурување од одговорност од употреба на моторни возила (AO)"> Осигурување
+                            од одговорност од употреба на моторни возила (AO)</option>
+                        <option id="" value="Осигурување од одговорност од употреба на моторни возила (ЗК)"> Осигурување
+                            од одговорност од употреба на моторни возила (ЗК)</option>
+                        <option id="" value="Осигурувањето на имот од пожар и природни непогоди">Осигурувањето на имот
+                            од пожар и природни непогоди</option>
+                        <option id="" value="Други осигурувања на имот"> Други осигурувања на имот</option>
+                        <option id="" value="Несреќен случај - незгода">Несреќен случај - незгода</option>
+                        <option id="" value="Здравствено осигурување">Здравствено осигурување</option>
+                        <option id="" value="Осигурување на стока во превоз (CMR)">Осигурување на стока во превоз (CMR)
+                        </option>
+                        <option id="" value="АО за странски возила (гранично осигурувања)">АО за странски возила
+                            (гранично осигурувања)</option>
+                        <option id="" value="Осигурувањето на моторни возила (каско)">Осигурувањето на моторни возила
+                            (каско)</option>
+                        <option id="" value="Општото осигурување од одговорностт">Општо осигурување од одговорност
+                        </option>
+                        <option id="" value="Осигурувањето на шински возила (каско)">Осигурувањето на шински возила
+                            (каско)</option>
+                        <option id="" value="Осигурувањето на воздухоплови (каско) ">Осигурувањето на воздухоплови
+                            (каско) </option>
+                        <option id="" value="Осигурувањето на пловни објекти (каско)">Осигурувањето на пловни објекти
+                            (каско)</option>
+                        <option id="" value="Осигурувањето од одговорност од употреба на воздухоплови">Осигурувањето од
+                            одговорност од употреба на воздухоплови</option>
+                        <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето
+                            од одговорност од употреба на пловни објекти</option>
+                        <option id="" value="Осигурувањето од одговорност од употреба на пловни објектит">Осигурувањето
+                            од одговорност од употреба на пловни објекти</option>
+                        <option id="" value="Осигурувањето на кредити">Осигурувањето на кредити</option>
+                        <option id="" value="Осигурувањето на гаранции">Осигурувањето на гаранции</option>
+                        <option id="" value="Осигурувањето од финансиски загуби">Осигурувањето од финансиски загуби
+                        </option>
+                        <option id="" value="Осигурувањето на правна заштита">Осигурувањето на правна заштита</option>
+                        <option id="" value="Осигурувањето на туристичка помош">Осигурувањето на туристичка помош
+                        </option>
+                        <option id="" value="Осигурувањето на живот">Осигурувањето на живот</option>
+                        <option id="" value="Осигурувањето на брак или породување">Осигурувањето на брак или породување
+                        </option>
+                        <option id="" value="Осигурувањето на живот во врска со удели во инвестициони фондови">
+                            Осигурувањето на живот во врска со удели во инвестициони фондови </option>
+                        <option id="" value="Осигурувањето на тонтина (здружение на рентиери)">Осигурувањето на тонтина
+                            (здружение на рентиери)</option>
+                        <option id="" value="Осигурувањето на средства за исплата">Осигурувањето на средства за исплата
+                        </option>
+                    </select>
+                    <label for="registrationNumber"></label>
+                    <input type="text" name="registrationNumber" id="registrationNumber"
+                        placeholder="Број на регистрација" pattern="[a-zA-Z0-9]+">
+                    <label for="insurancePolicyDate"></label>
+                    <input type="date" name="insurancePolicyDate" id="insurancePolicyDate"
+                        placeholder="Датум на полиса">
+                    <label for="installmentsNumber"></label>
+                    <input type="number" name="installmentsNumber" id="installmentsNumber" placeholder="Број на рати"
+                        max="12">
+                    <hr>
+                    <select type="text" name="agentSeller" id="agentSeller" placeholder="Агент - продавач">
+                        <option value="">Избери агент</option>
+                        <option value="БРАЦО ДООЕЛ">БРАЦО ДООЕЛ</option>
+                        <option value="Борче ЕУРОАГЕНТ">Борче ЕУРОАГЕНТ</option>
+                        <option value="БОШКОСКИ">БОШКОСКИ</option>
+                        <option value="----"> -----------------Агенти под Канцеларија Кузман Јосифоски
+                            Питу---------------</option>
+                        <option value="Васе Стефаноска">Васе Стефаноска</option>
+                        <option value="Пеце Мицакоски">Пеце Мицакоски</option>
+                        <option value="Ана Марија Димоска">Ана Марија Димоска</option>
+                        <option value="Дејан Петровски">Дејан Петровски</option>
+                        <option value="Лумјан Крензи"> Лумјан Крензи </option>
+                        <option value="Билјана Мирческа"> Билјана Мирческа </option>
+                        <option value="Александра Цуцулоска"> Александра Цуцулоска</option>
+                        <option value="Владимир Ѓорѓимајкоски">Владимир Ѓорѓимајкоски</option>
+                        <option value="Анита Бошева">Анита Бошева</option>
+                        <option value="Далиборка Башеска Јорданоска">Далиборка Башеска Јорданоска</option>
+                        <option value="Ненад Митиќ">Ненад Митиќ</option>
+                        <option value="Оливер Бузлески">Оливер Бузлески</option>
+                        <option value="Слаѓана Николоска">Слаѓана Николоска</option>
+                        <option value="Маре Петреска">Маре Петреска</option>
+                        <option value="Денис Трајчески">Денис Трајчески</option>
+                        <option value="Виктор Митрески">Виктор Митрески</option>
+                        <option value="Владимир Мандароски">Владимир Мандароски</option>
+                        <option value="Бране Јованоски">Бране Јованоски</option>
+                        <option value="СН Брокер">СН Брокер</option>
+                        <option value="----"> -----------------Агенти под Канцеларија Димо Наредникот---------------
+                        </option>
+                        <option value="Ана Видеска">Ана Видеска</option>
+                        <option value="Нури Мустафа">Нури Мустафа</option>
+                        <option value="Дино Ташкоски">Дино Ташкоски</option>
+                        <option value="Алмир Хаjро">Алмир Хаjро</option>
+                        <option value="Џеват Дајтоски">Џеват Дајтоски</option>
+                        <option value="Фатмир Демоски">Фатмир Демоски</option>
+                        <option value="Филип Трајкоски">Филип Трајкоски</option>
+                        <option value="Коле Јовески">Коле Јовески</option>
+                        <option value="Мартин Димоски">Мартин Димоски</option>
+                        <option value="Борче Јосифоски">Борче Јосифоски</option>
+                        <option value="Недзми Јусуфи">Недзми Јусуфи</option>
+                        <option value="АЛМА БЕЈЗ">АЛМА БЕЈЗ</option>
+                        <option value="Севџан Османоски">Севџан Османоски</option>
+                        <option value="Изабела Цуцулоска">Изабела Цуцулоска</option>
+                    </select>
+                    <% if (locals.isEditor) {%>
+                        <button class="btn" <% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси полиса
+                        </button>
+                        <% } else {%>
+                            <button style="display: none;" <% if (client.startedLawsuit) { %> id="policyBtn"<%}%>> Внеси
+                                    полиса </button>
+                            <% } %>
+                </form>
+                <%}%>
+        </section>
+
+        <!------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+        <section class="allPolicies">
+            <% for (const policy of clientPolicies) { %>
+                <section class="single-policy">
+                    <div>
+                        <h3 id="policy-title">Број на полиса: <%=policy.policyNumber.policyNumber%>
+                        </h3>
+                        <p style="font-size: small; margin: 0.25rem; padding: 0.25rem;">
+                            <%=policy.policyNumber.policyType%>
+                        </p>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+                            <tr>
+                                <th
+                                    style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">
+                                    Премија:</th>
+                                <td style="padding: 4px; border: 1px solid #ccc; width: 50%;">
+                                    <%=policy.policyNumber.policyAmount.toLocaleString('de-DE')%>,00 денари</td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">
+                                    Датум на издавање:</th>
+                                <td style="padding: 4px; border: 1px solid #ccc; width: 50%;">
+                                    <%=moment(policy.policyNumber.policyDate).format('DD /MM/YYYY')%> година
+                                </td>
+                            </tr>
+                            <!-- <tr>
                   <th style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">Број на рати:</th>
                   <td style="padding: 4px; border: 1px solid #ccc; width: 50%;"><%=policy.policyNumber.installmentsNumber%></td>
                 </tr> -->
-                <tr>
-                  <th style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">Вкупно платено:</th>
-                  <td style="padding: 4px; border: 1px solid #ccc; width: 50%;"><%= policy.policyNumber.totalPaid ? policy.policyNumber.totalPaid.toLocaleString('de-DE') : '0'%>,00 денари</td>
-                </tr>
-                <tr>
-                  <th style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">Агент/Продавач:</th>
-                  <td style="padding: 4px; border: 1px solid #ccc; width: 50%;"><%=policy.policyNumber.agentSeller%></td>
-                </tr>
-                <tr>
-                  <th style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">Преостанато за плаќање:</th>
-                  <td class="debtParagraph" data-debt="<%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>" style="padding: 4px; border: 1px solid #ccc; width: 50%; font-weight: bold; color: red;"><%= policy.policyNumber.policyAmount - (isNaN(policy.policyNumber.totalPaid) ? 0 : policy.policyNumber.totalPaid) %>,00 денари</td>
-                </tr>
-              </table>
-              
-            <h4>Уплати по полиса:</h4>
-            <section id="single-payments">
-                <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
-                  <thead>
-                    <tr>
-                      <th style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">Износ</th>
-                      <th style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">Датум</th>
-                      <th style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">Примени од</th>
-                      <% if(locals.isAdmin) { %>
-                      <th style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">Дејства</th>
-                      <% } %>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% for (const payment of policy.policyNumber.thePayment) { %>
-                    <tr>
-                      <td style="padding: 4px; border: 1px solid #ccc;"><%= payment.amount.toLocaleString('de-DE') %>,00 денари</td>
-                      <td style="padding: 4px; border: 1px solid #ccc;"><%= moment(payment.date).format('DD/MM/YYYY') %></td>
-                      <td style="padding: 4px; border: 1px solid #ccc; font-size: small;"><%= payment.agent %></td>
-                      <% if(locals.isAdmin) { %>
-                      <td style="padding: 4px; border: 1px solid #ccc;">
-                        <form class="change-payment" method="POST" action="/edit-payment" style="display: inline;">
-                          <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-                          <input type="hidden" name="pin" value="<%=client.pin%>">
-                          <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
-                          <input type="hidden" name="paymentId" value="<%=payment.id%>">
-                          <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
-                          <input type="hidden" name="paymentDateOld" value="<%=moment(payment.date).format('DD/MM/YYYY')%>">
-                          <input type="hidden" name="paymentAmountOld" value="<%=payment.amount%>">
-                          <input type="hidden" name="paidCash" value="<%=payment.paidCash%>">
-                          <input type="text" name="paymentAmount" value="<%=payment.amount%>" style="width: 80px; margin-bottom: 4px;">
-                          <input type="text" name="paymentDate" value="<%=moment(payment.date).format('DD/MM/YYYY')%>" style="width: 100px; margin-bottom: 4px;">
-                          <button type="submit" style="padding: 0px; margin-right: 20px;">Измени уплата</button>
-                        </form>
-                        <form method="POST" action="/delete-payment" style="display: inline;">
-                          <input type="hidden" name="policyId" value="<%= policy.policyNumber._id %>">
-                          <input type="hidden" name="pin" value="<%=client.pin%>">
-                          <input type="hidden" name="paymentDate" value="<%= moment(payment.date).format('DD/MM/YYYY') %>">
-                          <input type="hidden" name="paymentAmount" value="<%=payment.amount%>">
-                          <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-                          <button type="submit" style="padding: 0px;">Избриши уплата</button>
-                        </form>
-                      </td>
-                      <% } %>
-                    </tr>
-                    <% } %>
-                  </tbody>
-                </table>
-              </section>
-              
-            <hr>
-            <form action="/new-payment" method="POST" id="payment-form">
-                <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-                <input type="hidden" name="policyId" value="<%=policy.policyNumber._id %>"> 
-                <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber %>"> 
-                <input type="hidden" name="agentSeller" value="<%=policy.policyNumber.agentSeller %>"> 
-                <input type="hidden" name="pin" value="<%= client.pin %>"> 
-                <input type="hidden" name="clientName" value="<%= client.name %>"> 
-                <input type="hidden" name="agentName" value="<%= agentName %>"> 
-                <div class="policyPayment" style="font-size: smaller;">
-                    <input type="number" name="payment" id="payment" placeholder="Износ (без децимали)" style="font-size: smaller;" required> 
-                    <label for="paymentMethod"></label>
-                    <select name="paymentMethod" id="paymentMethod" required style="font-size: small;">
-                        <option value="" disabled selected>Избери метод на плаќање</option>
-                        <option value="paidCash1">Благајна - готовина</option>
-                        <option value="paidCash2">Благајна - со картичка</option>
-                        <option value="bankTransfer">Банкарска уплата (извод)</option>
-                    </select>
-                    <% if (locals.isEditor) { %>
-                    <button class="btn" id="paymentBtn" style="font-size: smaller; margin-left: 8px;"> Внеси уплата </button>
-                    <% } else { %>
-                    <button style="display: none;" id="paymentBtn"> Внеси уплата </button>
-                    <% } %>
-                </div>
-            </form>
-                </div>
-                <div class="policy-documents">
-                <% if (policy.policyNumber.installmentsNumber > 1) { %>
-                <form action="/annex/<%=client._id%>" method="POST">
-                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-                <input type="hidden" name="clientId" value="<%=client._id%>">
-                <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
-                <input type="hidden" name="thePolicy" value="<%=policy.policyNumber.clientPin%>">
-                <button class="btn"> Анекс </button>
+                            <tr>
+                                <th
+                                    style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">
+                                    Вкупно платено:</th>
+                                <td style="padding: 4px; border: 1px solid #ccc; width: 50%;">
+                                    <%= policy.policyNumber.totalPaid ?
+                                        policy.policyNumber.totalPaid.toLocaleString('de-DE') : '0' %>,00 денари
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">
+                                    Агент/Продавач:</th>
+                                <td style="padding: 4px; border: 1px solid #ccc; width: 50%;">
+                                    <%=policy.policyNumber.agentSeller%>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    style="padding: 4px; border: 1px solid #ccc; text-align: left; background-color: #f2f2f2; width: 50%;">
+                                    Преостанато за плаќање:</th>
+                                <td class="debtParagraph"
+                                    data-debt="<%=policy.policyNumber.policyAmount - policy.policyNumber.totalPaid%>"
+                                    style="padding: 4px; border: 1px solid #ccc; width: 50%; font-weight: bold; color: red;">
+                                    <%= policy.policyNumber.policyAmount - (isNaN(policy.policyNumber.totalPaid) ? 0 :
+                                        policy.policyNumber.totalPaid) %>,00 денари
+                                </td>
+                            </tr>
+                        </table>
+                        <% // Discount button logic %>
+                            <% const unpaid=policy.policyNumber.policyAmount - (isNaN(policy.policyNumber.totalPaid) ? 0
+                                : policy.policyNumber.totalPaid); const maxDiscount=0.2 *
+            policy.policyNumber.policyAmount; if (unpaid> 0 && unpaid <= maxDiscount) { %>
+                <button type="button" class="btn btn-discount" onclick="showDiscountModal('<%= policy.policyNumber.policyNumber %>')">Затвори со попуст</button>
+                <form id="discountForm-<%= policy.policyNumber.policyNumber %>" action="/close-with-discount" method="POST" style="display:none;">
+                    <input type="hidden" name="policyNumber"
+                        value="<%= policy.policyNumber.policyNumber %>">
+                    <input type="hidden" name="policyId" value="<%= policy.policyNumber._id %>">
+                    <input type="hidden" name="policyAmount"
+                        value="<%= policy.policyNumber.policyAmount %>">
+                    <input type="hidden" name="totalPaid"
+                        value="<%= policy.policyNumber.totalPaid %>">
+                    <input type="hidden" name="clientId" value="<%= client._id %>">
+                    <input type="hidden" name="clientName" value="<%= client.name %>">
+                    <input type="hidden" name="clientPin" value="<%= client.pin %>">
+                    <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
                 </form>
                 <% } %>
-                </div>
-                <% if(locals.isAdmin) { %>
-                <form action="/agents/clients/deletePolicy" method="POST">
-                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-                <input type="hidden" name="clientId" value="<%=client._id%>">
-                <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
-                <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
-                <button class="btn"> Избриши полиса </button>
-                </form>
-                <% } %>
-<!-- 
+    <!-- Discount Confirmation Modal -->
+    <div id="discountModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
+      <div style="background:#fff; padding:2rem; border-radius:8px; max-width:400px; margin:auto; text-align:center;">
+        <h3>Дали сте сигурни дека сакате да ја затворите полисата со попуст?</h3>
+        <p>Доколку попустот не е претходно одобрен, кликнете „не“. Доколку изберете „да“, попустот ќе биде заведен во неделниот извештај за дадени попусти.</p>
+        <div style="margin-top:1.5rem;">
+          <button id="discountYesBtn" class="btn" style="margin-right:10px;">Да</button>
+          <button id="discountNoBtn" class="btn-alt">Не</button>
+        </div>
+      </div>
+    </div>
+                                        <h4>Уплати по полиса:</h4>
+                                        <section id="single-payments">
+                                            <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th
+                                                            style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">
+                                                            Износ</th>
+                                                        <th
+                                                            style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">
+                                                            Датум</th>
+                                                        <th
+                                                            style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">
+                                                            Примени од</th>
+                                                        <th
+                                                            style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">
+                                                            Метод</th>
+                                                        <% if(locals.isAdmin) { %>
+                                                            <th
+                                                                style="padding: 4px; border: 1px solid #ccc; background-color: #f2f2f2; text-align: left;">
+                                                                Дејства</th>
+                                                            <% } %>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% for (const payment of policy.policyNumber.thePayment) { %>
+                                                        <tr>
+                                                            <td style="padding: 4px; border: 1px solid #ccc;">
+                                                                <%= payment.amount.toLocaleString('de-DE') %>,00 денари
+                                                            </td>
+                                                            <td style="padding: 4px; border: 1px solid #ccc;">
+                                                                <%= moment(payment.date).format('DD/MM/YYYY') %>
+                                                            </td>
+                                                            <td
+                                                                style="padding: 4px; border: 1px solid #ccc; font-size: small;">
+                                                                <%= payment.agent %>
+                                                            </td>
+                                                            <td style="padding: 4px; border: 1px solid #ccc; font-size: small;">
+                                                                <% if(payment.paymentMethodDetail === 'discount' || payment.paymentMethodDetail === 'Попуст') { %>
+                                                                    Попуст
+                                                                <% } else if(payment.paymentMethodDetail) { %>
+                                                                    <%= payment.paymentMethodDetail %>
+                                                                <% } else { %>
+                                                                    -
+                                                                <% } %>
+                                                            </td>
+                                                            <% if(locals.isAdmin) { %>
+                                                                <td style="padding: 4px; border: 1px solid #ccc;">
+                                                                    <form class="change-payment" method="POST"
+                                                                        action="/edit-payment" style="display: inline;">
+                                                                        <input type="hidden" name="_csrf"
+                                                                            value="<%=locals.csrfToken%>">
+                                                                        <input type="hidden" name="pin"
+                                                                            value="<%=client.pin%>">
+                                                                        <input type="hidden" name="policyId"
+                                                                            value="<%=policy.policyNumber._id%>">
+                                                                        <input type="hidden" name="paymentId"
+                                                                            value="<%=payment.id%>">
+                                                                        <input type="hidden" name="policyNumber"
+                                                                            value="<%=policy.policyNumber.policyNumber%>">
+                                                                        <input type="hidden" name="paymentDateOld"
+                                                                            value="<%=moment(payment.date).format('DD/MM/YYYY')%>">
+                                                                        <input type="hidden" name="paymentAmountOld"
+                                                                            value="<%=payment.amount%>">
+                                                                        <input type="hidden" name="paidCash"
+                                                                            value="<%=payment.paidCash%>">
+                                                                        <input type="text" name="paymentAmount"
+                                                                            value="<%=payment.amount%>"
+                                                                            style="width: 80px; margin-bottom: 4px;">
+                                                                        <input type="text" name="paymentDate"
+                                                                            value="<%=moment(payment.date).format('DD/MM/YYYY')%>"
+                                                                            style="width: 100px; margin-bottom: 4px;">
+                                                                        <button type="submit"
+                                                                            style="padding: 0px; margin-right: 20px;">Измени
+                                                                            уплата</button>
+                                                                    </form>
+                                                                    <form method="POST" action="/delete-payment"
+                                                                        style="display: inline;">
+                                                                        <input type="hidden" name="policyId"
+                                                                            value="<%= policy.policyNumber._id %>">
+                                                                        <input type="hidden" name="pin"
+                                                                            value="<%=client.pin%>">
+                                                                        <input type="hidden" name="paymentAmount"
+                                                                            value="<%= payment.amount %>">
+                                                                        <input type="hidden" name="paymentDate"
+                                                                            value="<%= moment(payment.date).format('DD/MM/YYYY') %>">
+                                                                        <input type="hidden" name="paymentMethodDetail"
+                                                                            value="<%= payment.paymentMethodDetail %>">
+                                                                        <input type="hidden" name="_csrf"
+                                                                            value="<%= locals.csrfToken %>">
+                                                                        <button type="submit"
+                                                                            style="padding: 0px;">Избриши
+                                                                            уплата</button>
+                                                                    </form>
+                                                                </td>
+                                                                <% } %>
+                                                        </tr>
+                                                        <% } %>
+                                                </tbody>
+                                            </table>
+                                        </section>
+
+                                        <hr>
+                                        <form action="/new-payment" method="POST" id="payment-form">
+                                            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                                            <input type="hidden" name="policyId" value="<%=policy.policyNumber._id %>">
+                                            <input type="hidden" name="policyNumber"
+                                                value="<%=policy.policyNumber.policyNumber %>">
+                                            <input type="hidden" name="agentSeller"
+                                                value="<%=policy.policyNumber.agentSeller %>">
+                                            <input type="hidden" name="pin" value="<%= client.pin %>">
+                                            <input type="hidden" name="clientName" value="<%= client.name %>">
+                                            <input type="hidden" name="agentName" value="<%= agentName %>">
+                                            <div class="policyPayment" style="font-size: smaller;">
+                                                <input type="number" name="payment" id="payment"
+                                                    placeholder="Износ (без децимали)" style="font-size: smaller;"
+                                                    required>
+                                                <label for="paymentMethod"></label>
+                                                <select name="paymentMethod" id="paymentMethod" required
+                                                    style="font-size: small;">
+                                                    <option value="" disabled selected>Избери метод на плаќање</option>
+                                                    <option value="paidCash1">Благајна - готовина</option>
+                                                    <option value="paidCash2">Благајна - со картичка</option>
+                                                    <option value="bankTransfer">Банкарска уплата (извод)</option>
+                                                </select>
+                                                <% if (locals.isEditor) { %>
+                                                    <button class="btn" id="paymentBtn"
+                                                        style="font-size: smaller; margin-left: 8px;"> Внеси уплата
+                                                    </button>
+                                                    <% } else { %>
+                                                        <button style="display: none;" id="paymentBtn"> Внеси уплата
+                                                        </button>
+                                                        <% } %>
+                                            </div>
+                                        </form>
+                    </div>
+                    <div class="policy-documents">
+                        <% if (policy.policyNumber.installmentsNumber> 1) { %>
+                            <form action="/annex/<%=client._id%>" method="POST">
+                                <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                                <input type="hidden" name="clientId" value="<%=client._id%>">
+                                <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
+                                <input type="hidden" name="thePolicy" value="<%=policy.policyNumber.clientPin%>">
+                                <button class="btn"> Анекс </button>
+                            </form>
+                            <% } %>
+                    </div>
+                    <% if(locals.isAdmin) { %>
+                        <form action="/agents/clients/deletePolicy" method="POST">
+                            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                            <input type="hidden" name="clientId" value="<%=client._id%>">
+                            <input type="hidden" name="policyId" value="<%=policy.policyNumber._id%>">
+                            <input type="hidden" name="policyNumber" value="<%=policy.policyNumber.policyNumber%>">
+                            <button class="btn"> Избриши полиса </button>
+                        </form>
+                        <% } %>
+                            <!-- 
 <% if(locals.isAdmin) { %>
 
     <% } %> -->
-    </section>
-    <% } %>
-</section>
-<!------------------------------------------------------------------------------------------------------------------------------------------------------------------>
-<% if(locals.isAdmin) {%>
-   <hr>
-    <section>
-       <div>
-        <form action="/agents/clients/delete/<%=client._id%>" method="POST">
-            <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
-            <input type="hidden" name="theClientId" value="<%=client._id%>">
-            <input type="hidden" name="theClientName" value="<%=client.name%>">
+                </section>
+                <% } %>
+        </section>
+        <!------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+        <% if(locals.isAdmin) {%>
+            <hr>
+            <section>
+                <div>
+                    <form action="/agents/clients/delete/<%=client._id%>" method="POST">
+                        <input type="hidden" name="_csrf" value="<%=locals.csrfToken%>">
+                        <input type="hidden" name="theClientId" value="<%=client._id%>">
+                        <input type="hidden" name="theClientName" value="<%=client.name%>">
 
-            <button value="<%= client._id%>"data-clientid="<%= client._id%>" data-csrf="<%=locals.csrfToken%>" class="btn-alt">Избриши клиент</button>
-        </form>
+                        <button value="<%= client._id%>" data-clientid="<%= client._id%>"
+                            data-csrf="<%=locals.csrfToken%>" class="btn-alt">Избриши клиент</button>
+                    </form>
+                </div>
+                <section class="delete-client-section">
+                </section>
+            </section>
+            <% }%>
+    </main>
+    <hr>
+
+    <div class="footer-div">
+        <p>ВАШ ПРИЈАТЕЛ АД Прилеп</p>
     </div>
-    <section class="delete-client-section">
-    </section>
-    </section>
-    <% }%> 
-</main>
-<hr>
-
-<div class="footer-div"> 
-    <p>ВАШ ПРИЈАТЕЛ АД Прилеп</p>
-</div>
 </body>
+    <script>
+      let discountFormId = null;
+      function showDiscountModal(formId) {
+        discountFormId = 'discountForm-' + formId;
+        document.getElementById('discountModal').style.display = 'flex';
+      }
+      document.getElementById('discountYesBtn').onclick = function() {
+        if (discountFormId) {
+          document.getElementById(discountFormId).submit();
+        }
+        document.getElementById('discountModal').style.display = 'none';
+      };
+      document.getElementById('discountNoBtn').onclick = function() {
+        document.getElementById('discountModal').style.display = 'none';
+        discountFormId = null;
+      };
+    </script>
+
 </html>

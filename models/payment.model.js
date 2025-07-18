@@ -116,22 +116,70 @@ static async updatePayment(paymentDateOld, paymentAmount, paymentDate, paidCash,
   return result;
 }
 /////////
-static async deletePayment(paymentDate, policyNumber) {
+static async deletePayment({ policyNumber, amount, date, paymentMethodDetail }) {
+  // Match payment by policyNumber, amount, date, and paymentMethodDetail
   const result = await db.getDb().collection('payments').deleteOne({
-    date: paymentDate, // Assuming the date is stored as a string in 'DD/MM/YYYY' format
-    policyNumber: policyNumber
+    policyNumber,
+    paymentAmount: amount,
+    date,
+    paymentMethodDetail
   });
-  
   if (result.deletedCount === 0) {
-      throw new Error('Payment not found or not deleted.');
+    throw new Error('Payment not found or not deleted.');
   }
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static async findPaymentsByPolicyNumbers(policyNumbers) {
   return db.getDb().collection('payments').find({
     policyNumber: { $in: policyNumbers }
   }).toArray();
 }
+static async closeWithDiscount({ policyNumber, policyId, policyAmount, totalPaid, clientName, clientPin, agentName }) {
+  const moment = require('moment');
+  const db = require('../data/database');
 
+  const unpaid = policyAmount - totalPaid;
+  const maxDiscount = 0.2 * policyAmount;
+  if (unpaid <= 0 || unpaid > maxDiscount) {
+    throw new Error("Discount not allowed.");
+  }
+
+  // 1. Add to policies
+  const discountPaymentObj = {
+    amount: unpaid,
+    agentCommision: 0,
+    agent: agentName,
+    date: moment().format("YYYY-MM-DD"),
+    paidCash: false,
+    paymentMethodDetail: "discount"
+  };
+  await db.getDb().collection("policies").updateOne(
+    { policyNumber },
+    {
+      $push: { thePayment: discountPaymentObj },
+      $set: { totalPaid: Number(policyAmount) }
+    }
+  );
+
+  // 2. Add to payments
+  await db.getDb().collection("payments").insertOne({
+    clientName,
+    clientPin,
+    policyNumber,
+    paymentAmount: unpaid,
+    agentName,
+    date: moment().format('DD/MM/YYYY'),
+    paymentMethodDetail: "discount"
+  });
+
+  // 3. Add to discounts
+  await db.getDb().collection("discounts").insertOne({
+    policyNumber,
+    discountAmount: unpaid,
+    agent: agentName,
+    date: moment().format("YYYY-MM-DD")
+  });
+}
 }
 
 module.exports = Payment;

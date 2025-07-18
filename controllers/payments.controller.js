@@ -76,11 +76,9 @@ async function generatePerDate(req, res, next) {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function insertPayment(req, res, next) {
-
   try {
     const policy = await Policy.findById(req.body.policyId);
     const policyNumber = req.body.policyNumber;
-
     let agentCommision;
     if (policy.policyAmount > +req.body.payment) {
       agentCommision = +req.body.payment * 0.15;
@@ -88,11 +86,9 @@ async function insertPayment(req, res, next) {
     if (policy.policyAmount === +req.body.payment) {
       agentCommision = +req.body.payment * 0.20;
     }
-
     // Determine paidCash and additional element based on paymentMethod
     let paidCash;
     let paymentMethodDetail;
-    
     switch (req.body.paymentMethod) {
       case 'paidCash1':
         paidCash = 'paidCash';
@@ -109,16 +105,17 @@ async function insertPayment(req, res, next) {
       default:
         throw new Error('Invalid payment method selected');
     }
-
+    // Add unique id to the payment
+    const paymentObjectId = new mongodb.ObjectId();
     const thePayment = {
+      id: paymentObjectId.toString(), // Always store as string
       amount: +req.body.payment,
       agentCommision: Math.round(agentCommision),
       agent: req.body.agentName,
       date: moment().format("YYYY-MM-DD"),
       paidCash: paidCash,
-      paymentMethodDetail: paymentMethodDetail  // Storing the payment method detail in the document
+      paymentMethodDetail: paymentMethodDetail
     };
-
     await db.getDb().collection("policies").updateOne(
       { policyNumber: policyNumber },
       { $push: { thePayment: thePayment } }
@@ -181,18 +178,15 @@ async function insertPaymentOld(req, res, next) {
     const policy = await Policy.findById(req.body.policyId);
     const policyNumber = req.body.policyNumber;
     const agentName = req.body.paymentPlace;
-
     let agentCommision;
     if (policy.policyAmount > +req.body.payment) {
       agentCommision = +req.body.payment * 0.15;
     } else if (policy.policyAmount === +req.body.payment) {
       agentCommision = +req.body.payment * 0.20;
     }
-
     // Determine paidCash and additional element based on paymentMethod
     let paidCash;
     let paymentMethodDetail;
-
     switch (req.body.paymentMethod) {
       case 'paidCash1':
         paidCash = 'paidCash';
@@ -209,14 +203,16 @@ async function insertPaymentOld(req, res, next) {
       default:
         throw new Error('Invalid payment method selected');
     }
-
+    // Add unique id to the payment
+    const paymentObjectId = new mongodb.ObjectId();
     const thePayment = {
+      id: paymentObjectId.toString(), // Always store as string
       amount: +req.body.payment,
       agentCommision: Math.round(agentCommision),
       agentName: agentName,
-      date: moment().format("YYYY-MM-DD"),  // Ensuring the correct date format
+      date: moment().format("YYYY-MM-DD"),
       paidCash: paidCash,
-      paymentMethodDetail: paymentMethodDetail  // Storing the payment method detail in the document
+      paymentMethodDetail: paymentMethodDetail
     };
 
     // Update the policy with the new payment
@@ -409,47 +405,80 @@ async function editPayment(req, res, next) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function deletePayment(req, res, next) {
-  const { policyId, paymentDate, paymentAmount } = req.body;
-
-  const policy = await Policy.findById(req.body.policyId);
+  const { policyId, paymentAmount, paymentDate, paymentMethodDetail, pin } = req.body;
+  const policy = await Policy.findById(policyId);
   const policyNumber = policy.policyNumber;
 
   try {
-    const allPayments = policy.thePayment;
-    let totalPaymentAmounts = [];
-    for (singlePayment of allPayments) {
-      totalPaymentAmounts.push(+singlePayment.amount);
+    // Delete payment from payments and policy collections using amount, date, and paymentMethodDetail
+    await Payment.deletePayment({
+      policyNumber,
+      amount: Number(paymentAmount),
+      date: paymentDate,
+      paymentMethodDetail
+    });
+    await Policy.deletePolicyPayment(policyId, {
+      amount: Number(paymentAmount),
+      date: paymentDate,
+      paymentMethodDetail
+    });
+    // If payment was a discount, also delete from discounts collection//
+    if (paymentMethodDetail === 'discount' || paymentMethodDetail === 'Попуст') {
+      const normalizedDate = moment(paymentDate, ['YYYY-MM-DD', 'DD/MM/YYYY']).format('YYYY-MM-DD');
+      await db.getDb().collection('discounts').deleteOne({
+        policyNumber,
+        discountAmount: Number(paymentAmount),
+        date: normalizedDate
+      });
     }
-    let totalPaid = totalPaymentAmounts.reduce(function (x, y) {
-      return x + y;
-    }, 0);
-
-    const finalResult = +totalPaid - +paymentAmount;
+    // Fetch updated policy to get the latest thePayment array
+    const updatedPolicy = await Policy.findById(policyId);
+    const allPayments = updatedPolicy.thePayment || [];
+    let totalPaid = 0;
+    for (const singlePayment of allPayments) {
+      totalPaid += Number(singlePayment.amount);
+    }
+    // Update totalPaid in the policy document
     await db
       .getDb()
       .collection("policies")
       .updateOne(
         { policyNumber: policyNumber },
-        { $set: { totalPaid: finalResult } }
-      ); //this needs to go into the model
-
-
-      await Payment.deletePayment(paymentDate, policyNumber);
-      await Policy.deletePolicyPayment(policyId, paymentDate);
-
-      // Redirect to the client page
-      const clientPin = req.body.pin;
-      const clientThroughPayment = await Payment.findByPin(clientPin.toString());
-      if (!clientThroughPayment) {
-          throw new Error('Client not found through payment');
-      }
-
-      const objectId = clientThroughPayment._id;
-      const theClientPage = "/agents/clients/" + objectId;
-      res.redirect(theClientPage);
+        { $set: { totalPaid: totalPaid } }
+      );
+    // Redirect to the client page
+    const clientThroughPayment = await Payment.findByPin(pin.toString());
+    if (!clientThroughPayment) {
+      throw new Error('Client not found through payment');
+    }
+    const objectId = clientThroughPayment._id;
+    const theClientPage = "/agents/clients/" + objectId;
+    res.redirect(theClientPage);
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'An error occurred while deleting the payment' });
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while deleting the payment' });
+  }
+}
+
+async function closeWithDiscount(req, res, next) {
+  try {
+    const { policyNumber, policyId, policyAmount, totalPaid, clientName, clientPin, clientId } = req.body;
+    const agent = await Agent.getAgentWithSameId(req.session.uid);
+    const agentName = agent.name;
+
+    await Payment.closeWithDiscount({
+      policyNumber,
+      policyId,
+      policyAmount: Number(policyAmount),
+      totalPaid: Number(totalPaid),
+      clientName,
+      clientPin,
+      agentName
+    });
+
+    res.redirect("/agents/clients/" + clientId);
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -461,6 +490,7 @@ module.exports = {
   generatePerDate: generatePerDate,
   getByDate: getByDate,
   editPayment:editPayment, 
-  deletePayment:deletePayment
+  deletePayment:deletePayment,
+  closeWithDiscount: closeWithDiscount,
 };
 

@@ -594,8 +594,6 @@ function scheduleUnpaidPoliciesEmail() {
     scheduled: true,
     timezone: 'Europe/Skopje' // Ensure the cron job uses EET timezone
   });
-
-  console.log('Scheduled unpaid policies email at 18:30 EET daily.');
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -696,13 +694,95 @@ function scheduleRenewalReminderEmail() {
     scheduled: true,
     timezone: 'Europe/Skopje' // Ensure the cron job uses EET timezone
   });
+}
 
-  console.log('Scheduled renewal reminder email at 09:00 EET every Monday.');
+function scheduleWeeklyDiscountsEmail() {
+  // Cron expression for 16:00 every Friday
+  const cronExpression = '0 16 * * 5'; // Every Friday at 16:00
+
+  cron.schedule(cronExpression, async () => {
+    try {
+      const timezone = 'Europe/Skopje';
+      // Get start and end of current week (Monday to Friday)
+      const startOfWeek = moment().tz(timezone).startOf('isoWeek').format('YYYY-MM-DD');
+      const endOfWeek = moment().tz(timezone).endOf('isoWeek').format('YYYY-MM-DD');
+
+      // Find discounts from this week
+      const discounts = await db.getDb().collection('discounts').find({
+        date: { $gte: startOfWeek, $lte: endOfWeek }
+      }).toArray();
+
+      if (discounts.length === 0) {
+        console.log('No discounts found for this week.');
+        return;
+      }
+
+      // Calculate total discount amount
+      let totalDiscount = 0;
+      let emailContent = `
+        <h2 style="color: #333333;">Листа на одобрени попусти за оваа недела</h2>
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="text-align: left;">#</th>
+              <th style="text-align: left;">Број на полиса</th>
+              <th style="text-align: left;">Износ на попуст</th>
+              <th style="text-align: left;">Агент</th>
+              <th style="text-align: left;">Датум</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      discounts.forEach((discount, index) => {
+        totalDiscount += discount.discountAmount || 0;
+        emailContent += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${discount.policyNumber}</td>
+            <td>${discount.discountAmount},00 денари</td>
+            <td>${discount.agent || '-'}</td>
+            <td>${discount.date}</td>
+          </tr>
+        `;
+      });
+
+      // Add total row
+      emailContent += `
+            <tr>
+              <td colspan="2" style="text-align: right;"><strong>Вкупно одобрени попусти:</strong></td>
+              <td colspan="3"><strong>${totalDiscount},00 денари</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      const todayDate = moment().format('DD.MM.YYYY');
+      const msg = {
+        to: 'info@vashprijatel.mk',
+        bcc: recipients.filter(email => email !== 'info@vashprijatel.mk'),
+        from: 'online@vashprijatel.mk',
+        subject: `Извештај за одобрени попусти - ВАШ ПРИЈАТЕЛ АД Прилеп - датум: ${todayDate}`,
+        html: emailContent,
+      };
+
+      await sgMail.send(msg);
+      console.log('Weekly discounts email sent successfully.');
+    } catch (error) {
+      console.error('Error sending weekly discounts email:', error);
+      if (error.response && error.response.body && error.response.body.errors) {
+        console.error('SendGrid errors:', error.response.body.errors);
+      }
+    }
+  }, {
+    scheduled: true,
+    timezone: 'Europe/Skopje'
+  });
 }
 
 scheduleUnpaidPoliciesEmail();
 scheduleRenewalReminderEmail();
-
+scheduleWeeklyDiscountsEmail();
 
 ////////////////////////////////////////////////////////////////////////////////
 async function newHomeInsurance(req, res, next) {
