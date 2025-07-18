@@ -173,10 +173,16 @@ static async closeWithDiscount({ policyNumber, policyId, policyAmount, totalPaid
   });
 
   // 3. Add to discounts
+  // Find the policy to get agentSeller and clientName
+  const policyDoc = await db.getDb().collection("policies").findOne({ policyNumber });
+  const agentSeller = policyDoc ? policyDoc.agentSeller : null;
+  const policyClientName = policyDoc ? policyDoc.clientName : null;
   await db.getDb().collection("discounts").insertOne({
     policyNumber,
     discountAmount: unpaid,
     agent: agentName,
+    agentSeller,
+    clientName: policyClientName,
     date: moment().format("YYYY-MM-DD")
   });
 }
