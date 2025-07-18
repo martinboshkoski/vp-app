@@ -19,6 +19,9 @@ router.get('/new-payment', function(req, res){
     res.render('agents/payment/new-payment')
 })
 router.post('/edit-payment', paymentsController.editPayment)
+
+router.post('/edit-payment', paymentsController.editPayment)
+router.post('/delete-payment', paymentsController.deletePayment);
 router.post('/delete-payment', paymentsController.deletePayment);
 router.post('/new-payment', paymentsController.insertPayment)
 router.post('/new-payment-old', paymentsController.insertPaymentOld)
@@ -30,6 +33,7 @@ router.get('/all-payments', paymentsController.getPayments)
 router.post('/lawsuit-payment', paymentsController.insertLawsuitPayment)
 router.post('/payments-per-date', paymentsController.generatePerDate)
 router.post('/get-by-date', paymentsController.getByDate)
+router.post('/close-with-discount', paymentsController.closeWithDiscount)
 
 //to be finished/idea or other
 // router.post('/dailyPaymentsReport', paymentsController.generatePaymentsReport)
