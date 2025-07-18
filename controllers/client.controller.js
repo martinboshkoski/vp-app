@@ -728,6 +728,8 @@ function scheduleWeeklyDiscountsEmail() {
               <th style="text-align: left;">Број на полиса</th>
               <th style="text-align: left;">Износ на попуст</th>
               <th style="text-align: left;">Агент</th>
+              <th style="text-align: left;">Agent Seller</th>
+              <th style="text-align: left;">Client Name</th>
               <th style="text-align: left;">Датум</th>
             </tr>
           </thead>
@@ -742,6 +744,8 @@ function scheduleWeeklyDiscountsEmail() {
             <td>${discount.policyNumber}</td>
             <td>${discount.discountAmount},00 денари</td>
             <td>${discount.agent || '-'}</td>
+            <td>${discount.agentSeller || '-'}</td>
+            <td>${discount.clientName || '-'}</td>
             <td>${discount.date}</td>
           </tr>
         `;
@@ -750,8 +754,8 @@ function scheduleWeeklyDiscountsEmail() {
       // Add total row
       emailContent += `
             <tr>
-              <td colspan="2" style="text-align: right;"><strong>Вкупно одобрени попусти:</strong></td>
-              <td colspan="3"><strong>${totalDiscount},00 денари</strong></td>
+              <td colspan="3" style="text-align: right;"><strong>Вкупно одобрени попусти:</strong></td>
+              <td colspan="4"><strong>${totalDiscount},00 денари</strong></td>
             </tr>
           </tbody>
         </table>
